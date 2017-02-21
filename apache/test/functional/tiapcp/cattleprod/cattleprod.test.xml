@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapcp.cattleprod" default="usage">
+  <description>
+    functional tiapcp cattleprod tests.
+
+    @testlogic.group  type="working" values="false"  
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="winFIPS"  values="false"
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapcp.cattleprod.dir" file="${ant.file.tiapcp.cattleprod}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapcp.cattleprod.dir}/../tiapcp-test-base.xml" />
+
+  <target name="suite">
+    <description>
+       Cattleprod tests - verify basic OHS functionality
+       This test is run as part of MATS.
+    </description>
+
+    <!-- tiapcp01 -->
+    <antcall target="01"/>
+    <antcall target="01_ssl"/>
+
+    <!-- tiapcp02 -->
+<!--
+    <antcall target="02"/>
+    <antcall target="02_ssl"/>
+-->
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="01">
+  <description>
+     tiapcp01
+  </description>
+    <property name="tstName" value="tiapcp_cattleprod_01"/>
+    <property name="url1"    value="/cgi-bin/cattleprod/testcgiCookie1.cgi"/>
+    <property name="url2"    value="/cgi-bin/cattleprod/testcgiCookie2.cgi?test=submit"/>
+
+    <antcall target="pingOHS">
+      <param name="out.log"  value="${tstName}_a.log"/>
+      <param name="ohs.name" value="cp1"/>
+      <param name="url"      value="${url1}"/>
+    </antcall>
+    <antcall target="pingOHS">
+      <param name="out.log"  value="${tstName}_b.log"/>
+      <param name="ohs.name" value="cp1"/>
+      <param name="url"      value="${url2}"/>
+    </antcall>
+  </target> 
+
+ <!-- =================================================== -->
+  <target name="01_ssl">
+  <description>
+     tiapcp01_ssl
+  </description>
+    <property name="tstName" value="tiapcp_cattleprod_01_ssl"/>
+    <property name="url1"    value="/cgi-bin/cattleprod/testcgiCookie1.cgi"/>
+    <property name="url2"    value="/cgi-bin/cattleprod/testcgiCookie2.cgi?test=submit"/>
+
+    <antcall target="pingOHS_ssl">
+      <param name="out.log"  value="${tstName}_a.log"/>
+      <param name="ohs.name" value="cp1"/>
+      <param name="url"      value="${url1}"/>
+    </antcall>
+    <antcall target="pingOHS_ssl">
+      <param name="out.log"  value="${tstName}_b.log"/>
+      <param name="ohs.name" value="cp1"/>
+      <param name="url"      value="${url2}"/>
+    </antcall>
+  </target>
+
+ <!-- =================================================== -->
+  <target name="02">
+  <description>
+     tiapcp02
+  </description>
+    <property name="tstName" value="tiapcp_cattleprod_02"/>
+    <property name="ohsName" value="cp1"/>
+
+    <!-- Pull in OHS ports from ports-ohsName.txt -->
+    <property name="port.file" value="${twork.dir}/ports-${ohsName}.txt"/>
+    <loadproperties srcFile="${port.file}"/>
+
+    <!-- Set URL -->
+    <property name="url1" value="/cgi-bin/cattleprod/testcgiMeta1.cgi"/>
+    <property name="url2" value="/cgi-bin/cattleprod/testcgiMeta2.cgi"/>
+    <property name="ping1" value="http://${ADMIN_HOST}:${APACHE_PORT}${url1}"/>
+    <property name="ping2" value="http://${ADMIN_HOST}:${APACHE_PORT}${url2}"/>
+
+    <!-- First ping -->
+    <trycatch property="pingOutput">
+    <try>
+      <http-url-connection
+        target="${ping1}"
+        checkmode="RESPONSE_CODE, RESPONSE_STRING"
+        connectionmode="POST">
+        <requestheader name="url"
+            value="http://${ADMIN_HOST}:${APACHE_PORT}/cgi-bin/cattleprod/testcgiMeta3.cgi/phony_path_info"/>
+        <requestheader name="Content-Type" value="text/html \n"/>
+        <requestheader name="Referer"
+            value="http://apacheserver.athome.com/cgi-bin/phonydata"/>
+        <requestheader name="Content-Length" value="41"/>
+
+        <expectedresponsecode>200</expectedresponsecode>
+        <expectedstring regexp="true">
+.*test PASSED.*
+        </expectedstring>
+      </http-url-connection>
+    </try>
+    <catch>
+      <antcall target="failOut">
+         <param name="outFile"     value="${tstName}_a.log"/>
+         <param name="pingUrl"     value="${ping1}"/>
+         <param name="fileContent" value="${pingOutput}"/>
+      </antcall>
+    </catch>
+    </trycatch>
+
+   <!-- Second ping -->
+    <trycatch property="pingOutput">
+    <try>
+      <http-url-connection
+        target="${ping2}"
+        checkmode="RESPONSE_CODE, RESPONSE_STRING"
+        connectionmode="POST">
+        <requestheader name="url"
+            value="cgi-bin/cattleprod/testcgiMeta3.cgi/phony_path_info"/>
+        <requestheader name="Content-Type" value="text/html \n"/>
+        <requestheader name="Referer"
+            value="http://apacheserver.athome.com/cgi-bin/phonydata"/>
+        <requestheader name="Content-Length" value="41"/>
+        <requestparam name="test"      value="submit"/>
+        <requestparam name="passfail1" value="PASS"/>
+
+        <expectedresponsecode>200</expectedresponsecode>
+        <expectedstring regexp="true">
+.*test PASSED.*
+        </expectedstring>
+      </http-url-connection>
+    </try>
+    <catch>
+      <antcall target="failOut">
+         <param name="outFile"     value="${tstName}_b.log"/>
+         <param name="pingUrl"     value="${ping2}"/>
+         <param name="fileContent" value="${pingOutput}"/>
+      </antcall>
+    </catch>
+    </trycatch>
+  </target>
+
+ <!-- =================================================== -->
+  <target name="02_ssl">
+  <description>
+     tiapcp02_ssl
+  </description>
+
+  </target>
+
+ <!-- =================================================== -->
+ <target name="failOut">
+ <description>
+   Generic fail for POST http_url_connection targets
+   Params:
+
+     ${outFile}     - output file for T_WORK
+     ${pingURL}     - ping command that was used
+     ${fileContent} - return info from http_url_connection
+ </description>
+      <property name="errMsg" value="ERROR:  Response code or expected string is
+ not as expected."/>
+     <echo file="${twork.dir}/${outFile}">
+${errMsg}
+========================
+${pingURL}
+========================
+${fileContent}
+     </echo>
+     <fail message="${errMsg}"/>
+ </target>
+
+</project>

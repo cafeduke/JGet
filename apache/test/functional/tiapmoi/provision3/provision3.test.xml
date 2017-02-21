@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapmoi.provision3" default="usage">
+  <description>
+    functional tiapmoi provision3 tests.
+
+    @testlogic.group  type="working" values="true"
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="winFIPS" values="false"
+
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapmoi.provision3.dir" file="${ant.file.tiapmoi.provision3}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapmoi.provision3.dir}/../tiapmoi-test-base.xml" />
+
+  <!-- =================================================== -->
+  <!-- prepare -->
+  <!-- =================================================== -->
+
+  <target name="prepare" >
+  <description>
+     Remove any old logfiles lingering in T_WORK
+  </description>
+    <firsttimeonly>
+     <delete>
+        <fileset dir="${twork.dir}" includes="tiapmoi_provision3*"/>
+     </delete>
+    </firsttimeonly>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- unprepare -->
+  <!-- =================================================== -->
+  <target name="unprepare" >
+  <description>
+     Recreate the ohs1 instance as it is expected by other tests
+  </description>
+     <trycatch>
+     <try>
+     <antcall target="createOHS">
+        <param name="out.log" value="tiapmoi_provision3_unprepare.log"/>
+        <param name="ohs.name" value="ohs1"/>
+     </antcall>
+     </try>
+     </trycatch>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- suite -->
+  <!-- =================================================== -->
+
+  <target name="suite">
+    <description>
+       Provision3 tests.
+       Create an instance and remove it immediately without starting.
+       Verify all filesets.  All of the following should be permitted:
+    </description>
+  
+    <!-- Create new instance with reused name - custom cmd -->
+    <antcall target="custom1"/>
+
+    <!-- Create new instance with reused name - older WLST cmds -->
+    <antcall target="wlst1"/>
+
+    <!-- Create new instance with unique name - custom cmd -->
+    <antcall target="custom2"/>  
+    
+    <!-- Create new instance with unique name - older WLST cmds --> 
+    <antcall target="wlst2"/>
+  
+  </target>
+
+  <!-- =================================================== -->
+  <!-- custom1 -->
+  <!-- =================================================== -->
+  <target name="custom1">
+  <description>
+     Custom commands, reused name
+     Create-delete using instance name that has previously existed
+     in the environment.
+  </description>
+
+     <property name="tstName" value="tiapmoi_provision3_custom1"/> 
+
+     <!-- Create instance -->
+     <antcall target="createOHS">
+        <param name="out.log"  value="${tstName}_crt.out"/>
+        <param name="ohs.name" value="ohs1"/>
+     </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file" value="${tstName}_crt.out"/>
+      <param name="out.file" value="${tstName}_crt.log"/>
+    </antcall>
+
+    <!-- Remove the instance -->
+    <antcall target="deleteOHS">
+      <param name="out.log"  value="${tstName}_del.out"/>
+      <param name="ohs.name" value="ohs1"/>
+    </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file"  value="${tstName}_del.out"/>
+      <param name="out.file" value="${tstName}_del.log"/>
+    </antcall>
+
+    <!-- Verify all filesets removed on deletion -->
+    <property name="ohsMaster"  value="${ohsConfDir}/ohs1"/>
+    <property name="ohsRuntime" value="${ohsConfDir}/instances/ohs1"/>
+    <property name="ohsLogs"    value="${ohsLogDir}/ohs1"/>
+    <property name="ohsNM"      value="${nmLogDir}/ohs1"/>
+
+    <assertTrue message="Directory ${ohsMaster} still exists post-deletion">
+      <not> <available file="${ohsMaster}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsRuntime} still exists post-deletion">
+      <not> <available file="${ohsRuntime}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsLogs} still exists post-deletion">
+      <not> <available file="${ohsLogs}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsNM} still exists post-deletion" >
+      <not> <available file="${ohsNM}" type="dir"/> </not>
+    </assertTrue>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- wlst1 -->
+  <!-- =================================================== -->
+  <target name="wlst1">
+  <description>
+  </description>
+
+     <property name="tstName" value="tiapmoi_provision3_wlst1"/>
+
+     <!-- Create instance -->
+     <antcall target="createOHS">
+        <param name="out.log"  value="${tstName}_crt.out"/>
+        <param name="ohs.name" value="ohs1"/>
+        <param name="old.way"  value="1"/>
+     </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file" value="${tstName}_crt.out"/>
+      <param name="out.file" value="${tstName}_crt.log"/>
+    </antcall>
+
+    <!-- Check the state - should be SHUTDOWN -->
+    <antcall target="chkState">
+      <param name="ohsName" value="ohs1"/>
+      <param name="expected" value="SHUTDOWN"/>
+      <param name="outfile" value="${tstName}_state.log"/>
+    </antcall>
+
+    <!-- Remove the instance -->
+    <antcall target="deleteOHS">
+      <param name="out.log"  value="${tstName}_del.out"/>
+      <param name="ohs.name" value="ohs1"/>
+      <param name="old.way"  value="1"/>
+    </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file"  value="${tstName}_del.out"/>
+      <param name="out.file" value="${tstName}_del.log"/>
+    </antcall>
+
+    <!-- Verify all filesets removed on deletion -->
+    <property name="ohsMaster"  value="${ohsConfDir}/ohs1"/>
+    <property name="ohsRuntime" value="${ohsConfDir}/instances/ohs1"/>
+    <property name="ohsLogs"    value="${ohsLogDir}/ohs1"/>
+    <property name="ohsNM"      value="${nmLogDir}/ohs1"/>
+
+    <assertTrue message="Directory ${ohsMaster} still exists post-deletion">
+      <not> <available file="${ohsMaster}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsRuntime} still exists post-deletion">
+      <not> <available file="${ohsRuntime}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsLogs} still exists post-deletion">
+      <not> <available file="${ohsLogs}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsNM} still exists post-deletion" >
+      <not> <available file="${ohsNM}" type="dir"/> </not>
+    </assertTrue>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- custom2 -->
+  <!-- =================================================== -->
+  <target name="custom2">
+  <description>
+  </description>
+
+    <property name="tstName" value="tiapmoi_provision3_custom2"/>
+    <property name="ohsName" value="provision3c"/>
+
+    <!-- Create instance -->
+    <antcall target="createOHS">
+       <param name="out.log"  value="${tstName}_crt.out"/>
+       <param name="ohs.name" value="${ohsName}"/>
+    </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file" value="${tstName}_crt.out"/>
+      <param name="out.file" value="${tstName}_crt.log"/>
+    </antcall>
+
+    <!-- Remove the instance -->
+    <antcall target="deleteOHS">
+      <param name="out.log"  value="${tstName}_del.out"/>
+      <param name="ohs.name" value="${ohsName}"/>
+    </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file"  value="${tstName}_del.out"/>
+      <param name="out.file" value="${tstName}_del.log"/>
+    </antcall>
+
+    <!-- Verify all filesets removed on deletion -->
+    <property name="ohsMaster"  value="${ohsConfDir}/${ohsName}"/>
+    <property name="ohsRuntime" value="${ohsConfDir}/instances/${ohsName}"/>
+    <property name="ohsLogs"    value="${ohsLogDir}/${ohsName}"/>
+    <property name="ohsNM"      value="${nmLogDir}/${ohsName}"/>
+
+    <assertTrue message="Directory ${ohsMaster} still exists post-deletion">
+      <not> <available file="${ohsMaster}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsRuntime} still exists post-deletion">
+      <not> <available file="${ohsRuntime}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsLogs} still exists post-deletion">
+      <not> <available file="${ohsLogs}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsNM} still exists post-deletion" >
+      <not> <available file="${ohsNM}" type="dir"/> </not>
+    </assertTrue>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- wlst2 -->
+  <!-- =================================================== -->
+  <target name="wlst2">
+  <description>
+  </description>
+
+     <property name="tstName" value="tiapmoi_provision3_wlst2"/>
+     <property name="ohsName" value="provision3d"/>
+
+     <!-- Create instance -->
+     <antcall target="createOHS">
+        <param name="out.log"  value="${tstName}_crt.out"/>
+        <param name="ohs.name" value="${ohsName}"/>
+        <param name="old.way"  value="1"/>
+     </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file" value="${tstName}_crt.out"/>
+      <param name="out.file" value="${tstName}_crt.log"/>
+    </antcall>
+
+    <!-- Check the state - should be SHUTDOWN -->
+    <antcall target="chkState">
+      <param name="ohsName" value="${ohsName}"/>
+      <param name="expected" value="SHUTDOWN"/>
+      <param name="outfile" value="${tstName}_state.log"/>
+    </antcall>
+
+    <!-- Remove the instance -->
+    <antcall target="deleteOHS">
+      <param name="out.log"  value="${tstName}_del.out"/>
+      <param name="ohs.name" value="${ohsName}"/>
+      <param name="old.way"  value="1"/>
+    </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file"  value="${tstName}_del.out"/>
+      <param name="out.file" value="${tstName}_del.log"/>
+    </antcall>
+
+    <!-- Verify all filesets removed on deletion -->
+    <property name="ohsMaster"  value="${ohsConfDir}/${ohsName}"/>
+    <property name="ohsRuntime" value="${ohsConfDir}/instances/${ohsName}"/>
+    <property name="ohsLogs"    value="${ohsLogDir}/${ohsName}"/>
+    <property name="ohsNM"      value="${nmLogDir}/${ohsName}"/>
+
+    <assertTrue message="Directory ${ohsMaster} still exists post-deletion">
+      <not> <available file="${ohsMaster}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsRuntime} still exists post-deletion">
+      <not> <available file="${ohsRuntime}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsLogs} still exists post-deletion">
+      <not> <available file="${ohsLogs}" type="dir"/> </not>
+    </assertTrue>
+    <assertTrue message="Directory ${ohsNM} still exists post-deletion" >
+      <not> <available file="${ohsNM}" type="dir"/> </not>
+    </assertTrue>
+
+  </target>
+
+</project>
+
+ 

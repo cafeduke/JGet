@@ -1,0 +1,30 @@
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee">
+   <display-name>tiapwt (Waiter) stress test</display-name>
+
+   <description>
+      Set of servlet stress tests.
+   </description> 
+
+   <!-- Single threaded stress test -->
+   <servlet>
+      <servlet-name>ServletStressSingle</servlet-name>
+      <servlet-class>ServletStressSingle</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+      <servlet-name>ServletStressSingle</servlet-name>
+      <url-pattern>/servlet/ServletStressSingle</url-pattern>
+   </servlet-mapping>
+
+   <!-- Multi-threaded stress test -->
+   <servlet>
+      <servlet-name>ServletStressMulti</servlet-name>
+      <servlet-class>ServletStressMulti</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+      <servlet-name>ServletStressMulti</servlet-name>
+      <url-pattern>/servlet/ServletStressMulti</url-pattern>
+   </servlet-mapping>
+
+</web-app>

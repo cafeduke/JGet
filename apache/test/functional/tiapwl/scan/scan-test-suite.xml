@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="functional.tiapwl.scan.test.suite">
+  <description>
+    scan test suite in tiapwl team.
+
+    Edit this file to control feature test suite
+
+  </description>
+
+  <!-- ADDED-BY-SEED location of this file -->
+  <dirname property="functional.tiapwl.scan.test.suite.dir" 
+           file="${ant.file.functional.tiapwl.scan.test.suite}" />
+
+  <!-- ADDED-BY-SEED Id of test suite -->
+  <property name="suiteid" value="functional.tiapwl.scan.suite" />
+
+  <!-- ADDED-BY-SEED Id of property set that is passed to test files -->
+  <property name="suite.propertysetid" 
+            value="functional.tiapwl.scan.suite.propertysetid"/>
+
+  <!-- ADDED-BY-SEED feature test xml files -->
+  <projects id="functional.tiapwl.scan.suite">
+    <path>
+      <fileset dir="${functional.tiapwl.scan.test.suite.dir}">
+        <include name="**/*.test.xml"/>
+      </fileset>
+    </path>
+  </projects>
+
+  <!-- ADDED-BY-SEED Properties that are passed to test xml files that makeup
+                     above suite -->
+  <propertyset id="functional.tiapwl.scan.suite.propertysetid">
+    <propertyref builtin="commandline" />
+  </propertyset>
+
+</project>

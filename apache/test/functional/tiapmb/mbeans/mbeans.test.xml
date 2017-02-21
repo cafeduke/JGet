@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapmb.mbeans" default="usage">
+  <description>
+    functional tiapmb mbeans tests.
+
+    @testlogic.group  type="working" values="true"  
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="winFIPS"  values="false"
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapmb.mbeans.dir" file="${ant.file.tiapmb.mbeans}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapmb.mbeans.dir}/../tiapmb-test-base.xml" />
+
+  <target name="suite">
+    <description>
+       MBeans tests - verify MBeans OHS functionality
+    </description>
+
+    <!-- tiapmb -->
+        <antcall target="01"/>
+        <antcall target="02"/>
+	<antcall target="03"/> 
+	<antcall target="04"/>
+	<antcall target="05"/>
+	<antcall target="06"/> 
+	<antcall target="07"/>
+	<antcall target="08"/>
+	<antcall target="09"/> 
+	<antcall target="10"/> 
+	<antcall target="11"/> 
+	<antcall target="12"/>
+	<antcall target="13"/>
+	<antcall target="14"/>
+	<antcall target="15"/>
+	<antcall target="16"/>
+	<antcall target="17"/>
+	<antcall target="18"/>
+	<antcall target="19"/>
+	<antcall target="20"/>
+	<antcall target="21"/> 
+	<antcall target="22"/> 
+</target>
+ 
+ 
+ <!-- =================================================== -->
+  <target name="01">
+  <description>
+     tiapmb01
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_01.log"/>
+   <param name="tc1" value="1"/>
+  </antcall>
+		<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_01.log" substring="5"/>
+        </condition>
+    <fail message="Verify Value is not 5... failing." unless="fail-res"/>
+
+</target>
+
+ <!-- =================================================== -->
+ 
+   <target name="02">
+  <description>
+     tiapmb02
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_02.log"/>
+   <param name="tc1" value="2"/>
+  </antcall>
+		<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_02.log" substring="2.0"/>
+        </condition>
+    <fail message="not 2.0, failing." unless="fail-res"/>
+
+</target>
+
+ <!-- =================================================== -->
+
+<target name="03">
+  <description>
+     tiapmb03
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_03.log"/>
+   <param name="tc1" value="3"/>
+  </antcall>
+		<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_03.log" substring=".0"/>
+        </condition>
+    <fail message="Can not get the value of AsyncRequestWorkerFactor directive, failing." unless="fail-res"/>
+
+</target>
+
+ <!-- =================================================== -->
+<target name="04">
+  <description>
+     tiapmb04
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_04.log"/>
+   <param name="tc1" value="4"/>
+  </antcall>
+		
+</target>
+
+ <!-- =================================================== -->
+ 
+   <target name="05">
+  <description>
+     tiapmb05
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_05.log"/>
+   <param name="tc1" value="5"/>
+  </antcall>
+
+</target>
+
+ <!-- =================================================== -->
+
+<target name="06">
+  <description>
+     tiapmb06
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_06.log"/>
+   <param name="tc1" value="6"/>
+  </antcall>
+	<if>	
+	    <os family="unix"/>
+		<then>
+		 <condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_06.log" substring="event"/>
+ 	</condition>	
+		</then>
+	<elseif>
+			<os family="windows"/>
+			        <then>
+ 		 <condition property="fail-res">     
+	      <resourcecontains resource="${twork.dir}/tiapmb_mbeans_06.log" substring="winnt"/>
+ 		</condition>		
+		       </then>       
+	</elseif>
+	</if>
+    <fail message="Mpm's default value is not event, failing." unless="fail-res"/>
+
+</target>
+
+ <!-- =================================================== -->
+<target name="07">
+  <description>
+     tiapmb07
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_07.log"/>
+   <param name="tc1" value="7"/>
+  </antcall>
+		
+</target>
+
+ <!-- =================================================== -->
+ 
+   <target name="08">
+  <description>
+     tiapmb08
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_08.log"/>
+   <param name="tc1" value="8"/>
+  </antcall>
+
+</target>
+
+ <!-- =================================================== -->
+
+<target name="09">
+  <description>
+     tiapmb09
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_09.log"/>
+   <param name="tc1" value="9"/>
+  </antcall>
+		<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_09.log" substring="text"/>
+        </condition>
+    <fail message="OraLogMode value is not text, failing." unless="fail-res"/>
+
+</target>
+
+ <!-- =================================================== -->
+<target name="10">
+  <description>
+     tiapmb10
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_10.log"/>
+   <param name="tc1" value="10"/>
+  </antcall>
+	<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_10.log" substring="5"/>
+        </condition>
+    <fail message="SetKeepAliveTimeout value is not 5, failing." unless="fail-res"/>
+
+		
+</target>
+
+ <!-- =================================================== -->
+ 
+   <target name="11">
+  <description>
+     tiapmb11
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_11.log"/>
+   <param name="tc1" value="11"/>
+  </antcall>
+	        <if>
+            <os family="unix"/>
+                <then>
+                 <condition property="fail-res">
+        <resourcecontains resource="${twork.dir}/tiapmb_mbeans_11.log" substring="120"/>
+
+        </condition>
+  <fail message="MaxRequestsWorkers value is not 120, failing." unless="fail-res"/>
+
+                </then>
+        </if>
+
+</target>
+
+ <!-- =================================================== -->
+
+<target name="12">
+  <description>
+     tiapmb12
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_12.log"/>
+   <param name="tc1" value="12"/>
+  </antcall>
+		
+</target>
+
+ <!-- =================================================== -->
+<target name="13">
+  <description>
+     tiapmb13
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_13.log"/>
+   <param name="tc1" value="13"/>
+  </antcall>
+</target>
+
+ <!-- =================================================== -->
+<target name="14">
+  <description>
+     tiapmb14
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_14.log"/>
+   <param name="tc1" value="14"/>
+  </antcall>
+	                <if>
+            <os family="unix"/>
+                <then>
+                 <condition property="fail-res">
+        <resourcecontains resource="${twork.dir}/tiapmb_mbeans_14.log" substring="250"/>
+
+        </condition>
+  <fail message="MaxSpareThreads value is not 250, failing." unless="fail-res"/>
+
+                </then>
+        </if>	
+
+</target>
+
+ <!-- =================================================== -->
+ 
+   <target name="15">
+  <description>
+     tiapmb15
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_15.log"/>
+   <param name="tc1" value="15"/>
+  </antcall>
+	                <if>
+            <os family="unix"/>
+                <then>
+                 <condition property="fail-res">
+    <resourcecontains resource="${twork.dir}/tiapmb_mbeans_15.log" substring="5"/>
+
+        </condition>
+    <fail message="MinRequestsWorkers value is not 5, failing." unless="fail-res"/>
+
+                </then>
+        </if>
+
+</target>
+
+ <!-- =================================================== -->
+
+<target name="16">
+  <description>
+     tiapmb16
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_16.log"/>
+   <param name="tc1" value="16"/>
+  </antcall>
+	                <if>
+            <os family="unix"/>
+                <then>
+                 <condition property="fail-res">
+  <resourcecontains resource="${twork.dir}/tiapmb_mbeans_16.log" substring="250>5"/>
+
+        </condition>
+     <fail message="MaxSpareThreads is not greater than MnSpareThreads, failing." unless="fail-res"/>
+
+                </then>
+        </if>
+
+</target>
+
+ <!-- =================================================== -->
+<target name="17">
+  <description>
+     tiapmb17
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_17.log"/>
+   <param name="tc1" value="17"/>
+  </antcall>
+		
+</target>
+
+ <!-- =================================================== -->
+ 
+   <target name="18">
+  <description>
+     tiapmb18
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_18.log"/>
+   <param name="tc1" value="18"/>
+  </antcall>
+		<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_18.log" substring="64"/>
+        </condition>
+    <fail message="The ThreadsPerChild value is not 64, failing." unless="fail-res"/>
+
+</target>
+
+ <!-- =================================================== -->
+
+<target name="19">
+  <description>
+     tiapmb19
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_19.log"/>
+   <param name="tc1" value="19"/>
+  </antcall>
+		<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_19.log" substring="60"/>
+        </condition>
+    <fail message="The Timeout value is not 60, failing." unless="fail-res"/>
+
+</target>
+
+ <!-- =================================================== -->
+<target name="20">
+  <description>
+     tiapmb20
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_20.log"/>
+   <param name="tc1" value="20"/>
+  </antcall>
+	<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_20.log" substring="emerg, alert, crit, error, warn, notice, info, debug, trace1, trace2, trace3, trace4, trace5, trace6, trace7, trace8"/>
+        </condition>
+    <fail message="AllApacheLogLevel valus are not correct, failing." unless="fail-res"/>
+
+		
+</target>
+
+ <!-- =================================================== -->
+ 
+   <target name="21">
+  <description>
+     tiapmb21
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_21.log"/>
+   <param name="tc1" value="21"/>
+  </antcall>
+		<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_21.log" substring="INCIDENT_ERROR:10, INCIDENT_ERROR:20, INCIDENT_ERROR:32, ERROR:32, WARNING:32, NOTIFICATION:16, NOTIFICATION:32, TRACE:16, TRACE:18, TRACE:20, TRACE:22, TRACE:24, TRACE:26, TRACE:28, TRACE:30, TRACE:32"/>
+        </condition>
+    <fail message="AllOraLogLevels value are not correct, failing." unless="fail-res"/>
+
+
+</target>
+
+ <!-- =================================================== -->
+
+<target name="22">
+  <description>
+     tiapmb22
+  </description>
+  <antcall target="setupPart">
+   <param name="out.log" value="tiapmb_mbeans_22.log"/>
+   <param name="tc1" value="22"/>
+  </antcall>
+		<condition property="fail-res">
+            <resourcecontains resource="${twork.dir}/tiapmb_mbeans_22.log" substring="NOTIFICATION:16 mime ERROR"/>
+        </condition>
+    <fail message="OraLogLevel value is not correct, failing." unless="fail-res"/>
+		
+</target>
+
+ <!-- =================================================== -->
+
+</project>

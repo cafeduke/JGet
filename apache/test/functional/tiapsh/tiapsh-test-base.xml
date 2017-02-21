@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<project name="test.tiapsh.base">
+  <description>
+   Base file of all tiapsh tests.
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="test.tiapsh.base.dir" file="${ant.file.test.tiapsh.base}" />
+
+  <!-- ADDED-BY-SEED Import tiapsh base file -->
+  <import file="${test.tiapsh.base.dir}/tiapsh-base.xml" />
+
+  <!-- Import TLR core to run with TestLogic -->
+  <import file="${testtool.3rdparty.testlogic.dir}/tlr-core-root.xml"/>
+
+  <!-- ADDED-BY-SEED Import common test file targets -->
+  <import file="${tl.cafe.file}"/>
+
+  <!-- ====================================================================
+    START: ADDED-BY-SEED Template generated code. Don't edit
+   ===================================================================== -->
+  <sequential>
+    <!--
+      Runs setup if it's neven been run. This is to help users to come to
+      any test file and just run the target. Setup is run, if it's neven
+      been run.
+     -->
+
+    <if>
+      <not><available file="${team.setup.marker.file}"/></not>
+      <then>
+        <ant antfile="${team.base.dir}/build.xml"
+             target="setup"
+        />
+      </then>
+    </if>
+
+  </sequential>
+  <!-- ====================================================================
+    END: ADDED-BY-SEED: Template generated code. Don't edit
+   ===================================================================== -->
+
+  <!-- Common validate for all tiapsh tests -->
+
+  <!-- =================================================== -->
+  <!-- prepare -->
+  <!-- =================================================== -->
+
+  <target name="prepare" >
+  <description>
+     Remove any old logfiles lingering in T_WORK
+  </description>
+    <firsttimeonly>
+     <delete dir="${twork.dir}/tiapsh_openssl"/>
+     <delete>
+        <fileset dir="${twork.dir}" includes="tiapsh*"/>
+     </delete>
+
+     <!-- Backup ssl.conf -->
+     <copy file="${ohsConfDir}/instances/ohs1/ssl.conf"
+           tofile="${twork.dir}/tiapsh.ssl.conf.orig" overwrite="true"/>
+
+     <!-- Make dir for openssl output - lots of files -->
+     <mkdir dir="${twork.dir}/tiapsh_openssl"/>
+     
+    </firsttimeonly>
+    
+    <!-- Bounce OHS -->
+    <!-- Get ohs1 into a known state - SHUTDOWN -->
+    <!-- By bouncing we remove possibility that instance is in a state -->
+    <!-- of FAILED for the cipher tests. -->
+    <antcall target="bounceOHS">
+      <param name="start.log" value="ohs1_start.log"/>
+      <param name="ohs.name"  value="ohs1"/>
+    </antcall>
+    <antcall target="stopOHS">
+      <param name="out.log"  value="ohs1_stop.log"/>
+      <param name="ohs.name" value="ohs1"/>
+    </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- unprepare -->
+  <!-- =================================================== -->
+
+  <target name="unprepare" >
+  <description>
+     Shutdown OHS to move to a known state
+  </description>
+    <antcall target="stopOHS">
+      <param name="out.log"  value="ohs1_stop.log"/>
+      <param name="ohs.name" value="ohs1"/>
+    </antcall>
+  </target>
+
+
+ <!-- =================================================== -->
+    <target name="runTest">
+    <description>
+      parameters:
+       ${tstName}     - test name for logfiles
+       ${protocol}    - what SSL protocol to use
+       ${configFile}  - which configuration file to use
+       ${goldFile}    - goldfile name (will distinguish rsa vs. ecc)
+       [${ecc}]       - set to true for ECC ciphers
+       [${fips}]      - set to true to turn on FIPS
+    </description>
+
+       <!-- Are we using RSA or ECC ciphers? -->
+       <if>
+         <isset property="ecc"/>
+         <then>
+           <property name="cipherFile" value="ciphers-ecc.txt"/>
+           <property name="cipherType" value="ecc"/>
+           <property name="arg.ecc"    value="1"/>
+         </then>
+         <else>
+           <property name="cipherFile" value="ciphers-rsa.txt"/>
+           <property name="cipherType" value="rsa"/>
+           <property name="arg.ecc"    value="0"/>
+         </else>
+       </if>
+
+       <!-- Should we turn on FIPS? -->
+       <if>
+         <isset property="fips"/>
+         <then>
+           <property name="dirName"    value="${cipherType}FIPS"/>
+           <property name="arg.fips"   value="1"/>
+         </then>
+         <else>
+           <property name="dirName"    value="${cipherType}"/>
+           <property name="arg.fips"   value="0"/>
+         </else>
+       </if>
+
+       <property name="ohsName" value="ohs1"/>
+       <property name="testName" value="tiapsh_${dirName}_${tstName}"/>
+       <property name="ssl.conf.1" value="${ohsConfDir}/${ohsName}/ssl.conf"/>
+       <property name="ssl.conf.2" value="${ohsConfDir}/instances/${ohsName}/ssl.conf"/>
+
+       <property name="result.dir" value="${twork.dir}/tiapsh_openssl/${testName}"/>
+       <mkdir dir="${result.dir}"/>
+
+       <!-- ======================================= -->
+       <!-- Configure OHS ssl.conf files            -->
+       <!-- The ssl.conf is already backed up in prepare -->
+
+       <trycatch>
+       <try>
+       <property name="configScript"
+           value="${tiapsh.base.dir}/common/perl/configServer.pl"/>
+       <tl-exec name="configServer" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${testName}_server.log"
+           failonerror="true">
+           <arg line="${configScript}"/>
+           <arg line="${ohsName}"/>
+           <arg line="${tiapsh.base.dir}/common/data/${configFile}"/>
+           <arg line="${testNum}"/>
+           <arg line="${arg.ecc}"/>
+           <arg line="${arg.fips}"/>
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="ORACLE_HOME"  value="${ORACLE_HOME}"/>
+           <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}"/>
+           <env key="ohsConfDir"   value="${ohsConfDir}"/>
+           <env key="ohsLogDir"    value="${ohsLogDir}"/>
+        </tl-exec>
+
+        <!-- Bounce OHS -->
+        <antcall target="bounceOHS">
+           <param name="start.log" value="${testName}_start.log"/>
+           <param name="ohs.name"  value="${ohsName}"/>
+        </antcall>
+
+        <!-- Copy new ssl.conf to T_WORK just for records -->
+        <copy file="${ssl.conf.1}"
+             tofile="${result.dir}/${testName}_ssl.conf"/>
+
+       <!-- ======================================= -->
+       <!-- Run the tests with openssl              -->
+
+       <property name="clientScript"
+           value="${tiapsh.base.dir}/common/perl/testClient.pl"/>
+       <tl-exec name="testClient" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${testName}.out"
+           failonerror="true">
+           <arg line="${clientScript}"/>
+           <arg line="${ohsName}"/>
+           <arg line="${protocol}"/>
+           <arg line="${testName}"/>
+           <arg line="${tiapsh.base.dir}/common/data/${cipherFile}"/>
+           <env key="T_WORK"       value="${twork.dir}" />
+        </tl-exec>
+
+       <!-- ======================================= -->
+       <!-- Analyze results vs. goldfile -->
+
+       <property name="resultScript"
+           value="${tiapsh.base.dir}/common/perl/chkResults.pl"/>
+       <tl-exec name="chkResults" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${testName}.log"
+           failonerror="true">
+           <arg line="${resultScript}"/>
+           <arg line="${testName}"/>
+           <arg line="${tiapsh.base.dir}/common/goldfiles/${dirName}/${goldFile}"/>
+           <env key="T_WORK"       value="${twork.dir}" />
+       </tl-exec>
+       </try>
+
+       <!-- ======================================= -->
+       <!-- Cleanup:  stop OHS, restore ssl.conf    -->
+       <finally>
+         <copy file="${twork.dir}/tiapsh.ssl.conf.orig"
+             tofile="${ssl.conf.1}" overwrite="true"/>
+         <copy file="${twork.dir}/tiapsh.ssl.conf.orig"
+             tofile="${ssl.conf.2}" overwrite="true"/>
+   
+         <!--
+         <antcall target="stopOHS">
+           <param name="out.log"  value="tmp.txt"/>
+           <param name="ohs.name" value="${ohsName}"/>
+         </antcall>
+         -->
+      
+       </finally>
+       </trycatch>
+    </target>
+
+
+</project>

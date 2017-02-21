@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapwl.scan" default="usage">
+  <description>
+    functional tiapwl scan tests.
+
+    @testlogic.group type="working"  values="true"  
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="bob" values="true"
+    @testlogic.group type="winFIPS" values="false"
+
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapwl.scan.dir" file="${ant.file.tiapwl.scan}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapwl.scan.dir}/../tiapwl-test-base.xml" />
+
+  <target name="suite">
+    <description>
+       Quick bounce of WLS.  Check to see if any warnings/errors happen on
+       starting or stopping the AdminServer.  Throw a *.dif if any unexpected
+       errors appear.  Assumption:  WLS is already running.
+    </description>
+
+    <antcall target="stopWLS"/>
+    <antcall target="startWLS"/>
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="stopWLS">
+  <description>
+     Stop WLS and capture the raw output.  Check the output
+     for any errors or warnings.
+  </description>
+     <property name="tstName" value="tiapwl_scan_stopWLS"/>
+     <tl-exec name="stopWLS" executable="perl"
+       output="${twork.dir}/${tstName}.out"
+       cmdfile="${twork.dir}/tmp.txt"
+       failonerror="true">
+       <arg line="${tiapwl.base.dir}/common/perl/stopWLS.pl" />
+       <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}" />
+     </tl-exec>
+
+     <!-- Scan output for warnings and errors -->
+     <antcall target="wlstErrorScan">
+         <param name="in.file"  value="${tstName}.out"/>
+         <param name="out.file" value="${tstName}.log"/>
+     </antcall>
+  </target> 
+
+ <!-- =================================================== -->
+  <target name="startWLS">
+  <description>
+     Start WLS and capture the raw output.  Check the output 
+     for any errors or warnings.
+  </description>
+     <property name="tstName" value="tiapwl_scan_startWLS"/>
+     <tl-exec name="startWLS" executable="perl"
+       output="${twork.dir}/${tstName}.out"
+       cmdfile="${twork.dir}/tmp.txt"
+       failonerror="true">
+       <arg line="${tiapwl.base.dir}/common/perl/startWLS.pl" />
+       <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}" />
+     </tl-exec>
+
+     <!-- Scan output for warnings and errors -->
+     <antcall target="wlstErrorScan">
+         <param name="in.file"  value="${tstName}.out"/>
+         <param name="out.file" value="${tstName}.log"/>
+     </antcall>
+  </target>
+
+</project>

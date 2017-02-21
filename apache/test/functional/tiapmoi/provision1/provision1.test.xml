@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapmoi.provision1" default="usage">
+  <description>
+    functional tiapmoi provision1 tests.
+
+    @testlogic.group  type="working" values="true"
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="winFIPS" values="false"
+
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapmoi.provision1.dir" file="${ant.file.tiapmoi.provision1}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapmoi.provision1.dir}/../tiapmoi-test-base.xml" />
+
+  <!-- =================================================== -->
+  <!-- prepare -->
+  <!-- =================================================== -->
+
+  <target name="prepare" >
+  <description>
+     Remove any old logfiles lingering in T_WORK
+  </description>
+    <firsttimeonly>
+     <delete>
+        <fileset dir="${twork.dir}" includes="tiapmoi_provision1*"/>
+     </delete>
+    </firsttimeonly>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- unprepare -->
+  <!-- =================================================== -->
+  <target name="unprepare" >
+  <description>
+     Recreate the ohs1 instance as it is expected by other tests
+  </description>
+     <antcall target="createOHS">
+        <param name="out.log" value="tiapmoi_provision1_unprepare.log"/>
+        <param name="ohs.name" value="ohs1"/>
+     </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- suite -->
+  <!-- =================================================== -->
+
+  <target name="suite">
+    <description>
+       Basic provision1 tests:
+       Create/start/stop/remove a single instance.  Verify all filesets
+    </description>
+    <sequential>
+   
+    <!-- Create ohs1 instance -->
+    <antcall target="crt"/>
+ 
+    <!-- Verify state is SHUTDOWN -->
+    <antcall target="crtState"/>
+ 
+    <!-- Verify creation of OHS configuration files -->
+    <antcall target="crtConf"/>
+    <antcall target="crtInst"/>
+
+    <!-- Verify no pids are running -->
+    <antcall target="crtPids"/>
+
+    <!-- Start ohs1 and configure the instance -->
+    <antcall target="start"/>
+
+    <!-- Verify state is RUNNING -->
+    <antcall target="startState"/>
+
+    <!-- Verify appropriate number of pids -->
+    <antcall target="startPids"/>
+
+    <!-- Check that logfiles & state info are created -->
+    <antcall target="startLogs"/>
+    <antcall target="startNM"/>
+ 
+    <!-- ping OHS -->
+    <antcall target="ping"/>
+    <antcall target="pingSSL"/>
+   
+    <!-- Stop OHS -->
+    <antcall target="stop"/>
+
+    <!-- Verify state is SHUTDOWN -->
+    <antcall target="stopState"/>
+
+    <!-- Verify no pids are running -->
+    <antcall target="stopPids"/>
+
+    <!-- Delete instance -->
+    <antcall target="del"/>
+
+    <!-- Verify deletion of OHS config files, logs & state info -->
+    <antcall target="delComplete"/>
+
+    </sequential>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="crt">
+  <description>
+     Create the ohs1 instance
+  </description>
+
+    <antcall target="createOHS">
+      <param name="out.log"  value="tiapmoi_provision1_crt.out"/>
+      <param name="ohs.name" value="ohs1"/>
+    </antcall>
+    <antcall target="wlstErrorScan">
+      <param name="in.file" value="tiapmoi_provision1_crt.out"/>
+      <param name="out.file" value="tiapmoi_provision1_crt.log"/>
+    </antcall>
+  </target>
+
+
+  <!-- =================================================== -->
+  <target name="crtState">
+  <description>
+     Verify state = SHUTDOWN
+  </description>
+    <antcall target="chkState">
+      <param name="ohsName" value="ohs1"/>
+      <param name="expected" value="SHUTDOWN"/>
+      <param name="outfile" value="tiapmoi_provision1_crtState.log"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="crtConf">
+  <description>
+     Verify all master OHS config files are created successfully.
+  </description>
+
+    <property name="tstName"  value="tiapmoi_provision1_crtConf"/>
+    <property name="goldfile" value="${tstName}.gold"/>
+    <copy file="${gold.path}/oi.crt.conf.gold" 
+         tofile="${twork.dir}/${goldfile}"/>
+
+    <antcall target="scanDir">
+      <param name="action" value="oi_conf"/>
+      <param name="ohsName" value="ohs1"/>
+      <param name="outfile" value="${tstName}.out"/>
+    </antcall>
+    <antcall target="compareFiles">
+      <param name="goldfile" value="${goldfile}"/>
+      <param name="testfile" value="${tstName}.out"/>
+      <param name="outfile" value="${tstName}.log"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="crtInst">
+  <description>
+     Verify all runtime OHS config files are created successfully.
+  </description>
+
+    <property name="tstName"  value="tiapmoi_provision1_crtInst"/>
+    <property name="goldfile" value="${tstName}.gold"/>
+    <copy file="${gold.path}/oi.crt.inst.gold" 
+         tofile="${twork.dir}/${goldfile}"/>
+
+    <antcall target="scanDir">
+      <param name="action" value="oi_inst"/>
+      <param name="ohsName" value="ohs1"/>
+      <param name="outfile" value="${tstName}.out"/>
+    </antcall>
+    <antcall target="compareFiles">
+      <param name="goldfile" value="${goldfile}"/>
+      <param name="testfile" value="${tstName}.out"/>
+      <param name="outfile" value="${tstName}.log"/>
+    </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="crtPids">
+  <description>
+     Verify no pids are running currently.
+  </description>
+    <antcall target="chkPids">
+      <param name="pidName" value="httpd"/>
+      <param name="expected" value="0"/>
+      <param name="outfile" value="tiapmoi_provision1_crtPids.log"/>
+      <param name="ohsName" value="ohs1"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="start">
+  <description>
+     Configure ohs1 and start it
+  </description>
+
+     <!-- Copy hello world to htdocs -->
+     <property name="htdocsDir" value="${ohsConfDir}/instances/ohs1/htdocs"/>
+     <copy file="${tiapmoi.base.dir}/common/tiapmoi.html"
+           todir="${htdocsDir}" />
+
+     <!-- Setup ohs1 for SSL -->
+     <antcall target="configureSSL">
+        <param name="ohs.name" value="ohs1"/>
+        <param name="out.log" value="tiapmoi_provision1_configureSSL.log"/>
+     </antcall>
+
+     <!-- Perform the start command -->
+     <antcall target="startOHS">
+        <param name="out.log"  value="tiapmoi_provision1_start.out"/>
+        <param name="ohs.name" value="ohs1"/>
+     </antcall>
+
+     <antcall target="wlstErrorScan">
+       <param name="in.file" value="tiapmoi_provision1_start.out"/>
+       <param name="out.file" value="tiapmoi_provision1_start.log"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="startState">
+  <description>
+     Verify state = RUNNING
+  </description>
+    <antcall target="chkState">
+      <param name="ohsName" value="ohs1"/>
+      <param name="expected" value="RUNNING"/>
+      <param name="outfile" value="tiapmoi_provision1_startState.log"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="startLogs">
+  <description>
+     Verify ohs1 logs have been created
+  </description>
+
+    <property name="tstName"  value="tiapmoi_provision1_startLogs"/>
+    <property name="goldfile" value="${tstName}.gold"/>
+    <copy file="${gold.path}/oi.crt.logs.gold" 
+         tofile="${twork.dir}/${goldfile}"/>
+    <replaceregexp file="${twork.dir}/${goldfile}"
+           match="%OHS_NAME%" replace="ohs1" byline="true" />
+
+    <antcall target="scanDir">
+      <param name="action" value="oi_logs"/>
+      <param name="ohsName" value="ohs1"/>
+      <param name="outfile" value="${tstName}.out"/>
+    </antcall>
+    <antcall target="compareFiles">
+      <param name="goldfile" value="${goldfile}"/>
+      <param name="testfile" value="${tstName}.out"/>
+      <param name="outfile" value="${tstName}.log"/>
+    </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="startNM">
+  <description>
+     Verify ohs1 state information has been created
+  </description>
+
+    <property name="tstName"  value="tiapmoi_provision1_startNM"/>
+    <property name="goldfile" value="${tstName}.gold"/>
+    <copy file="${gold.path}/oi.crt.syst.gold" 
+         tofile="${twork.dir}/${goldfile}"/>
+
+    <antcall target="scanDir">
+      <param name="action" value="oi_syst"/>
+      <param name="ohsName" value="ohs1"/>
+      <param name="outfile" value="${tstName}.out"/>
+    </antcall>
+    <antcall target="compareFiles">
+      <param name="goldfile" value="${goldfile}"/>
+      <param name="testfile" value="${tstName}.out"/>
+      <param name="outfile" value="${tstName}.log"/>
+    </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="startPids">
+  <description>
+     Verify appropriate number of pids are started
+  </description>
+
+    <!-- Set max number of pids - will be different by platform -->
+    <if>
+     <isset property="isWindows"/>
+     <then>
+       <property name="pidMax" value="2"/>
+     </then>
+     <else>
+       <property name="pidMax" value="5"/>
+     </else>
+    </if>
+
+    <antcall target="chkPids">
+      <param name="pidName" value="httpd"/>
+      <param name="expected" value="${pidMax}"/>
+      <param name="outfile" value="tiapmoi_provision1_startPids.log"/>
+      <param name="ohsName" value="ohs1"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="ping">
+  <description>
+     http ping
+  </description>
+
+    <antcall target="pingOHS">
+        <param name="out.log"  value="tiapmoi_provision1_ping.log"/>
+        <param name="ohs.name" value="ohs1"/>
+        <param name="url"      value="/tiapmoi.html"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="pingSSL">
+  <description>
+     https ping
+  </description>
+
+    <antcall target="pingOHS_ssl">
+        <param name="out.log"  value="tiapmoi_provision1_pingSSL.log"/>
+        <param name="ohs.name" value="ohs1"/>
+        <param name="url"      value="/tiapmoi.html"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="stop">
+  <description>
+     Stop the ohs1 instance.
+  </description>
+
+     <antcall target="stopOHS">
+        <param name="out.log"  value="tiapmoi_provision1_stop.out"/>
+        <param name="ohs.name" value="ohs1"/>
+     </antcall>
+
+      <antcall target="wlstErrorScan">
+        <param name="in.file" value="tiapmoi_provision1_stop.out"/>
+        <param name="out.file" value="tiapmoi_provision1_stop.log"/>
+      </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="stopState">
+  <description>
+     Verify state = SHUTDOWN
+  </description>
+    <antcall target="chkState">
+      <param name="ohsName" value="ohs1"/>
+      <param name="expected" value="SHUTDOWN"/>
+      <param name="outfile" value="tiapmoi_provision1_stopState.log"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="stopPids">
+  <description>
+     Verify no pids are running after stop
+  </description>
+   <antcall target="chkPids">
+      <param name="pidName" value="httpd"/>
+      <param name="expected" value="0"/>
+      <param name="outfile" value="tiapmoi_provision1_stopPids.log"/>
+      <param name="ohsName" value="ohs1"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="del">
+  <description>
+     Remove the ohs1 instance
+  </description>
+
+   <!-- Perform the delete command -->
+   <antcall target="deleteOHS">
+      <param name="out.log"  value="tiapmoi_provision1_del.out"/>
+      <param name="ohs.name" value="ohs1"/>
+   </antcall>
+
+   <antcall target="wlstErrorScan">
+     <param name="in.file" value="tiapmoi_provision1_del.out"/>
+     <param name="out.file" value="tiapmoi_provision1_del.log"/>
+   </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="delComplete">
+  <description>
+     Verify removal of OHS config files, logs, and state info
+     Fail if any of the following directories exist.
+  </description>
+      
+      <property name="ohsMaster"  value="${ohsConfDir}/ohs1"/>
+      <property name="ohsRuntime" value="${ohsConfDir}/instances/ohs1"/>
+      <property name="ohsLogs"    value="${ohsLogDir}/ohs1"/>
+      <property name="ohsNM"      value="${nmLogDir}/ohs1"/>
+
+      <assertTrue message="Directory ${ohsMaster} still exists post-deletion">
+        <not> <available file="${ohsMaster}" type="dir"/> </not>
+      </assertTrue>
+      <assertTrue message="Directory ${ohsRuntime} still exists post-deletion"> 
+        <not> <available file="${ohsRuntime}" type="dir"/> </not>
+      </assertTrue>
+      <assertTrue message="Directory ${ohsLogs} still exists post-deletion">
+        <not> <available file="${ohsLogs}" type="dir"/> </not>
+      </assertTrue>
+      <assertTrue message="Directory ${ohsNM} still exists post-deletion" >
+        <not> <available file="${ohsNM}" type="dir"/> </not>
+      </assertTrue>
+
+  </target>
+  
+</project>
+
+ 

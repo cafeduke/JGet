@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<project name="tiapkss" default="usage">
+  <description>
+    Build and run all TIAPKSS  tests. For more info, run
+    its usage target
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapkss.dir" file="${ant.file.tiapkss}" />
+
+  <!-- ADDED-BY-SEED Import tiapkss team base file -->
+  <import file="${tiapkss.dir}/tiapkss-base.xml" />
+
+  <!-- ADDED-BY-SEED Import tiapkss test suite -->
+  <import file="${tiapkss.dir}/tiapkss-test-suite.xml" />
+
+  <!-- ADDED-BY-SEED Import common test directory targets -->
+  <import file="${tl.cafe-dir.file}" />
+
+  <!-- ADDED-BY-SEED -->
+  <target name="setup">
+    <description>
+      Team level setup that is common to all files
+
+    </description>
+    <!-- ====================================================================
+      START: ADDED-BY-SEED Template generated code. Don't edit
+     ===================================================================== -->
+    <echo message="Starting setup for '${area}/${team}' team." />
+
+    <!-- <trycatch> -->
+      <!-- <try> -->
+
+        <delete file="${team.setup.marker.file}" />
+        <ant antfile="${area.base.dir}/build.xml"
+           target="setup"
+        />
+    <!-- ====================================================================
+      END: ADDED-BY-SEED: Template generated code. Don't edit
+     ===================================================================== -->
+
+    <!-- Enter your custom code here -->
+
+    <!-- ====================================================================
+      START: ADDED-BY-SEED Template generated code. Don't edit
+     ===================================================================== -->
+      <!-- </try> -->
+      <!-- <finally> -->
+         <!-- creating marker file to indicate that setup was attempted -->
+         <touch file="${team.setup.marker.file}"/>
+      <!-- </finally> -->
+    <!-- </trycatch> -->
+
+    <!-- ====================================================================
+      END: ADDED-BY-SEED: Template generated code. Don't edit
+     ===================================================================== -->
+    </target>
+
+</project>
+

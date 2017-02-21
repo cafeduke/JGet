@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+<project name="root">
+  <description>
+    Shared configuration that all test teams will use.
+
+    It defines common properties, taskdefs, paths and utility targets
+    that apply to all Ant files in WLS QA area
+
+    NOTE: To use ant files in Eclipse, please run devenv.sh outside in a shell
+    such that it creates devenv.properties file
+  </description>
+
+  <!-- ==================================================================== -->
+  <!-- START: Properties                                                    -->
+  <!-- ==================================================================== -->
+
+  <dirname property="root.dir" file="${ant.file.root}" />
+
+  <!-- load environment variables as properties with env. prefix -->
+  <property environment="env" />
+  <condition property="global.timeout" value="${env.SERVERALIVETIMEOUT}">
+    <isset property="env.SERVERALIVETIMEOUT"/>
+  </condition>
+
+  <!-- Default to 20min as some of our tests take 10min -->
+  <property name="testlogic.timeout.target" value="1200"/>
+
+  <!-- 
+   The following twork.dir defintion is also avilable in qaenv.xml also 
+   So test running from wlstest/build.xml (ie. mats.???) will get the 
+   twork.dir property defined  but test running from inner directory such 
+   as functional/wsee/cluster will not get this variable, as those file only 
+   import only root.xml 
+
+   Alternatively import qaenv.xml from root.xml file and donot import 
+   qaenv.xml from build.xml file - antaryami.panigrahi@oracle.com 
+  -->
+  <import file="${root.dir}/qaenv.xml"/>
+
+  <!-- load environment setup properties. -->
+  <property file="${twork.dir}/qaenv.properties" />
+
+  <!-- load any OS specific properties -->
+  <import file="${root.dir}/os.xml" />
+
+  <!-- import antcontrib; we do it early so we can use it below -->
+  <import file="${testtool.3rdparty.antcontrib.dir}/antcontrib-root.xml" />
+
+  <property name="junit4.home" location="${testtool.3rdparty.junit.dir}/4.4" />
+
+
+  <!-- .................................................................... -->
+  <!-- START: Build and Result output dir properties                        -->
+  <!-- .................................................................... -->
+
+
+  <!-- ADDED-BY-SEED Run output dir. All the output of a test run (excluding
+       build) are  under this directory.
+  -->
+  <property name="run.output.dir"
+            location="${TEST_RESULTS}/${area}/${team}" />
+
+  <!-- Build output dir -->
+  <property name="build.output.dir" location="${BUILDOUT}/${area}/${team}" />
+
+  <!-- Temp build output dir -->
+  <property name="build.temp.output.dir"
+            location="${build.output.dir}/tempdir" />
+
+  <!-- Test build outputdir -->
+  <property name="tests.build.output.dir" location="${build.output.dir}" />
+
+  <!-- App build outputdir -->
+  <property name="apps.build.output.dir" location="${build.output.dir}/apps" />
+
+  <!-- Util build outputdir -->
+  <property name="utils.build.output.dir"
+            location="${build.output.dir}/utils" />
+
+
+  <!-- build output directory -->
+  <property name="testlogic.build.output.dir"
+            location="${tests.build.output.dir}" />
+
+
+  <property name="testlogic.build.temp.output.dir"
+            location="${build.temp.output.dir}" />
+
+  <!-- Remove following three propertes once these are avilable in 
+       testtool.properties file in TESTTOOL label -->
+
+  <property name="testtool.3rdparty.apache.dir"
+          value="${testtool.3rdparty.dir}/apache" />
+
+  <property name="testtool.3rdparty.grinder.dir"
+          value="${testtool.3rdparty.dir}/grinder" />
+
+  <property name="testtool.3rdparty.httpunit.dir"
+         value="${testtool.3rdparty.dir}/httpunit" />
+
+
+  <!-- test result output directory -->
+  <property name="testlogic.output.dir" location="${run.output.dir}" />
+
+  <macrodef name="rootCreateOutputDirs">
+    <!-- Creates all the output directories  -->
+    <sequential>
+      <mkdir dir="${run.output.dir}" />
+      <mkdir dir="${build.output.dir}" />
+      <mkdir dir="${build.temp.output.dir}" />
+      <mkdir dir="${tests.build.output.dir}" />
+      <mkdir dir="${apps.build.output.dir}" />
+      <mkdir dir="${utils.build.output.dir}" />
+    </sequential>
+  </macrodef>
+
+  <!-- ==================================================================== -->
+  <!-- START: Oracle settings                                                       -->
+  <!-- ==================================================================== -->
+
+  <!-- exclude .ade_path from all directory-based tasks -->
+  <defaultexcludes add="**/.ade_path" />
+  <defaultexcludes add="**/.ade_path/**" />
+
+  <!-- ==================================================================== -->
+  <!-- START: TestLogic setup                                                      -->
+  <!-- ==================================================================== -->
+
+  <!-- Adding additional import as testlogic-root.xml in testtool wont do it -->
+  <import file="${testtool.3rdparty.dir}/testlogic/tlr-core-root.xml" />
+  <import file="${testtool.3rdparty.dir}/testlogic/tlt-antjunit-root.xml" />
+  <import file="${testtool.3rdparty.dir}/testlogic/tlt-antutils-root.xml" />
+  <import file="${testtool.3rdparty.dir}/testlogic/tlt-asserts-root.xml" />
+  <import file="${testtool.3rdparty.dir}/testlogic/tlt-testrunner-root.xml" />
+  <import file="${testtool.3rdparty.dir}/testlogic/tlt-webutils-root.xml" />
+
+  <!-- FIXME Remove version after seed-0.2 is released. -->
+  <property name="tlt.seed.version" value="0.2" />
+  <import file="${testtool.3rdparty.dir}/testlogic/tlt-seed-root.xml" />
+
+  <!-- FIXME Remove these obsolete properties after test environment
+       is cleaned up.  -->
+  <property name="tlt-antutils.dir" value="${tlt.antutils.home.dir}" />
+  <property name="tlt-antjunit.dir" value="${tlt.antjunit.home.dir}" />
+  <property name="tlt-seed.dir" value="${tlt.seed.home.dir}" />
+
+
+
+  <!-- ==================================================================== -->
+  <!-- START: Imports                                                       -->
+  <!-- ==================================================================== -->
+
+  <!-- .................................................................... -->
+  <!-- START: misc                                                          -->
+  <!-- .................................................................... -->
+
+  <!-- source directory of test -->
+  <property name="test.src.dir" location="${root.dir}/.." />
+
+  <property name="global.vmtype" value="-server" />
+
+
+  <!--set default to true for wlserver -->
+  <property name="global.append" value="true" />
+
+
+  <property name="testlogic.group.enable.on.build" value="false" />
+
+
+  <path id="build.and.test.classpath.id">
+    <path refid="tlt.testrunner.classpath.id" />
+  </path>
+
+  <!-- NOTE: This path is deprecated and will be removed by end of April 09
+             Use build.and.test.classpath.id instead.
+  -->
+  <path id="classpath.for.all.tests">
+    <path refid="build.and.test.classpath.id" />
+  </path>
+
+  <!--
+    Includes build output directory.
+    System classpath (java.class.path) was removed, see CR296782.
+  -->
+  <path id="tests.classpath.id">
+    <pathelement path="${tests.build.output.dir}" />
+  </path>
+
+  <path id="root.runtime.class.path">
+    <pathelement path="${testlogic.build.output.dir}" />
+    <path refid="root.junit4.classpath" />
+  </path>
+
+  <path id="root.tl-testrunner.classpath">
+    <path refid="tlt.testrunner.classpath.id" />
+  </path>
+
+
+  <path id="root.junit4.jars">
+    <fileset dir="${junit4.home}" />
+  </path>
+
+  <path id="root.junit4.classpath">
+    <path refid="root.junit.classpath" />
+    <path refid="root.junit4.jars" />
+  </path>
+
+  <path id="root.javatest.classpath">
+    <path refid="root.junit.classpath" />
+    <fileset dir="${testtool.3rdparty.dir}/coconut" />
+  </path>
+
+
+  <path id="root.antutils.classpath">
+    <fileset dir="${tlt-antutils.dir}/lib" />
+  </path>
+
+  <path id="root.server.processmngt.classpath">
+    <!--tlt-antutils -->
+    <path refid="root.antutils.classpath" />
+    <!--tlt-testrunner -->
+    <fileset dir="${tlt.testrunner.home.dir}/lib">
+      <include name="tlt-testrunner-*.jar" />
+    </fileset>
+
+    <fileset dir="${ant.library.dir}">
+      <include name="ant.jar" />
+      <include name="ant-launcher.jar" />
+      <include name="ant-apache-regexp.jar" />
+      <include name="jakarta-oro-2.0.8.jar" />
+      <include name="ant-nodeps.jar" />
+    </fileset>
+  </path>
+
+
+
+  <target name="root.build.init">
+    <description>
+      Initializes build environment
+    </description>
+
+    <mkdir dir="${testlogic.build.output.dir}" />
+
+  </target>
+
+  <target name="echo">
+    <description>
+      Echoes all the global property that are available to the targest in
+      the file.
+    </description>
+    <echoproperties />
+  </target>
+
+  <!-- 
+     Since all file import root.xml file indirectly, this target will 
+     be available to all the directory 
+     The target just display the readme.txt file in current directoy if exists
+     The purpose here is to provide a quick/short help information 
+    -->
+  <condition property="isHelpAvail" value="false" >
+    <not>
+      <available file="readme.txt"/>
+    </not>
+  </condition>
+
+  <target name="help">
+    <if>
+      <equals arg1="${isHelpAvail}" arg2="false" />
+      <then>
+        <echo
+       message="No Help Info (readme.txt) is avilable on current directory" />
+      </then>
+      <else>
+        <loadfile property="readme.txt" srcFile="readme.txt"/>
+        <echo>${readme.txt}</echo>
+      </else>
+    </if>
+  </target>
+
+  <!-- Pretty print out provided text -->
+  <macrodef name="echoLog">
+     <text name="text"/>
+     <sequential>
+       <property name="lineSpace" value="${line.separator}"/>
+       <property name="prettyLine" value="${lineSpace}***********************************************${lineSpace}"/>
+       <echo>${prettyLine}@{text}${prettyLine}</echo>
+     </sequential>
+  </macrodef>
+
+
+
+
+</project>

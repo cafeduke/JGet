@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="shiphome.command" default="usage">
+  <description>
+    Build and run all shiphome tests in tiapmoi team. For more info, run
+    its usage target
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="shiphome.command.dir" file="${ant.file.shiphome.command}" />
+
+  <!-- ADDED-BY-SEED Import tiapmoi team base file -->
+  <import file="${shiphome.command.dir}/../tiapmoi-base.xml" />
+
+  <!-- ADDED-BY-SEED Import shiphome test suite -->
+  <import file="${shiphome.command.dir}/shiphome-test-suite.xml" />
+
+  <!-- ADDED-BY-SEED Import common test directory targets -->
+  <import file="${tl.cafe-dir.file}" />
+
+</project>

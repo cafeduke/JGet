@@ -1,0 +1,34 @@
+#### - BEGIN 1
+The following required arguments are missing .*instanceName.*
+#### - END
+#### - BEGIN 2
+ohs_deleteInstance.* too many arguments. expected 0 got 1
+#### - END
+#### - BEGIN 3
+ohs_deleteInstance.* too many arguments. expected 0 got 1
+#### - END
+#### - BEGIN 4
+Instance \"\" does not exist.
+#### - END
+#### - BEGIN 5
+Instance \" \" does not exist.
+#### - END
+#### - BEGIN 6
+Error\: exceptions.NameError
+#### - END
+#### - BEGIN 7
+ohs_deleteInstance.* too many arguments. expected 0 got 1
+#### - END
+#### - BEGIN 8
+The following arguments are not valid .*bob.*
+#### - END
+#### - BEGIN 9
+Instance \"bogus\" does not exist.
+#### - END
+#### - BEGIN 10
+Instance \"ohs04\" is in state "RUNNING" and cannot be deleted.
+ohs_deleteInstance.* failed.
+#### - END
+#### - BEGIN 11
+Instance \"ohs04\" does not exist.
+#### - END

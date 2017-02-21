@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<project name="functional" default="usage">
+  <description>
+    Build and run all functional tests. For more info, run
+    its usage target
+  </description>
+
+  <!-- ADDED-BY-SEED  Absolute path to this file -->
+  <dirname property="functional.dir" file="${ant.file.functional}" />
+
+  <!-- ADDED-BY-SEED Import functional area base file -->
+  <import file="${functional.dir}/functional-base.xml" />
+
+  <!-- ADDED-BY-SEED Import functional area test suite -->
+  <import file="${functional.dir}/functional-test-suite.xml" />
+
+  <!-- ADDED-BY-SEED Import common test directory targets -->
+  <import file="${tl.cafe-dir.file}" />
+
+  <!-- ADDED-BY-SEED -->
+  <target name="setup">
+    <description>
+      Area level setup that is common to all the teams in this area.
+
+      This target is never run directly. It's executed when team level
+      setup is called, as team level setup depends on this.
+    </description>
+    <!-- ====================================================================
+      START: ADDED-BY-SEED Template generated code. Don't edit
+     ===================================================================== -->
+    <echo message="Starting setup for '${area}' area." />
+    <delete file="${area.setup.marker.file}" />
+
+    <!-- create output directories -->
+    <mkdir dir="${testlogic.output.dir}" />
+    <mkdir dir="${run.output.dir}" />
+    <mkdir dir="${testlogic.build.output.dir}" />
+    <mkdir dir="${testlogic.build.temp.output.dir}" />
+    <mkdir dir="${java.io.tmpdir}" />
+
+    <!-- ====================================================================
+      END: ADDED-BY-SEED: Template generated code. Don't edit
+     ===================================================================== -->
+
+    <!-- Enter your custom code here -->
+
+    <!-- Run environment checks before any tests -->
+    <firsttimeonly>
+      <antcall target="chkEnvironment" />
+    </firsttimeonly>
+
+    <!-- ====================================================================
+      START: ADDED-BY-SEED Template generated code. Don't edit
+     ===================================================================== -->
+    <!-- creating marker file to indicate that setup was a success -->
+    <touch file="${area.setup.marker.file}" />
+    <!-- ====================================================================
+      END: ADDED-BY-SEED: Template generated code. Don't edit
+     ===================================================================== -->
+  </target>
+
+  <target name="build" depends="common-testdir-targets.build">
+    <description>
+      Build all the functional tests. All new subsystem/team should add call
+      to their build target in this target.
+    </description>
+    <echo>build testlogic tests </echo>
+    <!-- <ant antfile="${functional.dir}/tiapwt/build.xml"
+         target="build"
+         inheritall="false"/>  -->
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Custom Tasks                                                         -->
+  <!-- ==================================================================== -->
+
+  <target name="chkEnvironment">
+    <description>
+     Verify test environment is good before running any tests.
+     If there are any failures, we have a suspect environment and
+     there is no point running tests.
+    </description>
+
+    <echo message="T_WORK is set to ${twork.dir}"/>
+
+    <property name="bad.env.file" value="${twork.dir}/BAD_ENVIRONMENT.dif" />
+    <property name="smoke.fail.file" value="${twork.dir}/SMOKE_FAIL.dif" />
+    <property name="chkEnv.file"  value="${twork.dir}/chkEnv.log" />
+    <property name="myVars.file"  value="${twork.dir}/myVars.sh"  />
+    <property name="getEnv.file"  value="${twork.dir}/getEnv.log" />
+    <property name="chkWLS.file"  value="${twork.dir}/chkWLS.log" />
+    <property name="chkNM.file"   value="${twork.dir}/chkNM.log"  />
+    <property name="myJKS.file"   value="${twork.dir}/sslJKS.jks" />
+    <property name="myCRT.file"   value="${twork.dir}/sslOHS.crt" />
+
+    <!-- Clean up from any previous test runs -->
+    <delete file="${bad.env.file}" />
+    <delete file="${smoke.fail.file}" />
+    <delete file="${chkEnv.file}"  />
+    <delete file="${myVars.file}"  />
+    <delete file="${getEnv.file}"  />
+    <delete file="${chkWLS.file}"  />
+    <delete file="${chkNM.file}"   />
+    <delete file="${myJKS.file}"   />
+    <delete file="${myCRT.file}"   />
+
+    <!-- Verify there were no *.difs thrown by the topology -->
+    <echoLog>Check topology output for any *.difs"</echoLog>
+    <tl-exec name="chkEnv" executable="perl"
+         output="${chkEnv.file}"
+         cmdfile="${twork.dir}/tmp.txt"
+         failonerror="true">
+       <arg line="${functional.dir}/common/perl/chkEnv.pl" />
+       <env key="T_WORK" value="${twork.dir}" />
+    </tl-exec>
+
+    <!-- Verify we can capture env info from topology -->
+    <if>
+      <not><available file="${bad.env.file}"/></not>
+      <then>
+        <echoLog>Capture environment info from topology</echoLog>
+        <tl-exec name="getEnv" executable="perl"
+           output="${getEnv.file}"
+           cmdfile="${twork.dir}/tmp.txt"
+           failonerror="true">
+           <arg line="${functional.dir}/common/perl/getEnv.pl" />
+           <env key="T_WORK" value="${twork.dir}" />
+        </tl-exec>
+
+        <!-- Pull in all the captured properties -->
+        <loadproperties srcFile="${getEnv.file}"/>
+        <antcall target="displayEnv"/>
+    </then>
+    </if>
+
+    <!-- WLS being up is a prerequisite for OHS testing -->
+    <if>
+      <not><available file="${bad.env.file}"/></not>
+      <then>
+        <echoLog>WLS AdminServer:  start it, if not already up</echoLog>
+        <echo message="May take a few minutes if not up..."/>
+        <tl-exec name="chkWLS" executable="perl"
+           output="${chkWLS.file}"
+           cmdfile="${twork.dir}/tmp.txt"
+           failonerror="true">
+           <arg line="${functional.dir}/common/perl/chkWLS.pl" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}" />           
+           <env key="INSTALL_TYPE" value="${INSTALL_TYPE}" />
+        </tl-exec>
+      </then>
+      </if>
+
+    <!-- NM being up is a prerequiste for OHS testing -->
+    <if>
+      <not><available file="${bad.env.file}"/></not>
+      <then>
+        <echoLog>NodeManager:  start it, if not already up</echoLog>
+        <tl-exec name="chkNM" executable="perl"
+           output="${chkNM.file}"
+           cmdfile="${twork.dir}/tmp.txt"
+           failonerror="true">
+           <arg line="${functional.dir}/common/perl/chkNM.pl" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}" />
+           <env key="INSTALL_TYPE" value="${INSTALL_TYPE}"/>
+        </tl-exec>
+     </then>
+     </if>
+
+    <!-- Stop ohs1 if running so it's in a known state -->
+    <if>
+      <not><available file="${bad.env.file}"/></not>
+      <then>
+       <echoLog>OHS instance ohs1:  stop, if already started...</echoLog>
+ 
+       <trycatch>
+       <try>
+         <!-- Check to see if any ohs1 pids are running -->
+         <antcall target="chkPids">
+           <param name="pidName"  value="httpd.worker"/>
+           <param name="expected" value="0"/>
+           <param name="outfile"  value="ohs1_expected.log"/>
+           <param name="ohsName"  value="ohs1"/>
+         </antcall>
+       </try> 
+       <catch>
+          <!-- We didn't find zero pids, so stop ohs1 --> 
+          <antcall target="stopOHS">
+           <param name="out.log"  value="ohs1_stop.log"/>
+           <param name="ohs.name" value="ohs1"/>
+          </antcall>
+       </catch>
+       </trycatch>
+      </then>
+   </if>
+
+    <!-- If BAD_ENVIRONMENT.dif:  trigger failure & exit -->
+    <property name="exit.msg" value="${lineSpace}${prettyLine}BAD_ENVIRONMENT.dif detected in T_WORK!${lineSpace}Environment is suspect.  Exiting...${prettyLine}"/>
+    <assertTrue message="${exit.msg}">
+      <not><available file="${bad.env.file}"/></not>
+    </assertTrue>
+
+  </target>
+
+</project>

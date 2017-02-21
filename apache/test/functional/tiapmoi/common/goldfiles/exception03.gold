@@ -1,0 +1,84 @@
+#### - BEGIN 1
+Port  is not valid.
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 2
+Port   is not valid.
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 3
+Port  is not valid.
+#### - END
+#### - BEGIN 4
+Port   is not valid.
+#### - END
+#### - BEGIN 5
+Port  is not valid.
+#### - END
+#### - BEGIN 6
+Port   is not valid.
+#### - END
+#### - BEGIN 7
+Configuration file template value \"listenPort\=7778.9\" does not contain a valid port number
+#### - END
+#### - BEGIN 8
+Error\: exceptions.NameError
+#### - END
+#### - BEGIN 9
+Port badFormat is not valid.
+#### - END
+#### - BEGIN 10
+Error\: exceptions.SyntaxError
+non-keyword argument following keyword
+#### - END
+#### - BEGIN 11
+Port \-1 is not valid.
+#### - END
+#### - BEGIN 12
+Port 0 is not valid.
+#### - END
+#### - BEGIN 13
+Port 0 is not valid.
+#### - END
+#### - BEGIN 14
+Port 18000000000000 is not valid.
+#### - END
+#### - BEGIN 15
+The new instance uses a privileged port.  Refer to the privileged port configuration information in the product documentation.
+#### - END
+#### - BEGIN 16
+The new instance uses a privileged port.  Refer to the privileged port configuration information in the product documentation.
+#### - END
+#### - BEGIN 17
+The new instance uses a privileged port.  Refer to the privileged port configuration information in the product documentation.
+#### - END
+#### - BEGIN 18
+The port value.*9000.*has already been used and cannot be configured for listenPort.
+#### - END
+#### - BEGIN 19
+The port value.*9000.*has already been used and cannot be configured for listenPort.
+#### - END
+#### - BEGIN 20
+The port value.*9000.*has already been used and cannot be configured for sslPort.
+#### - END
+#### - BEGIN 21
+The port value.*8000.*has already been used and cannot be configured for listenPort.
+#### - END
+#### - BEGIN 22
+Port %ADMIN_PORT% for listenPort is already in use on machine \"%MACHINE_NAME%\".
+#### - END
+#### - BEGIN 23
+Port %ADMIN_PORT% for sslPort is already in use on machine \"%MACHINE_NAME%\".
+#### - END
+#### - BEGIN 24
+Port %ADMIN_SSL_PORT% for listenPort is already in use on machine \"%MACHINE_NAME%\".
+#### - END
+#### - BEGIN 25
+Port %ADMIN_SSL_PORT% for adminPort is already in use on machine \"%MACHINE_NAME%\".
+#### - END
+#### - BEGIN 26
+Port 5556 for listenPort is already in use on machine \"%MACHINE_NAME%\".
+#### - END
+#### - BEGIN 27
+Port 5556 for sslPort is already in use on machine \"%MACHINE_NAME%\".
+#### - END

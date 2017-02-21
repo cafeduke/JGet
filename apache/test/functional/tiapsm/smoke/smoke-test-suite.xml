@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="functional.tiapsm.smoke.test.suite">
+  <description>
+    smoke test suite in tiapsm team.
+
+    Edit this file to control feature test suite
+
+  </description>
+
+  <!-- ADDED-BY-SEED location of this file -->
+  <dirname property="functional.tiapsm.smoke.test.suite.dir" 
+           file="${ant.file.functional.tiapsm.smoke.test.suite}" />
+
+  <!-- ADDED-BY-SEED Id of test suite -->
+  <property name="suiteid" value="functional.tiapsm.smoke.suite" />
+
+  <!-- ADDED-BY-SEED Id of property set that is passed to test files -->
+  <property name="suite.propertysetid" 
+            value="functional.tiapsm.smoke.suite.propertysetid"/>
+
+  <!-- ADDED-BY-SEED feature test xml files -->
+  <projects id="functional.tiapsm.smoke.suite">
+    <path>
+      <fileset dir="${functional.tiapsm.smoke.test.suite.dir}">
+        <include name="**/*.test.xml"/>
+      </fileset>
+    </path>
+  </projects>
+
+  <!-- ADDED-BY-SEED Properties that are passed to test xml files that makeup
+                     above suite -->
+  <propertyset id="functional.tiapsm.smoke.suite.propertysetid">
+    <propertyref builtin="commandline" />
+  </propertyset>
+
+</project>

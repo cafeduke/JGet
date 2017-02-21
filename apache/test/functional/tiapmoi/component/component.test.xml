@@ -1,0 +1,714 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapmoi.component" default="usage">
+  <description>
+    functional tiapmoi component tests.
+
+    @testlogic.group  type="working" values="true"
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="winFIPS" values="false"
+
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapmoi.component.dir" file="${ant.file.tiapmoi.component}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapmoi.component.dir}/../tiapmoi-test-base.xml" />
+
+  <!-- =================================================== -->
+  <!-- prepare -->
+  <!-- =================================================== -->
+
+  <target name="prepare" >
+  <description>
+     Remove any old logfiles lingering in T_WORK
+  </description>
+    <firsttimeonly>
+     <delete>
+        <fileset dir="${twork.dir}" includes="tiapmoi_component*"/>
+     </delete>
+
+    <!-- Create a new OHS instance -->
+    <antcall target="createOHS">
+      <param name="out.log"  value="tiapmoi_component_crt.log"/>
+      <param name="ohs.name" value="comp1"/>
+    </antcall>
+
+    <!-- Setup .wlst directory -->
+    <!-- This allows the start-stopComponent scripts to work without -->
+    <!-- entering a password. -->
+    <property name="keyPath"  value="${user.home}/.wlst"/>
+    <property name="basePath" value="${tiapmoi.component.dir}/common/data"/>
+    <if>
+     <isset property="isWindows"/>
+     <then>
+       <property name="from1" value="${basePath}/nt/nm-cfg.props"/>
+       <property name="from2" value="${basePath}/nt/nm-key.props"/>
+     </then>
+     <else>
+       <property name="from1" value="${basePath}/linux/nm-cfg.props"/>
+       <property name="from2" value="${basePath}/linux/nm-key.props"/>
+     </else>
+    </if>
+    <property name="keyFile1" value="${keyPath}/nm-cfg-${DOMAIN_NAME}.props"/>
+    <property name="keyFile2" value="${keyPath}/nm-key-${DOMAIN_NAME}.props"/>
+    
+    <trycatch>
+    <try>
+      <delete dir="${keyPath}"/>
+    </try>
+    </trycatch>
+    <mkdir dir="${keyPath}"/>
+    <copy file="${from1}" tofile="${keyFile1}"/>
+    <copy file="${from2}" tofile="${keyFile2}"/>
+
+    </firsttimeonly>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- unprepare -->
+  <!-- =================================================== -->
+
+  <target name="unprepare" >
+  <description>
+     Remove the comp1 instance
+  </description>
+    <firsttimeonly>
+
+    <trycatch>
+    <try>
+      <antcall target="stopOHS">
+        <param name="out.log"  value="tiapmoi_component_stp.log"/>
+        <param name="ohs.name" value="comp1"/>
+      </antcall>
+    </try>
+    </trycatch>
+
+    <antcall target="deleteOHS">
+      <param name="out.log"  value="tiapmoi_component_del.log"/>
+      <param name="ohs.name" value="comp1"/>
+    </antcall>
+    </firsttimeonly>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- suite -->
+  <!-- =================================================== -->
+
+  <target name="suite">
+    <description>
+       $DOMAIN_HOME/bin tests for startComponent.sh and stopComponent.sh
+    </description>
+
+    <!-- ============================================== -->
+    <!-- Start a component -->
+    <antcall target="start01"/>
+
+    <!-- Start when already started -->
+    <antcall target="start02"/>
+   
+    <!-- Start with no component name provided -->
+    <antcall target="start03"/>
+ 
+    <!-- Start with bogus component name -->
+    <antcall target="start04"/>
+
+    <!-- Start with OHS misconfig -->
+    <antcall target="start05"/>
+
+    <!-- ============================================== -->
+    <!-- Stop a component -->
+    <antcall target="stop01"/>
+
+    <!-- Stop when already stopped -->
+    <antcall target="stop02"/>
+
+    <!-- Stop with no component name provided -->
+    <antcall target="stop03"/>
+
+    <!-- Stop with bogus component name -->
+    <antcall target="stop04"/>
+
+    <!-- Stop with OHS misconfig -->
+    <antcall target="stop05"/>
+
+    <!-- ============================================== -->
+    <!-- Start/stop five times in a row -->
+    <antcall target="exer01"/>
+
+    <!-- Start via startComp, stop via WLST -->
+    <antcall target="exer02"/>
+
+    <!-- Start via WLST, stop via stopComp -->
+    <antcall target="exer03"/>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- start01 -->
+  <!-- =================================================== -->
+  <target name="start01">
+  <description>
+     Start OHS component with startComponent.sh
+     Verify pids and state pre and post to be sure it's working.
+  </description>
+     <property name="tstName" value="tiapmoi_component_start01"/>
+     <!-- Set max number of pids - will be different by platform -->
+     <if>
+      <isset property="isWindows"/>
+      <then>
+        <property name="pidMax" value="2"/>
+      </then>
+      <else>
+        <property name="pidMax" value="5"/>
+      </else>
+     </if>
+
+     <!-- Verify no pids are running --> 
+     <antcall target="chkPids">
+       <param name="pidName" value="httpd"/>
+       <param name="expected" value="0"/>
+       <param name="outfile" value="${tstName}_bf_pids.log"/>
+       <param name="ohsName" value="comp1"/>
+     </antcall>
+
+     <!-- Verify initial state -->
+     <antcall target="chkState">
+       <param name="ohsName" value="comp1"/>
+       <param name="expected" value="SHUTDOWN"/>
+       <param name="outfile" value="${tstName}_bf_state.log"/>
+     </antcall>
+
+     <!-- Run the script and verify there are no errors --> 
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="wlstErrorScan">
+       <param name="in.file" value="${tstName}.out"/>
+       <param name="out.file" value="${tstName}.log"/>
+     </antcall>
+
+     <!-- Verify after state -->
+     <antcall target="chkState">
+       <param name="ohsName" value="comp1"/>
+       <param name="expected" value="RUNNING"/>
+       <param name="outfile" value="${tstName}_af_state.log"/>
+     </antcall>
+
+     <!-- Verify number of pids started -->
+     <antcall target="chkPids">
+       <param name="pidName" value="httpd"/>
+       <param name="expected" value="${pidMax}"/>
+       <param name="outfile" value="${tstName}_af_pids.log"/>
+       <param name="ohsName" value="comp1"/>
+     </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- start02 -->
+  <!-- =================================================== -->
+  <target name="start02">
+  <description>
+     Start OHS component when already started
+     The instance is already up from start01.
+  </description>
+     <property name="tstName"  value="tiapmoi_component_start02"/>
+     <property name="goldpath" value="${tiapmoi.component.dir}/common/goldfiles"/>
+     <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+     <copy file="${goldpath}/start02.gold" tofile="${goldFile}"/>
+
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="wlstFindStr">
+        <param name="logfile"  value="${tstName}.out"/>
+        <param name="goldfile" value="${goldFile}"/>
+        <param name="outfile"  value="${tstName}.log"/>
+     </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- start03 -->
+  <!-- =================================================== -->
+  <target name="start03">
+  <description>
+     Start OHS component and no OHS instance name provided
+  </description>
+     <property name="tstName" value="tiapmoi_component_start03"/>
+     <property name="goldpath" value="${tiapmoi.component.dir}/common/goldfiles"/>
+     <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+     <copy file="${goldpath}/start03.gold" 
+         tofile="${goldFile}"/>
+
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value=""/>
+     </antcall>
+     <antcall target="wlstFindStr">
+        <param name="logfile"  value="${tstName}.out"/>
+        <param name="goldfile" value="${goldFile}"/>
+        <param name="outfile"  value="${tstName}.log"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- start04 -->
+  <!-- =================================================== -->
+  <target name="start04">
+  <description>
+     Start OHS component and bogus OHS instance provided
+  </description>
+     <property name="tstName" value="tiapmoi_component_start04"/>
+     <property name="goldpath" value="${tiapmoi.component.dir}/common/goldfiles"/>
+     <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+     <copy file="${goldpath}/start04.gold" tofile="${goldFile}"/>
+
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value="bogus"/>
+     </antcall>
+     <antcall target="wlstFindStr">
+        <param name="logfile"  value="${tstName}.out"/>
+        <param name="goldfile" value="${goldFile}"/>
+        <param name="outfile"  value="${tstName}.log"/>
+     </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- start05 -->
+  <!-- =================================================== -->
+  <target name="start05">
+  <description>
+     Start OHS component with a misconfig
+  </description>
+     <property name="tstName" value="tiapmoi_component_start05"/>
+
+     <!-- Need to stop comp1 instance -->
+     <antcall target="stopOHS">
+        <param name="out.log"  value="${tstName}_stop.log"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+
+     <!-- Setup the misconfiguration -->
+     <property name="mod.dir"
+               value="${ohsConfDir}/instances/comp1/moduleconf"/> 
+     <copy file="${tiapmoi.base.dir}/common/misconfig.conf"
+          todir="${mod.dir}" />
+
+     <!-- Copy goldfile to T_WORK --> 
+     <property name="goldpath" value="${tiapmoi.component.dir}/common/goldfiles"/>
+     <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+     <copy file="${goldpath}/start05.gold" tofile="${goldFile}"/>
+
+     <!-- Try to start comp1 with misconfig -->
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+    
+     <!-- Scan output for expected error -->
+     <antcall target="wlstFindStr">
+        <param name="logfile"  value="${tstName}.out"/>
+        <param name="goldfile" value="${goldFile}"/>
+        <param name="outfile"  value="${tstName}.log"/>
+     </antcall>
+
+     <!-- Cleanup misconfig -->
+     <delete file="${mod.dir}/misconfig.conf"/>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- stop01 -->
+  <!-- =================================================== -->
+  <target name="stop01">
+  <description>
+     Stop OHS component with stopComponent.sh
+     Verify pids and state pre and post to be sure it's working.
+  </description>
+     <property name="tstName" value="tiapmoi_component_stop01"/>
+
+     <!-- Set max number of pids - will be different by platform -->
+     <if>
+      <isset property="isWindows"/>
+      <then>
+        <property name="pidMax" value="2"/>
+      </then>
+      <else>
+        <property name="pidMax" value="5"/>
+      </else>
+     </if>
+
+     <!-- Start OHS - should be down -->
+     <antcall target="startOHS">
+       <param name="out.log"  value="${tstName}_start.log"/>
+       <param name="ohs.name" value="comp1"/>
+     </antcall>
+
+     <!-- Verify all pids are running -->
+     <antcall target="chkPids">
+       <param name="pidName" value="httpd"/>
+       <param name="expected" value="${pidMax}"/>
+       <param name="outfile" value="${tstName}_bf_pids.log"/>
+       <param name="ohsName" value="comp1"/>
+     </antcall>
+
+     <!-- Verify initial state -->
+     <antcall target="chkState">
+       <param name="ohsName" value="comp1"/>
+       <param name="expected" value="RUNNING"/>
+       <param name="outfile" value="${tstName}_bf_state.log"/>
+     </antcall>
+
+     <!-- Run the script and verify there are no errors -->
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="wlstErrorScan">
+       <param name="in.file" value="${tstName}.out"/>
+       <param name="out.file" value="${tstName}.log"/>
+     </antcall>
+
+     <!-- Verify after state -->
+     <antcall target="chkState">
+       <param name="ohsName" value="comp1"/>
+       <param name="expected" value="SHUTDOWN"/>
+       <param name="outfile" value="${tstName}_af_state.log"/>
+     </antcall>
+
+     <!-- Verify number of pids started -->
+     <antcall target="chkPids">
+       <param name="pidName" value="httpd"/>
+       <param name="expected" value="0"/>
+       <param name="outfile" value="${tstName}_af_pids.log"/>
+       <param name="ohsName" value="comp1"/>
+     </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- stop02 -->
+  <!-- =================================================== -->
+  <target name="stop02">
+  <description>
+     Stop OHS component when already stopped
+  </description>
+     <property name="tstName" value="tiapmoi_component_stop02"/>
+     <property name="goldpath" value="${tiapmoi.component.dir}/common/goldfiles"/>
+     <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+     <copy file="${goldpath}/stop02.gold" tofile="${goldFile}"/>
+
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="wlstFindStr">
+        <param name="logfile"  value="${tstName}.out"/>
+        <param name="goldfile" value="${goldFile}"/>
+        <param name="outfile"  value="${tstName}.log"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- stop03 -->
+  <!-- =================================================== -->
+  <target name="stop03">
+  <description>
+     Stop OHS component when OHS instance not provided
+  </description>
+     <property name="tstName" value="tiapmoi_component_stop03"/>
+     <property name="goldpath" value="${tiapmoi.component.dir}/common/goldfiles"/>
+     <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+     <copy file="${goldpath}/stop03.gold" tofile="${goldFile}"/>
+
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value=""/>
+     </antcall>
+     <antcall target="wlstFindStr">
+        <param name="logfile"  value="${tstName}.out"/>
+        <param name="goldfile" value="${goldFile}"/>
+        <param name="outfile"  value="${tstName}.log"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- stop04 -->
+  <!-- =================================================== -->
+  <target name="stop04">
+  <description>
+     Stop OHS component when OHS instance does not exist
+  </description>
+     <property name="tstName" value="tiapmoi_component_stop04"/>
+     <property name="goldpath" value="${tiapmoi.component.dir}/common/goldfiles"/>
+     <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+     <copy file="${goldpath}/stop04.gold" tofile="${goldFile}"/>
+
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value="bogus"/>
+     </antcall>
+     <antcall target="wlstFindStr">
+        <param name="logfile"  value="${tstName}.out"/>
+        <param name="goldfile" value="${goldFile}"/>
+        <param name="outfile"  value="${tstName}.log"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- stop05 -->
+  <!-- =================================================== -->
+  <target name="stop05">
+  <description>
+     Stop OHS component with a misconfig
+  </description>
+     <property name="tstName" value="tiapmoi_component_stop05"/>
+
+     <!-- Need to start comp1 instance - should be down -->
+     <antcall target="startOHS">
+        <param name="out.log"  value="${tstName}_start.log"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+
+     <!-- Setup the misconfiguration -->
+     <property name="mod.dir"
+               value="${ohsConfDir}/instances/comp1/moduleconf"/>
+     <copy file="${tiapmoi.base.dir}/common/misconfig.conf"
+          todir="${mod.dir}" />
+
+     <!-- Copy goldfile to T_WORK -->
+     <property name="goldpath" value="${tiapmoi.component.dir}/common/goldfiles"/>
+     <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+     <copy file="${goldpath}/stop05.gold" tofile="${goldFile}"/>
+
+     <!-- Try to stop comp1 with misconfig -->
+     <!-- This should succeed -->
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+
+     <!-- Scan output for expected success msg -->
+     <antcall target="wlstFindStr">
+        <param name="logfile"  value="${tstName}.out"/>
+        <param name="goldfile" value="${goldFile}"/>
+        <param name="outfile"  value="${tstName}.log"/>
+     </antcall>
+
+     <!-- Cleanup misconfig -->
+     <delete file="${mod.dir}/misconfig.conf"/>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- exer01 -->
+  <!-- =================================================== -->
+  <target name="exer01">
+  <description>
+     Exercise start/stopComponent.
+     Start and stop five times in a row (stress test).
+     The comp1 instance should be down at present.
+  </description>
+     <property name="tstName" value="tiapmoi_component_exer01"/>
+
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.1.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.1.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.2.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.2.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.3.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.3.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.4.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.4.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}.5.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+
+     <!-- Check that state should be RUNNING -->
+     <antcall target="chkState">
+       <param name="ohsName" value="comp1"/>
+       <param name="expected" value="RUNNING"/>
+       <param name="outfile" value="${tstName}_lstart_state.log"/>
+     </antcall>
+
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}.5.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+
+     <!-- Check that state should be SHUTDOWN -->
+     <antcall target="chkState">
+       <param name="ohsName" value="comp1"/>
+       <param name="expected" value="SHUTDOWN"/>
+       <param name="outfile" value="${tstName}_lstop_state.log"/>
+     </antcall>
+  
+     <!-- Scan the output log for any errors -->
+     <antcall target="wlstErrorScan">
+       <param name="in.file" value="${tstName}.5.out"/>
+       <param name="out.file" value="${tstName}.log"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- exer02 -->
+  <!-- =================================================== -->
+  <target name="exer02">
+  <description>
+     Exercise start/stopComponent.
+     Start with startComponent, stop with WLST
+  </description>
+     <property name="tstName" value="tiapmoi_component_exer02"/>
+
+     <antcall target="startComp">
+        <param name="out.log"  value="${tstName}_start.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="stopOHS">
+        <param name="out.log"  value="${tstName}_stop.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+
+     <!-- Check that state should be SHUTDOWN -->
+     <antcall target="chkState">
+       <param name="ohsName" value="comp1"/>
+       <param name="expected" value="SHUTDOWN"/>
+       <param name="outfile" value="${tstName}_state.log"/>
+     </antcall>
+
+    <!-- Scan the output log for any errors -->
+     <antcall target="wlstErrorScan">
+       <param name="in.file" value="${tstName}_stop.out"/>
+       <param name="out.file" value="${tstName}_stop.log"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- exer03 -->
+  <!-- =================================================== -->
+  <target name="exer03">
+  <description>
+     Exercise start/stopComponent.
+     Start with WLST, stop with stopComponent
+  </description>
+     <property name="tstName" value="tiapmoi_component_exer03"/>
+
+     <antcall target="startOHS">
+        <param name="out.log"  value="${tstName}_start.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+     <antcall target="stopComp">
+        <param name="out.log"  value="${tstName}_stop.out"/>
+        <param name="ohs.name" value="comp1"/>
+     </antcall>
+
+     <!-- Check that state should be SHUTDOWN -->
+     <antcall target="chkState">
+       <param name="ohsName" value="comp1"/>
+       <param name="expected" value="SHUTDOWN"/>
+       <param name="outfile" value="${tstName}_state.log"/>
+     </antcall>
+
+    <!-- Scan the output log for any errors -->
+     <antcall target="wlstErrorScan">
+       <param name="in.file" value="${tstName}_stop.out"/>
+       <param name="out.file" value="${tstName}_stop.log"/>
+     </antcall>
+
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Start OHS Instance with startComponent                               -->
+  <!-- ==================================================================== -->
+
+  <target name="startComp">
+  <description>
+     Start a given OHS instance with $DOMAIN_HOME/bin/startComponent
+     Params:
+        ${out.log}      - name of output file in T_WORK
+        ${ohs.name}     - ohs name
+  </description>
+
+     <echo message="startComponent:  starting OHS Instance:  ${ohs.name}..."/>
+     <property name="script" value="${tiapmoi.component.dir}/common/perl/ohs_startComp.pl"/>
+     <tl-exec name="startComp" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${out.log}"
+           failonerror="true" append="true">
+           <arg line="${script}" />
+           <arg line="${ohs.name}" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="PLATFORM"     value="${PLATFORM}" />
+           <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}" />
+           <env key="DOMAIN_NAME"  value="${DOMAIN_NAME}" />
+           <env key="HOME"         value="${user.home}" />
+     </tl-exec>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Stop OHS Instance with stopComponent                                 -->
+  <!-- ==================================================================== -->
+
+  <target name="stopComp">
+  <description>
+     Stop a given OHS instance with $DOMAIN_HOME/bin/stopComponent
+     Params:
+        ${out.log}      - name of output file in T_WORK
+        ${ohs.name}     - ohs name
+  </description>
+
+     <echo message="stopComponent:  stopping OHS Instance:  ${ohs.name}..."/>
+     <property name="script" value="${tiapmoi.component.dir}/common/perl/ohs_stopComp.pl"/>
+     <tl-exec name="stopComp" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${out.log}"
+           failonerror="true" append="true">
+           <arg line="${script}" />
+           <arg line="${ohs.name}" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="PLATFORM"     value="${PLATFORM}" />
+           <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}" />
+           <env key="DOMAIN_NAME"  value="${DOMAIN_NAME}" />
+           <env key="HOME"         value="${user.home}" />
+     </tl-exec>
+  </target>
+
+
+
+
+</project>
+
+ 

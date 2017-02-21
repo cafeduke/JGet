@@ -1,0 +1,839 @@
+<?xml version="1.0"?>
+<project name="functional.base">
+  <description>
+    Base file of all functional tests.
+
+    It defines properties and libraries that are used by all functional area
+    Ant file. User can also add utlity targets.
+  </description>
+
+  <!-- ==================================================================== -->
+  <!-- START: Properties                                                    -->
+  <!-- ==================================================================== -->
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="functional.base.dir" file="${ant.file.functional.base}" />
+
+  <!-- ADDED-BY-SEED Area name -->
+  <property name="area" value="functional" />
+
+  <!-- ADDED-BY-SEED Empty string for team -->
+  <property name="team" value=""/>
+
+  <!-- ADDED-BY-SEED Standard property to identify area base directory -->
+  <property name="area.base.dir" value="${functional.base.dir}"/>
+
+
+  <!-- Want to know if the run fails -->
+  <property name="testlogic.failonerror" value="true"/>
+
+  <!-- But don't skip tests -->
+  <property name="testlogic.haltonerror" value="false"/>
+  <property name="testlogic.haltonfailure" value="false"/>
+  
+  <!-- Test target timeout -->
+  <property name="testlogic.timeout.target" value="5000" />
+
+
+  <!-- ==================================================================== -->
+  <!-- START: Imports                                                       -->
+  <!-- ==================================================================== -->
+
+  <!-- import root file of all tests -->
+  <import file="${functional.base.dir}/../root.xml" />
+
+  <!-- Pull in OHS environment information -->
+  <property name="getEnv.file"  value="${twork.dir}/getEnv.log" />
+  <if>
+     <available file="${getEnv.file}"/>
+     <then>
+       <loadproperties srcFile="${getEnv.file}"/>
+     </then>
+  </if>
+
+  <!-- ==================================================================== -->
+  <!-- START: Properties defined based on above imports                     -->
+  <!-- ==================================================================== -->
+
+  <!-- ADDED-BY-SEED Marker file which is created when area setup target has
+                       successfully run
+  -->
+  <property name="area.setup.marker.file"
+     value="${run.output.dir}/functional-setup-marker.properties" />
+
+  <!-- 
+    Since all the <team>/<team>-base.xml file only imports  
+    functional-base.xml file, we need to define the Reference ID 
+    full.tools.build here, so that it is accessible form all team/feature
+    without changing any test.xml file as follows ...
+    ant build -Dsuiteid=full.tools.build
+    It can be overwriten at team level in exclude any particular file
+   -->
+
+  <projects id="full.tests.build">
+   <path>
+   <fileset dir="${functional.base.dir}/${team}">
+     <include name="**/**/*.test.xml" />
+   </fileset>
+  </path>
+ </projects>
+
+ 
+  <!-- ==================================================================== -->
+  <!-- Custom Tasks                                                         -->
+  <!-- ==================================================================== -->
+
+  <!-- Display OHS environment information --> 
+  <target name="displayEnv" >
+    <echoLog>Display environment variables</echoLog>
+    <echo message="::: INSTALL_TYPE is ${INSTALL_TYPE}" />
+    <echo message="::: ORACLE_HOME is ${ORACLE_HOME}" />
+    <echo message="::: DOMAIN_HOME is ${DOMAIN_HOME}" />
+    <echo message="::: WLST_LOC is ${WLST_LOC}" />
+    <echo message="::: WLS_USER is ${WLS_USER}" />
+    <echo message="::: WLS_PWD is ${WLS_PWD}" />
+    <echo message="::: ADMIN_HOST is ${ADMIN_HOST}" />
+
+    <!-- If collocated, there are a few more -->
+    <if>
+      <not><equals arg1="${INSTALL_TYPE}" arg2="standalone" /></not>
+      <then>
+        <echo message="::: ADMIN_PORT is ${ADMIN_PORT}" />
+        <echo message="::: ADMIN_SSL_PORT is ${ADMIN_SSL_PORT}" />
+        <echo message="::: MACHINE_NAME is ${MACHINE_NAME}" />
+      </then>
+    </if>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Create OHS Instance                                                  -->
+  <!-- ==================================================================== -->
+
+<target name="createOHS">
+  <description>
+     Create a given OHS instance.
+     Params:
+        ${out.log}        - name of output file in T_WORK
+        [${ohs.name}]     - ohs name (default to ohs1)
+        [${machine.name}] - machine name (use env var if not set)
+        [${listen.port}]  - listen port to set
+        [${ssl.port}]     - ssl port to set
+        [${admin.port}]   - admin port to set
+        [${old.way}]      - use older WLST commands
+        [${no.delete}]    - do not perform a deletion if ohs.name exists
+  </description>
+
+     <!-- Set all optional arguments -->
+     <condition property="arg.ohs" value="-ohs ${ohs.name}" else="">
+        <isset property="ohs.name"/>
+     </condition>
+     <condition property="arg.machine" value="-machine ${machine.name}" else="">
+        <isset property="machine.name"/>
+     </condition>
+     <condition property="arg.listen" value="-listen ${listen.port}" else="">
+        <isset property="listen.port"/>
+     </condition>
+     <condition property="arg.ssl" value="-ssl ${ssl.port}" else="">
+        <isset property="ssl.port"/>
+     </condition>
+     <condition property="arg.admin" value="-admin ${admin.port}" else="">
+        <isset property="admin.port"/>
+     </condition>
+     <condition property="arg.old" value="-old" else="">
+        <isset property="old.way"/>
+     </condition>
+     <condition property="arg.del" value="-nodelete" else="">
+        <isset property="no.delete"/>
+     </condition>
+
+     <property name="script" value="${functional.base.dir}/common/perl/createInstance.pl"/>
+
+     <echo message="Creating OHS Instance: ${ohs.name}..."/>
+     <tl-exec name="create" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${out.log}"
+           failonerror="true">
+           <arg line="${script}" />
+           <arg line="${arg.ohs}" />
+           <arg line="${arg.machine}"/>
+           <arg line="${arg.listen}"/>
+           <arg line="${arg.ssl}"/>
+           <arg line="${arg.admin}"/>
+           <arg line="${arg.old}"/>
+           <arg line="${arg.del}" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="INSTALL_TYPE" value="${INSTALL_TYPE}" />
+           <env key="ORACLE_HOME"  value="${ORACLE_HOME}" />
+           <env key="ADMIN_HOST"   value="${ADMIN_HOST}" />
+           <env key="ADMIN_PORT"   value="${ADMIN_PORT}" />
+           <env key="WLS_USER"     value="${WLS_USER}" />
+           <env key="WLS_PWD"      value="${WLS_PWD}" />
+           <env key="WLST_LOC"     value="${WLST_LOC}" />
+           <env key="MACHINE_NAME" value="${MACHINE_NAME}" />
+           <env key="ohsConfDir"   value="${ohsConfDir}" />
+           <env key="ohsLogDir"    value="${ohsLogDir}" />
+           <env key="nmLogDir"     value="${nmLogDir}" />
+        </tl-exec>
+  </target>
+
+
+  <!-- ==================================================================== -->
+  <!-- Start OHS Instance                                                   -->
+  <!-- ==================================================================== -->
+
+  <target name="startOHS">
+  <description>
+     Start a given OHS instance.
+     Params:
+        ${out.log}      - name of output file in T_WORK
+        ${ohs.name}     - ohs name
+  </description>
+
+     <echo message="Starting OHS Instance:  ${ohs.name}..."/>
+     <echo message="Writing out:  ${twork.dir}/${out.log}"/>
+     <property name="script" value="${functional.base.dir}/common/perl/ohs_start.pl"/>
+     <tl-exec name="start" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${out.log}"
+           failonerror="true">
+           <arg line="${script}" />
+           <arg line="-ohs ${ohs.name}" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="INSTALL_TYPE" value="${INSTALL_TYPE}" />
+           <env key="ADMIN_HOST"   value="${ADMIN_HOST}" />
+           <env key="ADMIN_PORT"   value="${ADMIN_PORT}" />
+           <env key="WLS_USER"     value="${WLS_USER}" />
+           <env key="WLS_PWD"      value="${WLS_PWD}" />
+           <env key="WLST_LOC"     value="${WLST_LOC}" />
+           <env key="DOMAIN_NAME"  value="${DOMAIN_NAME}" />
+           <env key="ohsConfDir"   value="${ohsConfDir}" />
+        </tl-exec>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Stop OHS Instance                                                    -->
+  <!-- ==================================================================== -->
+
+  <target name="stopOHS">
+  <description>
+     Stop a given OHS instance.
+     Params:
+        ${out.log}      - name of output file in T_WORK
+        ${ohs.name}     - ohs name
+  </description>
+     <property name="script" value="${functional.base.dir}/common/perl/ohs_stop.pl"/>
+
+     <echo message="Stopping OHS Instance: ${ohs.name}..."/>
+     <echo message="Writing out:  ${twork.dir}/${out.log}"/>
+     <tl-exec name="stop" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${out.log}"
+           failonerror="true">
+           <arg line="${script}" />
+           <arg line="-ohs ${ohs.name}" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="INSTALL_TYPE" value="${INSTALL_TYPE}" />
+           <env key="ADMIN_HOST"   value="${ADMIN_HOST}" />
+           <env key="ADMIN_PORT"   value="${ADMIN_PORT}" />
+           <env key="WLS_USER"     value="${WLS_USER}" />
+           <env key="WLS_PWD"      value="${WLS_PWD}" />
+           <env key="WLST_LOC"     value="${WLST_LOC}" />
+           <env key="DOMAIN_NAME"  value="${DOMAIN_NAME}" />
+        </tl-exec>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Restart OHS Instance                                                 -->
+  <!-- ==================================================================== -->
+
+  <target name="restartOHS">
+  <description>
+     Attempt a softRestart on a given OHS instance.
+     Params:
+        ${out.log}      - name of output file in T_WORK
+        ${ohs.name}     - ohs name
+  </description>
+     <property name="script" value="${functional.base.dir}/common/perl/ohs_restart.pl"/>
+
+     <echo message="Restarting OHS Instance: ${ohs.name}..."/>
+     <echo message="Writing out:  ${twork.dir}/${out.log}"/>
+     <tl-exec name="restart" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${out.log}"
+           failonerror="true">
+           <arg line="${script}" />
+           <arg line="-ohs ${ohs.name}" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="INSTALL_TYPE" value="${INSTALL_TYPE}" />
+           <env key="ADMIN_HOST"   value="${ADMIN_HOST}" />
+           <env key="ADMIN_PORT"   value="${ADMIN_PORT}" />
+           <env key="WLS_USER"     value="${WLS_USER}" />
+           <env key="WLS_PWD"      value="${WLS_PWD}" />
+           <env key="WLST_LOC"     value="${WLST_LOC}" />
+           <env key="DOMAIN_NAME"  value="${DOMAIN_NAME}" />
+        </tl-exec>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Bounce OHS Instance                                                  -->
+  <!-- ==================================================================== -->
+  <target name="bounceOHS">
+  <description>
+     Check to see if given OHS instance is running.
+       - If yes:  perform a softRestart
+       - If no:   start it up.
+     Bouncing is often necessary to pick up changes in OHS configuration.
+     The softRestart is less of a time hit then shutting down followed
+     by a second connection to restart the instance.
+     Params:
+        ${start.log}    - name of output file in T_WORK
+        ${ohs.name}     - ohs name
+  </description>
+   
+    <trycatch>
+    <try>
+      <!-- Check to see if any OHS pids are running -->
+      <antcall target="chkPids">
+        <param name="pidName"  value="httpd.worker"/>
+        <param name="expected" value="0"/>
+        <param name="outfile"  value="${start.log}"/>
+        <param name="ohsName"  value="${ohs.name}"/>
+      </antcall>
+    </try>
+    <catch>
+      <!-- We found some pids, so let's run softRestart -->
+      <antcall target="restartOHS">
+        <param name="out.log"  value="${start.log}"/>
+        <param name="ohs.name" value="${ohs.name}"/>
+      </antcall>
+      <property name="finished" value="1"/>
+    </catch>
+    </trycatch>
+  
+    <!-- If we we didn't restart try to start it up -->
+    <if>
+      <not>
+        <isset property="finished"/>
+      </not>
+      <then>
+        <antcall target="startOHS">
+          <param name="out.log"  value="${start.log}"/>
+          <param name="ohs.name" value="${ohs.name}"/>
+        </antcall>
+      </then>
+    </if>
+
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Delete OHS Instance                                                  -->
+  <!-- ==================================================================== -->
+  <target name="deleteOHS">
+  <description>
+     Remove a given OHS instance.
+     Params:
+        ${out.log}        - name of output file in T_WORK
+        ${ohs.name}       - ohs name (default to ohs1)
+        [${old.way}]      - use older WLST commands
+        [${delete}]       - force a deletion of the instane
+  </description>
+
+     <!-- Set all optional arguments -->
+     <condition property="arg.old" value="-old" else="">
+        <isset property="old.way"/>
+     </condition>
+     <condition property="arg.del" value="-delete" else="">
+        <isset property="delete"/>
+     </condition>
+
+     <property name="script" value="${functional.base.dir}/common/perl/deleteInstance.pl" />
+
+     <echo message="Deleting OHS Instance:  ${ohs.name}..."/>
+     <tl-exec name="delete" executable="perl"
+           cmdfile="${twork.dir}/tmp.txt"
+           output="${twork.dir}/${out.log}"
+           failonerror="true">
+           <arg line="${script}" />
+           <arg line="-ohs ${ohs.name}" />
+           <arg line="${arg.old}"/>
+           <arg line="${arg.del}"/>
+           <env key="ORACLE_HOME"  value="${ORACLE_HOME}" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="ADMIN_HOST"   value="${ADMIN_HOST}" />
+           <env key="ADMIN_PORT"   value="${ADMIN_PORT}" />
+           <env key="WLS_USER"     value="${WLS_USER}" />
+           <env key="WLS_PWD"      value="${WLS_PWD}" />
+           <env key="WLST_LOC"     value="${WLST_LOC}" />
+           <env key="ohsConfDir"   value="${ohsConfDir}" />
+           <env key="ohsLogDir"    value="${ohsLogDir}" />
+           <env key="nmLogDir"     value="${nmLogDir}" />
+        </tl-exec>
+
+        <!-- Remove the port file, if it exists -->
+        <property name="port.file" value="${twork.dir}/ports-${ohs.name}.txt"/>
+        <if> 
+          <available file="${port.file}"/>
+          <then>
+            <delete file="${port.file}"/>            
+          </then>
+        </if>
+
+   </target>
+
+  <!-- ==================================================================== -->
+  <!-- Bounce WLS                                                           -->   <!-- ==================================================================== -->
+
+  <target name="bounceWLS">
+  <description>
+     Stop and then start WLS.
+     Params:
+        ${stopWLS.log}      - name of stopWLS file in T_WORK
+        ${startWLS.log}      - name of startWLS  file in T_WORK
+  </description>
+
+     <echoLog>WLS AdminServer:  stop it, if up</echoLog>
+        <echo message="May take a few minutes"/>
+        <tl-exec name="stopWLS" executable="perl"
+           output="${stopWLS.log}"
+           cmdfile="${twork.dir}/tmp.txt"
+           failonerror="true">
+           <arg line="${functional.base.dir}/common/perl/stopWLS.pl" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}" />
+           <env key="INSTALL_TYPE" value="${INSTALL_TYPE}" />
+        </tl-exec>
+
+     <echoLog>WLS AdminServer:  start it, if not already up</echoLog>
+        <echo message="May take a few minutes if not up..."/>
+        <tl-exec name="chkWLS" executable="perl"
+           output="${startWLS.log}"
+           cmdfile="${twork.dir}/tmp.txt"
+           failonerror="true">
+           <arg line="${functional.base.dir}/common/perl/chkWLS.pl" />
+           <env key="T_WORK"       value="${twork.dir}" />
+           <env key="DOMAIN_HOME"  value="${DOMAIN_HOME}" />
+           <env key="INSTALL_TYPE" value="${INSTALL_TYPE}" />
+        </tl-exec>
+
+  </target>
+
+
+  <!-- ==================================================================== -->
+  <!-- Send ping to OHS Instance                                            -->
+  <!-- ==================================================================== -->
+  <target name="pingOHS">
+  <description>
+     Send a basic URL request to a given OHS instance.
+     Params:
+        ${out.log}           - logfile name
+        ${ohs.name}          - ohs name
+        ${url}               - URL to use
+  </description>
+
+    <!-- Pull in OHS ports from ports-ohsName.txt -->
+    <property name="port.file" value="${twork.dir}/ports-${ohs.name}.txt"/>
+    <loadproperties srcFile="${port.file}"/>
+    
+    <!-- Set URL -->
+    <property name="urlPing" value="http://${ADMIN_HOST}:${APACHE_PORT}${url}"/>
+    <property name="pingOutput" value=""/>
+
+    <trycatch property="pingOutput">
+    <try>
+      <http-url-connection
+        target="${urlPing}"
+        checkmode="RESPONSE_CODE, RESPONSE_STRING">
+        <expectedresponsecode>200</expectedresponsecode>
+        <expectedstring regexp="true">
+.*test PASSED.*
+        </expectedstring>
+      </http-url-connection>
+    </try>
+    <catch>
+      <property name="errMsg" value="ERROR:  Response code or expected string is
+ not as expected."/>
+      <if>
+      <equals arg1="${ohs.name}" arg2="smoke" />
+      <then>
+        <echo file="${twork.dir}/SMOKE_FAIL.dif" append="false">
+${urlPing}
+${errMsg}
+        </echo>
+      </then>
+      </if>
+      <fail message="${errMsg}"/>
+    </catch>
+
+    <finally>
+       <echo file="${twork.dir}/${out.log}" append="false">
+URL: ${urlPing}
+----------------------------------------------
+${pingOutput}
+       </echo>
+    </finally>
+    </trycatch>
+  </target>
+  
+  <!-- ==================================================================== -->
+  <!-- Send SSL ping to OHS Instance                                        -->
+  <!-- ==================================================================== -->
+  <target name="pingOHS_ssl">
+  <description>
+     Send a basic URL request via SSL to a given OHS instance.
+     Params:
+        ${out.log}           - logfile name
+        ${ohs.name}          - ohs name
+        ${url}               - URL to use 
+       [${port}]           - provide an SSL port as per virtual host
+  </description>
+
+    <!-- Pull in OHS ports from ports-ohsName.txt -->
+    <property name="port.file" value="${twork.dir}/ports-${ohs.name}.txt"/>
+    <loadproperties srcFile="${port.file}"/>
+
+    <!-- Use Virtual Host SSL port if provided -->
+    <condition property="argPort" value="${port}" else="${APACHE_SSL_PORT}">
+       <isset property="port"/>
+    </condition>
+
+    <!-- Set the URL -->
+    <property name="urlPing" value="https://${ADMIN_HOST}:${argPort}${url}"/>
+    <property name="pingOutput" value=""/>
+
+    <trycatch property="pingOutput">
+    <try>
+      <http-url-connection
+        target="${urlPing}"
+        checkmode="RESPONSE_CODE, RESPONSE_STRING"
+        secure="true" twowayssl="false"
+        certlocation="${twork.dir}/sslJKS.jks"
+        Keystorepassword="welcome1"
+        Keypassword="welcome1"
+        keyalias="sslcert">
+        <expectedresponsecode>200</expectedresponsecode>
+        <expectedstring regexp="true">
+.*test PASSED.*
+        </expectedstring>
+      </http-url-connection>
+    </try>
+
+    <catch>
+      <property name="errMsg" value="ERROR:  Response code or expected string is not as expected."/>
+      <if>
+      <equals arg1="${ohs.name}" arg2="smoke"/>
+      <then>
+        <echo file="${twork.dir}/SMOKE_FAIL.dif" append="false">
+${urlPing}
+${errMsg}
+        </echo>
+      </then>
+      </if>
+      <fail message="${errMsg}"/>
+    </catch>
+
+    <finally>
+      <echo file="${twork.dir}/${out.log}" append="false">
+URL: ${urlPing}
+----------------------------------------------
+${pingOutput}
+      </echo>
+    </finally>
+    </trycatch>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- configureSSL                                                         -->
+  <!-- ==================================================================== -->
+  <target name="configureSSL">
+  <description>
+     Configure SSL for the given instance
+     Params:
+        ${out.log}           - logfile name
+        ${ohs.name}          - ohs name
+  </description>
+     <tl-exec name="configureSSL" executable="perl"
+       cmdfile="${twork.dir}/tmp.txt"
+       output="${twork.dir}/${out.log}"
+       failonerror="true">
+       <arg line="${functional.base.dir}/common/perl/configureSSL.pl" />
+       <arg line="-ohs ${ohs.name}" />
+       <env key="T_WORK"       value="${twork.dir}" />
+       <env key="ORACLE_JAVA_HOME" value="${ORACLE_JAVA_HOME}" />
+       <env key="ORACLE_HOME"  value="${ORACLE_HOME}"/>
+       <env key="ohsConfDir"   value="${ohsConfDir}" />
+      </tl-exec>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Send ping to OHS Instance                                            -->
+  <!-- ==================================================================== -->
+  <target name="pingOHSJava">
+  <description>
+     Use java client to send HTTP request
+  </description>
+
+    <!-- Pull in OHS ports from ports-ohsName.txt -->
+    <property name="port.file" value="${twork.dir}/ports-${ohs.name}.txt"/>
+    <loadproperties srcFile="${port.file}"/>
+
+    <property name="srcdir" location="${functional.base.dir}/tiapwt/common/java" />
+
+    <property name="urlPing" value="http://${ADMIN_HOST}:${APACHE_PORT}${url}"/>
+
+    <trycatch property="pingOutput">
+    <try>
+      <java classname="HttpURLConnectionExample" fork="true" failonerror="false">
+         <classpath path="${srcdir}"/>
+         <arg value="${urlPing}"/>
+         <env key="env1" value="${twork.dir}/${file1}" />
+         <env key="env2" value="${twork.dir}/${out.log}" />
+      </java>
+    </try>
+    <finally>
+      <echo file="${twork.dir}/${out.log}" append="true">
+URL: ${urlPing}
+------------------------------------------
+${pingOutput}
+      </echo>
+    </finally>
+    </trycatch>
+  </target>
+
+  <!-- ==================================================================== -->
+  <!-- Send SSL ping to OHS Instance                                       -->
+  <!-- ==================================================================== -->
+
+  <target name="SSLpingOHSJava">
+  <description>
+    Use java client to send an HTTPS request
+  </description>
+
+   <!-- Pull in OHS ports from ports-ohsName.txt -->
+   <property name="port.file" value="${twork.dir}/ports-${ohs.name}.txt"/>
+   <loadproperties srcFile="${port.file}"/>
+
+   <property name="srcdir" location="${functional.base.dir}/tiapwt/common/misc" />
+   <property name="urlPing" value="https://${ADMIN_HOST}:${APACHE_SSL_PORT}${url}"/>
+
+   <trycatch property="pingOutput">
+   <try>
+    <javac srcdir="${srcdir}" destdir="${srcdir}"/>
+    <java classname="HttpsURLConnectionExample" fork="true" failonerror="false">
+      <classpath path="${srcdir}"/>
+      <arg value="${urlPing}"/>
+      <env key="env1" value="${twork.dir}/${file1}" />
+      <env key="env2" value="${twork.dir}/${out.log}" />
+    </java>
+   </try>
+   <finally>
+      <echo file="${twork.dir}/${out.log}" append="true">
+URL: ${urlPing}
+------------------------------------------
+${pingOutput}
+      </echo>
+    </finally>
+    </trycatch>
+  </target>
+
+<!-- ==================================================================== -->
+  <!-- Setup for Mbeans test                                                -->     
+  <!-- ==================================================================== -->
+  <target name="setupMBeans">
+  <description>
+     setup MBeans
+  </description>
+
+    
+    <property name="Admin_port" value="${ADMIN_PORT}"/>
+    <property name="Machine_name" value="${MACHINE_NAME}"/>
+    <property name="Oracle_home" value="${ORACLE_HOME}"/>
+    <property name="srcdir" location="${functional.base.dir}/tiapmb/common/java" />
+
+	   <path id="classpath.test">
+        <pathelement location="${functional.base.dir}/tiapmb/common/jars/junit-4.10.jar" />
+        <pathelement location="${Oracle_home}/wlserver/server/lib/wlclient.jar" />
+	<pathelement location="${Oracle_home}/wlserver/server/lib/wljmxclient.jar" />
+        <pathelement location="${srcdir}" />
+    </path> 
+
+ <!--trycatch property="Output"-->
+    
+    <javac includeantruntime="false" srcdir="${srcdir}" destdir="${srcdir}" verbose="${full-compile}" debug ="true" >
+			<classpath refid="classpath.test" />
+		
+		</javac> 
+   		
+	<!--<junit fork="yes" printsummary="true">
+		
+			<test name="MyConnection" haltonerror="false" haltonfailure="false" todir="createR.txt">
+			<sysproperty key="admin_port" value="${Admin_port}"/>
+			
+		</test>
+			<classpath refid="classpath.test" />
+			<formatter type="brief" usefile="false" />
+		</junit> -->
+
+       <java classname="MyConnection" fork="true" failonerror="true">
+      <classpath path="${srcdir}"/>
+      <classpath refid="classpath.test"/>
+      <arg value="${Admin_port}"/>
+      <arg value="${Machine_name}"/>
+      <env key="env2" value="${twork.dir}/${out.log}" />
+      <env key="env3" value="${tc1}" />
+    </java>
+  
+		
+  
+
+<!--/trycatch-->
+    </target>
+
+
+  <!-- =================================================== -->
+  <!-- wlstErrorScan -->
+  <!-- =================================================== -->
+  <target name="wlstErrorScan" >
+  <description>
+    Scan the output from WLST command to look for any error msgs
+    Params:
+      ${in.file}   - logfile to scan
+      ${out.file}  - output from the scan
+  </description>
+    <tl-exec name="wlstErrorScan" executable="perl"
+       cmdfile="${twork.dir}/tmp.txt"
+       output="${twork.dir}/${out.file}"
+       failonerror="true">
+       <arg line="${functional.base.dir}/common/perl/wlstErrorScan.pl" />
+       <arg line="${twork.dir}/${in.file}"/>
+     </tl-exec>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- wlstFindStr -->
+  <!-- =================================================== -->
+  <target name="wlstFindStr" >
+  <description>
+     Scan output from WLST command to look for given message(s)
+     Params:
+       ${logfile}  - log to scan
+       ${goldfile} - full path to goldfile with messages to look for
+       ${outfile}  - output from wlstFindStr
+  </description>
+     <tl-exec name="wlstFindStr" executable="perl"
+       cmdfile="${twork.dir}/tmp.txt"
+       output="${twork.dir}/${outfile}"
+       failonerror="true">
+       <arg line="${functional.base.dir}/common/perl/wlstFindStr.pl" />
+       <arg line="${twork.dir}/${logfile}"/>
+       <arg line="${goldfile}"/>
+     </tl-exec>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- wlstRunScript -->
+  <!-- =================================================== -->
+  <target name="wlstRunScript" >
+  <description>
+     Run a given WLST script
+     Params:
+       ${script}   - script to run - need full path
+       ${ohsName}  - OHS instance
+       ${outfile}  - script output (goes to T_WORK)
+  </description>
+
+   <tl-exec name="wlstRunScript" executable="perl"
+       cmdfile="${twork.dir}/tmp.txt"
+       output="${twork.dir}/${outfile}"
+       failonerror="false">
+       <arg line="${functional.base.dir}/common/perl/wlstRunScript.pl" />
+       <arg line="${script}" />
+       <arg line="${ohsName}" />
+       <env key="ADMIN_HOST"     value="${ADMIN_HOST}" />
+       <env key="ADMIN_PORT"     value="${ADMIN_PORT}" />
+       <env key="ADMIN_SSL_PORT" value="${ADMIN_SSL_PORT}" />
+       <env key="WLS_USER"       value="${WLS_USER}" />
+       <env key="WLS_PWD"        value="${WLS_PWD}" />
+       <env key="WLST_LOC"       value="${WLST_LOC}" />
+       <env key="MACHINE_NAME"   value="${MACHINE_NAME}" />
+   </tl-exec>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- wlstCompareLogs -->
+  <!-- =================================================== -->
+  <target name="wlstCompareLogs" >
+  <description>
+     Compare two logfiles - test output vs. a goldfile.
+     Params:
+       ${logfile}   - logfile in T_WORK
+       ${goldfile}  - goldfile in T_WORK
+       ${outfile}   - output of comparison to T_WORK
+  </description>
+
+   <tl-exec name="wlstCompareLogs" executable="perl"
+       cmdfile="${twork.dir}/tmp.txt"
+       output="${twork.dir}/${outfile}"
+       failonerror="true">
+       <arg line="${functional.base.dir}/common/perl/wlstCompareLogs.pl" />
+       <arg line="${logfile}" />
+       <arg line="${goldfile}" />
+       <env key="T_WORK" value="${twork.dir}" />
+   </tl-exec>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- chkPids -->
+  <!-- =================================================== -->
+  <target name="chkPids" >
+  <description>
+     Verify the number of procs running
+     Params:
+       ${pidName}  - usually httpd.worker
+       ${expected} - number of pids to expect
+       ${outfile}  - output from chkPids
+       ${ohsName}  - name of OHS instance to search for
+  </description>
+     <tl-exec name="chkPids" executable="perl"
+       cmdfile="${twork.dir}/tmp.txt"
+       output="${twork.dir}/${outfile}"
+       failonerror="true">
+       <arg line="${functional.base.dir}/common/perl/check_pids.pl" />
+       <arg line="${pidName}"/>
+       <arg line="${expected}"/>
+       <arg line="${ohsName}"/>
+       <env key="T_WORK"       value="${twork.dir}" />
+       <env key="os"           value="${platform}" />
+     </tl-exec>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- chkState -->
+  <!-- =================================================== -->
+  <target name="chkState" >
+  <description>
+     Verify a given instance is in expected state
+     Params:
+       ${ohsName}  - name of OHS instance
+       ${expected} - expected state of instance
+       ${outfile}  - output from chkState
+  </description>
+     <tl-exec name="chkState" executable="perl"
+       cmdfile="${twork.dir}/tmp.txt"
+       output="${twork.dir}/${outfile}"
+       failonerror="true">
+       <arg line="${functional.base.dir}/common/perl/check_state.pl" />
+       <arg line="${ohsName}"/>
+       <arg line="${expected}"/>
+       <env key="T_WORK"         value="${twork.dir}" />
+       <env key="ADMIN_HOST"     value="${ADMIN_HOST}" />
+       <env key="ADMIN_PORT"     value="${ADMIN_PORT}" />
+       <env key="WLS_USER"       value="${WLS_USER}" />
+       <env key="WLS_PWD"        value="${WLS_PWD}" />
+       <env key="WLST_LOC"       value="${WLST_LOC}" />
+       <env key="INSTALL_TYPE"   value="${INSTALL_TYPE}" />
+       <env key="DOMAIN_NAME"    value="${DOMAIN_NAME}" />
+     </tl-exec>
+  </target>
+
+
+</project>

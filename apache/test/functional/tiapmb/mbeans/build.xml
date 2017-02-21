@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="mbeans.command" default="usage">
+  <description>
+    Build and run all mbeans tests in tiapmb team. For more info, run
+    its usage target
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="mbeans.command.dir" file="${ant.file.mbeans.command}" />
+
+  <!-- ADDED-BY-SEED Import tiapmb team base file -->
+  <import file="${mbeans.command.dir}/../tiapmb-base.xml" />
+
+  <!-- ADDED-BY-SEED Import mbeans test suite -->
+  <import file="${mbeans.command.dir}/mbeans-test-suite.xml" />
+
+  <!-- ADDED-BY-SEED Import common test directory targets -->
+  <import file="${tl.cafe-dir.file}" />
+
+</project>

@@ -1,0 +1,5 @@
+Requested Certificates:
+User Certificates:
+Subject:        CN=localhost,OU=OHSDomain kss1,O=FOR TESTING ONLY
+Trusted Certificates:
+Subject:        CN=CertGenCA,OU=FOR TESTING ONLY,O=MyOrganization,L=MyTown,ST=MyState,C=US

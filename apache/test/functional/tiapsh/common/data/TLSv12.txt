@@ -1,0 +1,47 @@
+#################
+# Configuration settings for TLSv1.2 testing
+#################
+# Should be run with protocol=TLSv1.2
+#################
+1.SSLProtocol=default
+1.SSLCipherSuite=default
+################
+2.SSLProtocol=TLSv1.2
+2.SSLCipherSuite=ALL
+################
+3.SSLProtocol=ALL
+3.SSLCipherSuite=TLSv1.2
+################
+# Everything switched on
+4.SSLProtocol=TLSv1 TLSv1.1 TLSv1.2
+4.SSLCipherSuite=ALL
+################
+#  Everything switched on
+5.SSLProtocol=+TLSv1 +TLSv1.1 +TLSv1.2
+5.SSLCipherSuite=ALL
+################
+# Everything switched on
+6.SSLProtocol=ALL
+6.SSLCipherSuite=ALL
+################
+#  Negative case;  all should fail
+7.SSLProtocol=ALL -TLSv1.2
+7.SSLCipherSuite=ALL
+################
+8.SSLProtocol=TLSv1.2
+8.SSLCipherSuite=HIGH
+#################
+9.SSLProtocol=TLSv1.2
+9.SSLCipherSuite=MEDIUM
+#################
+10.SSLProtocol=TLSv1.2
+10.SSLCipherSuite=RSA
+################
+11.SSLProtocol=TLSv1.2
+11.SSLCipherSuite=ECDSA
+#################
+# CPU Test - added 160519
+12.SSLProtocol=TLSv1.2
+12.SSLCipherSuite=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+#################
+

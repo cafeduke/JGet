@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="basic.command" default="usage">
+  <description>
+    Build and run all basic tests in tiapfc team. For more info, run
+    its usage target
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="basic.command.dir" file="${ant.file.basic.command}" />
+
+  <!-- ADDED-BY-SEED Import tiapfc team base file -->
+  <import file="${basic.command.dir}/../tiapfc-base.xml" />
+
+  <!-- ADDED-BY-SEED Import basic test suite -->
+  <import file="${basic.command.dir}/basic-test-suite.xml" />
+
+  <!-- ADDED-BY-SEED Import common test directory targets -->
+  <import file="${tl.cafe-dir.file}" />
+
+</project>

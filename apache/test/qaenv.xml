@@ -1,0 +1,32 @@
+<project name="build-qaenv">
+  <description>
+    This project ensures that qaenv.properties exists, so that root.xml can
+    be subsequently imported.
+  </description>
+
+  <dirname property="build-qaenv.dir" file="${ant.file.build-qaenv}" />
+
+  <property environment="env" />
+  <condition property="twork.dir" value="${env.T_WORK}">
+     <isset property="env.T_WORK"/>
+  </condition>
+
+  <!-- <condition property="twork.dir" value="${build-qaenv.dir}"> -->
+  <condition property="twork.dir" value="${env.ADE_VIEW_ROOT}/oracle/work">
+    <not>
+     <isset property="env.T_WORK"/>
+    </not>
+  </condition>
+
+  <import file="${build-qaenv.dir}/../../testtool/testtool-root.xml"/>
+  
+  <!-- import antcontrib-root.xml -->
+  <echo level="verbose">importing antcontrib-root.xml from ${testtool.3rdparty.antcontrib.dir}/antcontrib-root.xml</echo>
+  <import file="${testtool.3rdparty.antcontrib.dir}/antcontrib-root.xml" />
+  <import file="${build-qaenv.dir}/os.xml"/>  
+
+  <!-- load qaenv.properties -->
+  <property name="BUILDOUT" value="${twork.dir}/tl_buildout" />
+  <property name="TEST_RESULTS" value="${twork.dir}/tl_results" />
+
+</project>

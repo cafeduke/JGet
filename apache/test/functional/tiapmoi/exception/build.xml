@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="exception.command" default="usage">
+  <description>
+    Build and run all exception tests in tiapmoi team. For more info, run
+    its usage target
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="exception.command.dir" file="${ant.file.exception.command}" />
+
+  <!-- ADDED-BY-SEED Import tiapmoi team base file -->
+  <import file="${exception.command.dir}/../tiapmoi-base.xml" />
+
+  <!-- ADDED-BY-SEED Import exception test suite -->
+  <import file="${exception.command.dir}/exception-test-suite.xml" />
+
+  <!-- ADDED-BY-SEED Import common test directory targets -->
+  <import file="${tl.cafe-dir.file}" />
+
+</project>

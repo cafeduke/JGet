@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapsh.ecc" default="usage">
+  <description>
+
+    This suite will check out combinations of SSL protocols and ciphers.
+    Tests will include both valid combinations as well as negative test
+    cases.  Also will try various aliases for SSLCipherSuite to be sure
+    they are working.
+
+    @testlogic.group  type="working" values="true"  
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="ssl" values="true"
+    @testlogic.group type="winFIPS" values="false"
+
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapsh.ecc.dir" file="${ant.file.tiapsh.ecc}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapsh.ecc.dir}/../tiapsh-test-base.xml" />
+
+  <target name="suite">
+  <description>
+    Cipher tests for ECC ciphers.  (See "rsa" for RSA ciphers.)
+    Each target is a separate configuration of OHS ssl.conf which will
+    have a set of ciphers run against it.  There are 8 ECC ciphers.  
+    Results are compared with a goldfile.  All of the individual test
+    cases must pass to consider the test to have passed.
+  </description>
+
+    <!-- =============================== -->
+    <!-- Standard Ciphers -->
+
+    <!-- SSLv3 tests -->
+    <antcall target="ssl3_1"/>
+    <antcall target="ssl3_2"/>
+    <antcall target="ssl3_3"/>
+
+    <!-- TLSv1 tests -->
+    <antcall target="tls10_1"/>
+    <antcall target="tls10_2"/>
+    <antcall target="tls10_3"/>
+    <antcall target="tls10_4"/>
+    <antcall target="tls10_5"/>
+    <antcall target="tls10_6"/>
+    <antcall target="tls10_7"/>
+    <antcall target="tls10_8"/>
+    <antcall target="tls10_9"/>
+    <antcall target="tls10_10"/>
+    <antcall target="tls10_11"/>
+
+    <!-- TLSv1.1 tests -->
+    <antcall target="tls11_1"/>
+    <antcall target="tls11_2"/>
+    <antcall target="tls11_3"/>
+    <antcall target="tls11_4"/>
+    <antcall target="tls11_5"/>
+    <antcall target="tls11_6"/>    
+    <antcall target="tls11_7"/>
+    <antcall target="tls11_8"/>
+    <antcall target="tls11_9"/>
+    <antcall target="tls11_10"/>
+    <antcall target="tls11_11"/>
+   
+    <!-- TLSv1.2 tests -->
+    <antcall target="tls12_1"/>
+    <antcall target="tls12_2"/>
+    <antcall target="tls12_3"/>
+    <antcall target="tls12_4"/>
+    <antcall target="tls12_5"/>
+    <antcall target="tls12_6"/>
+    <antcall target="tls12_7"/>
+    <antcall target="tls12_8"/>
+    <antcall target="tls12_9"/>    
+    <antcall target="tls12_10"/>
+    <antcall target="tls12_11"/>
+    <antcall target="tls12_12"/>
+
+    <!-- SHA cipher alias tests (use protocol TLSv1.2) -->
+    <antcall target="sha_1"/>
+    <antcall target="sha_2"/>
+    <antcall target="sha_3"/>
+    <antcall target="sha_4"/>
+
+  </target>
+
+ <!-- =================================================== -->
+ <!-- SSLv3 tests -->
+ <!-- This protocol is not supported in 12.2.1, so all of these    -->
+ <!-- tests are designed to check that it really is is turned off. -->
+
+    <target name="ssl3_1">
+      <antcall target="runTest">
+        <param name="testNum"    value="1"/>
+        <param name="tstName"    value="ssl3_1"/>
+        <param name="protocol"   value="SSLv3"/>
+        <param name="configFile" value="SSLv3.txt"/>
+        <param name="goldFile"   value="ssl3-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="ssl3_2">
+      <antcall target="runTest">
+        <param name="testNum"    value="2"/>
+        <param name="tstName"    value="ssl3_2"/>
+        <param name="protocol"   value="SSLv3"/>
+        <param name="configFile" value="SSLv3.txt"/>
+        <param name="goldFile"   value="ssl3-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="ssl3_3">
+      <antcall target="runTest">
+        <param name="testNum"    value="3"/>
+        <param name="tstName"    value="ssl3_3"/>
+        <param name="protocol"   value="SSLv3"/>
+        <param name="configFile" value="SSLv3.txt"/>
+        <param name="goldFile"   value="ssl3-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+ <!-- =================================================== -->
+ <!-- TLSv1 tests -->
+
+    <target name="tls10_1">
+      <antcall target="runTest">
+        <param name="testNum"    value="1"/>
+        <param name="tstName"    value="tls10_1"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.1.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_2">
+      <antcall target="runTest">
+        <param name="testNum"    value="2"/>
+        <param name="tstName"    value="tls10_2"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_3">
+      <antcall target="runTest">
+        <param name="testNum"    value="3"/>
+        <param name="tstName"    value="tls10_3"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_4">
+      <antcall target="runTest">
+        <param name="testNum"    value="4"/>
+        <param name="tstName"    value="tls10_4"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_5">
+      <antcall target="runTest">
+        <param name="testNum"    value="5"/>
+        <param name="tstName"    value="tls10_5"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_6">
+      <antcall target="runTest">
+        <param name="testNum"    value="6"/>
+        <param name="tstName"    value="tls10_6"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_7">
+      <antcall target="runTest">
+        <param name="testNum"    value="7"/>
+        <param name="tstName"    value="tls10_7"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_8">
+      <antcall target="runTest">
+        <param name="testNum"    value="8"/>
+        <param name="tstName"    value="tls10_8"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.8.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_9">
+      <antcall target="runTest">
+        <param name="testNum"    value="9"/>
+        <param name="tstName"    value="tls10_9"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.9.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>    
+   
+    <target name="tls10_10">
+      <antcall target="runTest">
+        <param name="testNum"    value="10"/>
+        <param name="tstName"    value="tls10_10"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls10_11">
+      <antcall target="runTest">
+        <param name="testNum"    value="11"/>
+        <param name="tstName"    value="tls10_11"/>
+        <param name="protocol"   value="TLSv1"/>
+        <param name="configFile" value="TLSv10.txt"/>
+        <param name="goldFile"   value="tls10-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+ <!-- =================================================== -->
+ <!-- TLSv1.1 tests -->
+
+    <target name="tls11_1">
+      <antcall target="runTest">
+        <param name="testNum"    value="1"/>
+        <param name="tstName"    value="tls11_1"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.1.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_2">
+      <antcall target="runTest">
+        <param name="testNum"    value="2"/>
+        <param name="tstName"    value="tls11_2"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_3">
+      <antcall target="runTest">
+        <param name="testNum"    value="3"/>
+        <param name="tstName"    value="tls11_3"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_4">
+      <antcall target="runTest">
+        <param name="testNum"    value="4"/>
+        <param name="tstName"    value="tls11_4"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_5">
+      <antcall target="runTest">
+        <param name="testNum"    value="5"/>
+        <param name="tstName"    value="tls11_5"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_6">
+      <antcall target="runTest">
+        <param name="testNum"    value="6"/>
+        <param name="tstName"    value="tls11_6"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_7">
+      <antcall target="runTest">
+        <param name="testNum"    value="7"/>
+        <param name="tstName"    value="tls11_7"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_8">
+      <antcall target="runTest">
+        <param name="testNum"    value="8"/>
+        <param name="tstName"    value="tls11_8"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.8.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_9">
+      <antcall target="runTest">
+        <param name="testNum"    value="9"/>
+        <param name="tstName"    value="tls11_9"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.9.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_10">
+      <antcall target="runTest">
+        <param name="testNum"    value="10"/>
+        <param name="tstName"    value="tls11_10"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls11_11">
+      <antcall target="runTest">
+        <param name="testNum"    value="11"/>
+        <param name="tstName"    value="tls11_11"/>
+        <param name="protocol"   value="TLSv1.1"/>
+        <param name="configFile" value="TLSv11.txt"/>
+        <param name="goldFile"   value="tls11-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+ <!-- =================================================== -->
+ <!-- TLSv1.2 tests -->
+ 
+    <target name="tls12_1">
+      <antcall target="runTest">
+        <param name="testNum"    value="1"/>
+        <param name="tstName"    value="tls12_1"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.1.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_2">
+      <antcall target="runTest">
+        <param name="testNum"    value="2"/>
+        <param name="tstName"    value="tls12_2"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_3">
+      <antcall target="runTest">
+        <param name="testNum"    value="3"/>
+        <param name="tstName"    value="tls12_3"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_4">
+      <antcall target="runTest">
+        <param name="testNum"    value="4"/>
+        <param name="tstName"    value="tls12_4"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_5">
+      <antcall target="runTest">
+        <param name="testNum"    value="5"/>
+        <param name="tstName"    value="tls12_5"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_6">
+      <antcall target="runTest">
+        <param name="testNum"    value="6"/>
+        <param name="tstName"    value="tls12_6"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_7">
+      <antcall target="runTest">
+        <param name="testNum"    value="7"/>
+        <param name="tstName"    value="tls12_7"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_8">
+      <antcall target="runTest">
+        <param name="testNum"    value="8"/>
+        <param name="tstName"    value="tls12_8"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.8.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_9">
+      <antcall target="runTest">
+        <param name="testNum"    value="9"/>
+        <param name="tstName"    value="tls12_9"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.9.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_10">
+      <antcall target="runTest">
+        <param name="testNum"    value="10"/>
+        <param name="tstName"    value="tls12_10"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.fail.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_11">
+      <antcall target="runTest">
+        <param name="testNum"    value="11"/>
+        <param name="tstName"    value="tls12_11"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.base.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="tls12_12">
+      <antcall target="runTest">
+        <param name="testNum"    value="12"/>
+        <param name="tstName"    value="tls12_12"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="TLSv12.txt"/>
+        <param name="goldFile"   value="tls12-ecc.12.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+ <!--  ================================================== -->
+ <!-- SHA ciphersuite tests -->
+
+    <target name="sha_1">
+      <antcall target="runTest">
+        <param name="testNum"    value="1"/>
+        <param name="tstName"    value="sha_1"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="SHA.txt"/>
+        <param name="goldFile"   value="sha-ecc.1.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="sha_2">
+      <antcall target="runTest">
+        <param name="testNum"    value="2"/>
+        <param name="tstName"    value="sha_2"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="SHA.txt"/>
+        <param name="goldFile"   value="sha-ecc.2.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="sha_3">
+      <antcall target="runTest">
+        <param name="testNum"    value="3"/>
+        <param name="tstName"    value="sha_3"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="SHA.txt"/>
+        <param name="goldFile"   value="sha-ecc.3.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+    <target name="sha_4">
+      <antcall target="runTest">
+        <param name="testNum"    value="4"/>
+        <param name="tstName"    value="sha_4"/>
+        <param name="protocol"   value="TLSv1.2"/>
+        <param name="configFile" value="SHA.txt"/>
+        <param name="goldFile"   value="sha-ecc.4.gold"/>
+        <param name="ecc"        value="true"/>
+      </antcall>
+    </target>
+
+</project>
+

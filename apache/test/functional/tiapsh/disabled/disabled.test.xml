@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapsh.disabled" default="usage">
+  <description>
+    functional tiapsh disabled tests.
+    This suite will check out SSL protocols and ciphers to be sure
+    they have been disabled in OHS.
+
+    @testlogic.group  type="working" values="true"  
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="ssl" values="true"
+    @testlogic.group type="winFIPS" values="false"
+
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapsh.disabled.dir" file="${ant.file.tiapsh.disabled}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapsh.disabled.dir}/../tiapsh-test-base.xml" />
+
+  <target name="suite">
+    <description>
+       This suite will verify that the SSLv2 and SSLv3 protocols
+       have been disabled in 12.2.1.  In all of the following cases it is
+       expected that OHS will NOT start successfully.
+
+       SSLv2:
+       1) SSLProtocol SSLv2
+       2) SSLProtocol ALL SSLv2
+       3) SSLProtocol nzos_Version_2_0
+
+       SSLv3:
+       1) SSLprotocol SSLv3
+       2) SSLProtocol ALL +SSLv3
+       3) SSLProtocol ALL nzos_Version_3_0
+       4) SSLProtocol nzos_Version_3_0_Or_2_0
+    </description>
+
+    <!-- SSLv2 protocols -->
+    <antcall target="sslv2_01"/>
+    <antcall target="sslv2_02"/>
+    <antcall target="sslv2_03"/>
+
+    <!-- SSLv3 protocols -->
+    <antcall target="sslv3_01"/>
+    <antcall target="sslv3_02"/>
+    <antcall target="sslv3_03"/>
+    <antcall target="sslv3_04"/>
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="sslv2_01">
+
+  <property name="tstName"  value="tiapsh_disabled_sslv2_01"/>
+  <property name="ohsName"  value="ohs1"/>
+  <property name="protocol" value="SSLv2"/>
+ 
+  <antcall target="configureOHS">
+    <param name="tstName"  value="${tstName}"/>
+    <param name="ohsName"  value="${ohsName}"/>
+    <param name="protocol" value="${protocol}"/>
+  </antcall>
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="sslv2_02">
+
+  <property name="tstName"  value="tiapsh_disabled_sslv2_02"/>
+  <property name="ohsName"  value="ohs1"/>
+  <property name="protocol" value="ALL SSLv2"/>
+
+  <antcall target="configureOHS">
+    <param name="tstName"  value="${tstName}"/>
+    <param name="ohsName"  value="${ohsName}"/>
+    <param name="protocol" value="${protocol}"/>
+  </antcall>
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="sslv2_03">
+
+  <property name="tstName"  value="tiapsh_disabled_sslv2_03"/>
+  <property name="ohsName"  value="ohs1"/>
+  <property name="protocol" value="nzos_Version_2_0"/>
+
+  <antcall target="configureOHS">
+    <param name="tstName"  value="${tstName}"/>
+    <param name="ohsName"  value="${ohsName}"/>
+    <param name="protocol" value="${protocol}"/>
+  </antcall>
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="sslv3_01">
+
+  <property name="tstName"  value="tiapsh_disabled_sslv3_01"/>
+  <property name="ohsName"  value="ohs1"/>
+  <property name="protocol" value="SSLv3"/>
+
+  <antcall target="configureOHS">
+    <param name="tstName"  value="${tstName}"/>
+    <param name="ohsName"  value="${ohsName}"/>
+    <param name="protocol" value="${protocol}"/>
+  </antcall>
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="sslv3_02">
+
+  <property name="tstName"  value="tiapsh_disabled_sslv3_02"/>
+  <property name="ohsName"  value="ohs1"/>
+  <property name="protocol" value="ALL +SSLv3"/>
+
+  <antcall target="configureOHS">
+    <param name="tstName"  value="${tstName}"/>
+    <param name="ohsName"  value="${ohsName}"/>
+    <param name="protocol" value="${protocol}"/>
+  </antcall>
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="sslv3_03">
+
+  <property name="tstName"  value="tiapsh_disabled_sslv3_03"/>
+  <property name="ohsName"  value="ohs1"/>
+  <property name="protocol" value="ALL nzos_Version_3_0"/>
+
+  <antcall target="configureOHS">
+    <param name="tstName"  value="${tstName}"/>
+    <param name="ohsName"  value="${ohsName}"/>
+    <param name="protocol" value="${protocol}"/>
+  </antcall>
+
+  </target>
+
+ <!-- =================================================== -->
+  <target name="sslv3_04">
+
+  <property name="tstName"  value="tiapsh_disabled_sslv3_04"/>
+  <property name="ohsName"  value="ohs1"/>
+  <property name="protocol" value="nzos_Version_3_0_Or_2_0"/>
+
+  <antcall target="configureOHS">
+    <param name="tstName"  value="${tstName}"/>
+    <param name="ohsName"  value="${ohsName}"/>
+    <param name="protocol" value="${protocol}"/>
+  </antcall>
+
+  </target>
+
+
+ <!-- =================================================== -->
+  <target name="configureOHS">
+  <description>
+     Apply the protocol and try to start OHS.
+     Afterwards return to original ssl.conf
+     Params:
+       ${tstName}     - test name
+       ${ohsName}     - OHS instance
+       ${protocol}    - protcol to set to OHS instance
+  </description>
+ 
+  <!-- Apply the configuration -->
+  <!-- Need to do it to both versions of ssl.conf -->
+  <property name="ssl.conf.1" value="${ohsConfDir}/${ohsName}/ssl.conf"/>
+  <property name="ssl.conf.2" value="${ohsConfDir}/instances/${ohsName}/ssl.conf"/>
+  <replaceregexp file="${ssl.conf.1}"
+                 match="SSLProtocol (.*)"
+                 replace="SSLProtocol ${protocol}"/>
+  <replaceregexp file="${ssl.conf.2}"
+                 match="SSLProtocol (.*)"
+                 replace="SSLProtocol ${protocol}"/>
+
+  <copy file="${ssl.conf.2}"
+        tofile="${twork.dir}/${tstName}.ssl.conf" overwrite="true"/>
+
+  <!-- Try to start OHS -->
+  <trycatch>
+  <try>
+  <antcall target="startOHS">
+    <param name="out.log"  value="${tstName}.out"/>
+    <param name="ohs.name" value="${ohsName}"/>
+  </antcall>
+  
+  <!-- Verify no pids are running --> 
+  <antcall target="chkPids">
+    <param name="pidName"  value="httpd"/>
+    <param name="expected" value="0"/>
+    <param name="outfile"  value="${tstName}_pids.log"/>
+    <param name="ohsName"  value="${ohsName}"/>
+  </antcall>
+
+  <!-- Verify state = FAILED -->
+  <antcall target="chkState">
+    <param name="ohsName" value="${ohsName}"/>
+    <param name="expected" value="FAILED"/>
+    <param name="outfile" value="${tstName}_state.log"/>
+  </antcall>
+  </try>
+
+  <finally>
+  <!-- Cleanup:  restore original ssl.conf to both versions -->
+  <copy file="${twork.dir}/tiapsh.ssl.conf.orig"
+        tofile="${ssl.conf.1}" overwrite="true"/>
+  <copy file="${twork.dir}/tiapsh.ssl.conf.orig"
+        tofile="${ssl.conf.2}" overwrite="true"/>
+
+  <!-- Workaround until SSLv2 gets turned off -->
+  <antcall target="stopOHS">
+    <param name="out.log"  value="${tstName}.stop"/>
+    <param name="ohs.name" value="${ohsName}"/>
+  </antcall>
+  </finally>
+  </trycatch>
+
+  </target>
+  
+</project>
+

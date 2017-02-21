@@ -1,0 +1,18 @@
+#### - BEGIN 1
+Failed to start the server ohs01
+#### - END
+#### - BEGIN 2
+Server softRestart command for OHS server \'ohs02\' failed
+#### - END
+#### - BEGIN 3
+System component with name \"ohs03\" shutdown successfully
+#### - END
+#### - BEGIN 4
+Instance \"ohs01\" is in state \"FAILED\" and cannot be deleted.
+#### - END
+#### - BEGIN 5
+Instance \"ohs02\" is in state \"FAILED\" and cannot be deleted.
+#### - END
+#### - BEGIN 6
+OHS instance \"ohs03\" was successfully deleted.
+#### - END

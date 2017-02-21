@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapkss.single2" default="usage">
+  <description>
+    functional tiapkss single2 tests.
+
+    @testlogic.group  type="working" values="true"  
+    @testlogic.group type="install" values="full"
+    @testlogic.group type="winFIPS" values="false"
+
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapkss.single2.dir" file="${ant.file.tiapkss.single2}" />
+
+  <!-- ADDED-BY-SEED Import base file -->
+  <import file="${tiapkss.single2.dir}/../tiapkss-test-base.xml" />
+
+  <!-- =================================================== -->
+  <!-- prepare -->
+  <!-- =================================================== -->
+
+  <target name="prepare" >
+  <description>
+     Remove any old logfiles lingering in T_WORK.
+     Create and start a kss2 instance.
+     Copy hello.html to htdocs of kss2.
+  </description>
+    <firsttimeonly>
+     <delete>
+        <fileset dir="${twork.dir}" includes="tiapkss_single2*"/>
+     </delete>
+
+    <!-- Create a new OHS instance -->
+    <antcall target="createOHS">
+      <param name="out.log"  value="tiapkss_single2_crt.log"/>
+      <param name="ohs.name" value="kss2"/>
+    </antcall>
+
+    <!-- Copy hello world to htdocs -->
+    <!-- No SSL configuration necessary as this is the default wallet -->
+    <property name="htdocsDir" value="${ohsConfDir}/instances/kss2/htdocs"/>
+    <copy file="${tiapkss.base.dir}/common/data/hello.html"
+           todir="${htdocsDir}" />
+
+    <!-- Start kss2 -->
+    <antcall target="startOHS">
+      <param name="out.log"  value="tiapkss_single2_start.log"/>
+      <param name="ohs.name" value="kss2"/>
+    </antcall>
+
+    </firsttimeonly>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- unprepare -->
+  <!-- =================================================== -->
+
+  <target name="unprepare" >
+  <description>
+     Shutdown kss2 instance and remove k1 keystore
+  </description>
+    <firsttimeonly>
+    <trycatch>
+    <try>
+      <antcall target="stopOHS">
+        <param name="out.log"  value="tiapkss_single2_stop.log"/>
+        <param name="ohs.name" value="kss2"/>
+      </antcall>
+    </try>
+    </trycatch>
+
+    <!-- Remove the k1 keystore from KSS -->
+    <!-- Otherwise when recreating next time will throw errors -->
+    <property name="scriptDir"  value="${team.base.dir}/common/wlst"/>
+    <antcall target="wlstRunScript">
+      <param name="script"  value="${scriptDir}/single2_cleanup.py"/>
+      <param name="ohsName" value="kss2"/>
+      <param name="outfile" value="tiapkss_single2_clean.log"/>
+    </antcall>
+
+    </firsttimeonly>
+  </target>
+
+  <!-- =================================================== -->
+  <!-- suite -->
+  <!-- =================================================== -->
+
+  <target name="suite">
+    <description>
+       Tests to validate export of KSS "k1" keystore to OHS wallet
+    </description>
+
+    <!-- KSS:  create k1 KSS keystore, then add three certs -->
+    <!-- and export to the OHS wallet -->
+    <antcall target="exp1"/>
+
+    <!-- Validate creation of new k1 wallet and added certs -->
+    <antcall target="val1"/>
+
+    <!-- Bounce & ping OHS -->
+    <!-- Need to update SSL to point at k1 -->
+    <antcall target="ping1"/>
+
+    <!-- KSS:  delete two certs and then export to the wallet -->
+    <antcall target="exp2"/>
+
+    <!-- Verify OHS wallet has been updated -->
+    <antcall target="val2"/>
+
+    <!-- Bounce & ping OHS -->
+    <antcall target="ping2"/>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="exp1">
+  <description>
+     Run script to create KSS "k1" keystore, add three certs, and
+     export it become a newly created OHS wallet
+  </description>
+    <property name="tstName" value="tiapkss_single2_exp1"/>
+    <property name="scriptDir"  value="${team.base.dir}/common/wlst"/>
+    <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+    <copy file="${gold.path}/single2_exp1.gold"
+        tofile="${goldFile}"/>
+
+    <!-- Run the script -->
+    <antcall target="wlstRunScript">
+      <param name="script"  value="${scriptDir}/single2_exp1.py"/>
+      <param name="ohsName" value="kss2"/>
+      <param name="outfile" value="${tstName}.out"/>
+    </antcall>
+   
+    <!-- Check script output vs. expected results -->
+    <antcall target="wlstCompareLogs">
+      <param name="logfile"  value="${tstName}.out"/>
+      <param name="goldfile" value="${tstName}.gold"/>
+      <param name="outfile"  value="${tstName}.log"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="val1">
+  <description>
+     Validate new k1 OHS wallet has been created and
+     contains the expected certs.
+  </description>
+    <property name="tstName" value="tiapkss_single2_val1"/>
+    <property name="ohsName" value="kss2"/>
+    <property name="walDir"
+     value="${ohsConfDir}/instances/${ohsName}/keystores/k1"/>
+    <property name="wallet" value="${walDir}/cwallet.sso"/>
+
+    <!-- Run:  orapki wallet display -wallet . -->
+    <antcall target="oraDisplay">
+      <param name="out.log"    value="${tstName}.out"/>
+      <param name="walletPath" value="${walDir}"/>
+    </antcall>
+
+    <!-- Compare orapki output with goldfile -->
+    <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+    <copy file="${gold.path}/single2_val1.gold"
+        tofile="${goldFile}"/>
+    <antcall target="wlstFindStr">
+      <param name="logfile"  value="${tstName}.out"/>
+      <param name="goldfile" value="${goldFile}"/>
+      <param name="outfile"  value="${tstName}.log"/>
+    </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <target name="ping1">
+  <description>
+    Configure to use the new k1 wallet.
+    Bounce kss2 and ping it
+  </description>
+
+     <!-- Need to be sure we update ssl.conf to point at the new -->
+     <!-- k1 wallet instead of default -->
+     <property name="walletPath" 
+               value="${ohsConfDir}/instances/kss2/keystores/k1"/>
+     <property name="ssl1" value="${ohsConfDir}/kss2/ssl.conf"/>
+     <property name="ssl2" value="${ohsConfDir}/instances/kss2/ssl.conf"/>
+
+     <replaceregexp file="${ssl1}"
+          match="SSLWallet (.*)"
+          replace="SSLWallet ${walletPath}"/>
+     <replaceregexp file="${ssl2}"
+          match="SSLWallet (.*)"
+          replace="SSLWallet ${walletPath}"/>
+
+     <antcall target="pingKSS">
+       <param name="tstName" value="tiapkss_single2_ping1"/>
+       <param name="ohsName" value="kss2"/>
+     </antcall>
+  </target>
+  
+  <!-- =================================================== -->
+  <target name="exp2">
+  <description>
+     Run script to delete two certs, and
+     export it to the k1 OHS wallet
+  </description>
+    <property name="tstName" value="tiapkss_single2_exp2"/>
+    <property name="scriptDir"  value="${team.base.dir}/common/wlst"/>
+    <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+    <copy file="${gold.path}/single2_exp2.gold"
+        tofile="${goldFile}"/>
+
+    <!-- Run the script -->
+    <antcall target="wlstRunScript">
+      <param name="script"  value="${scriptDir}/single2_exp2.py"/>
+      <param name="ohsName" value="kss2"/>
+      <param name="outfile" value="${tstName}.out"/>
+    </antcall>
+
+    <!-- Check script output vs. expected results -->
+    <antcall target="wlstCompareLogs">
+      <param name="logfile"  value="${tstName}.out"/>
+      <param name="goldfile" value="${tstName}.gold"/>
+      <param name="outfile"  value="${tstName}.log"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="val2">
+  <description>
+     Validate new k1 OHS wallet contains expected cert/
+  </description>
+    <property name="tstName" value="tiapkss_single2_val2"/>
+    <property name="ohsName" value="kss2"/>
+    <property name="walDir"
+     value="${ohsConfDir}/instances/${ohsName}/keystores/k1"/>
+
+    <!-- Run:  orapki wallet display -wallet . -->
+    <antcall target="oraDisplay">
+      <param name="out.log"    value="${tstName}.out"/>
+       <param name="walletPath" value="${walDir}"/>
+    </antcall>
+
+    <!-- Compare orapki output with goldfile -->
+    <property name="goldFile" value="${twork.dir}/${tstName}.gold"/>
+    <copy file="${gold.path}/single2_val2.gold"
+        tofile="${goldFile}"/>
+    <antcall target="wlstFindStr">
+      <param name="logfile"  value="${tstName}.out"/>
+      <param name="goldfile" value="${goldFile}"/>
+      <param name="outfile"  value="${tstName}.log"/>
+    </antcall>
+  </target>
+
+  <!-- =================================================== -->
+  <target name="ping2">
+  <description>
+    Bounce kss2 and ping it
+  </description>
+
+     <!-- SSLWallet already pointing to k1 -->
+
+     <antcall target="pingKSS">
+       <param name="tstName" value="tiapkss_single2_ping2"/>
+       <param name="ohsName" value="kss2"/>
+     </antcall>
+  </target>
+
+ 
+</project>
+
+ 

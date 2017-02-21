@@ -1,0 +1,58 @@
+#### - BEGIN 1
+The following required arguments are missing .*instanceName.*machine.*
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 2
+ohs_createInstance.* too many arguments.*expected 0 got 1
+#### - END
+#### - BEGIN 3
+ohs_createInstance.* too many arguments.*expected 0 got 1
+#### - END
+#### - BEGIN 4
+ohs_createInstance.* too many arguments.*expected 0 got 2
+#### - END
+#### - BEGIN 5
+ohs_createInstance.* too many arguments.*expected 0 got 2
+#### - END
+#### - BEGIN 6
+The following required arguments are missing .*machine.*
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 7
+The following required arguments are missing .*instanceName.*
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 8
+Machine \"\" does not exist.
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 9
+Error. exceptions.NameError
+#### - END
+#### - BEGIN 10
+ohs_createInstance.* too many arguments. expected 0 got 1
+#### - END
+#### - BEGIN 11
+The following required arguments are missing .*machine.*
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 12
+The following arguments are not valid .*bob.*
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 13
+Machine \"\" does not exist.
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 14
+Machine \" \" does not exist.
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 15
+Machine \"bogus\" does not exist.
+ohs_createInstance.* failed.
+#### - END
+#### - BEGIN 16
+Instance \"ohs01\" already exists.
+ohs_createInstance.* failed.
+#### - END

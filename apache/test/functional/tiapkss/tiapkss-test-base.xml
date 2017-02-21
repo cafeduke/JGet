@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<project name="test.tiapkss.base">
+  <description>
+   Base file of all tiapkss tests.
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="test.tiapkss.base.dir" file="${ant.file.test.tiapkss.base}" />
+
+  <!-- ADDED-BY-SEED Import tiapkss base file -->
+  <import file="${test.tiapkss.base.dir}/tiapkss-base.xml" />
+
+  <!-- Import TLR core to run with TestLogic -->
+  <import file="${testtool.3rdparty.testlogic.dir}/tlr-core-root.xml"/>
+
+  <!-- ADDED-BY-SEED Import common test file targets -->
+  <import file="${tl.cafe.file}"/>
+
+  <!-- ====================================================================
+    START: ADDED-BY-SEED Template generated code. Don't edit
+   ===================================================================== -->
+  <sequential>
+    <!--
+      Runs setup if it's neven been run. This is to help users to come to
+      any test file and just run the target. Setup is run, if it's neven
+      been run.
+     -->
+
+    <if>
+      <not><available file="${team.setup.marker.file}"/></not>
+      <then>
+        <ant antfile="${team.base.dir}/build.xml"
+             target="setup"
+        />
+      </then>
+    </if>
+
+  </sequential>
+  <!-- ====================================================================
+    END: ADDED-BY-SEED: Template generated code. Don't edit
+   ===================================================================== -->
+
+  <!-- Path for all tiapkss goldfiles -->
+  <property name="gold.path" value="${team.base.dir}/common/goldfiles"/>
+
+
+</project>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="functional.tiapmoi.test.suite">
+  <description>
+    tiapmoi test suite in ohs team.
+
+    Edit this file to control feature test suite
+
+  </description>
+
+  <!-- ADDED-BY-SEED location of this file -->
+  <dirname property="functional.tiapmoi.test.suite.dir" 
+           file="${ant.file.functional.tiapmoi.test.suite}" />
+
+  <!-- ADDED-BY-SEED Id of test suite -->
+  <property name="suiteid" value="functional.tiapmoi.suite" />
+
+  <!-- ADDED-BY-SEED Id of property set that is passed to test files -->
+  <property name="suite.propertysetid" 
+            value="functional.tiapmoi.suite.propertysetid"/>
+
+  <!-- Importing feature suite files -->
+  <import file="${functional.tiapmoi.test.suite.dir}/shiphome/shiphome-test-suite.xml"/>
+  <import file="${functional.tiapmoi.test.suite.dir}/provision1/provision1-test-suite.xml"/>
+  <import file="${functional.tiapmoi.test.suite.dir}/provision2/provision2-test-suite.xml"/>
+  <import file="${functional.tiapmoi.test.suite.dir}/provision3/provision3-test-suite.xml"/>
+  <import file="${functional.tiapmoi.test.suite.dir}/scripting/scripting-test-suite.xml"/>
+  <import file="${functional.tiapmoi.test.suite.dir}/exception/exception-test-suite.xml"/>
+  <import file="${functional.tiapmoi.test.suite.dir}/component/component-test-suite.xml"/>
+
+
+  <!-- ADDED-BY-SEED team test xml files -->
+  <projects id="functional.tiapmoi.suite">
+     <projects refid="functional.tiapmoi.shiphome.suite"/>
+     <projects refid="functional.tiapmoi.provision1.suite"/>
+     <projects refid="functional.tiapmoi.provision2.suite"/>
+     <projects refid="functional.tiapmoi.provision3.suite"/>
+     <projects refid="functional.tiapmoi.scripting.suite"/>
+     <projects refid="functional.tiapmoi.exception.suite"/>
+     <projects refid="functional.tiapmoi.component.suite"/>
+  </projects>
+
+  <!-- ADDED-BY-SEED Properties that are passed to test xml files that makeup
+                     above suite -->
+  <propertyset id="functional.tiapmoi.suite.propertysetid">
+    <propertyref builtin="commandline" />
+  </propertyset>
+
+</project>

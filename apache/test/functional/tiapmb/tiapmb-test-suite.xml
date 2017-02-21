@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="functional.tiapmb.test.suite">
+  <description>
+    tiapmb test suite in ohs team.
+
+    Edit this file to control feature test suite
+
+  </description>
+
+  <!-- ADDED-BY-SEED location of this file -->
+  <dirname property="functional.tiapmb.test.suite.dir" 
+           file="${ant.file.functional.tiapmb.test.suite}" />
+
+  <!-- ADDED-BY-SEED Id of test suite -->
+  <property name="suiteid" value="functional.tiapmb.suite" />
+
+  <!-- ADDED-BY-SEED Id of property set that is passed to test files -->
+  <property name="suite.propertysetid" 
+            value="functional.tiapmb.suite.propertysetid"/>
+
+  <!-- Importing feature suite files -->
+  <import file="${functional.tiapmb.test.suite.dir}/mbeans/mbeans-test-suite.xml"/>
+
+  <!-- ADDED-BY-SEED team test xml files -->
+  <projects id="functional.tiapmb.suite">
+     <projects refid="functional.tiapmb.mbeans.suite"/>
+
+  </projects>
+
+  <!-- ADDED-BY-SEED Properties that are passed to test xml files that makeup
+                     above suite -->
+  <propertyset id="functional.tiapmb.suite.propertysetid">
+    <propertyref builtin="commandline" />
+  </propertyset>
+
+</project>

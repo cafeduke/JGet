@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="provision1.command" default="usage">
+  <description>
+    Build and run all provision1 tests in tiapmoi team. For more info, run
+    its usage target
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="provision1.command.dir" file="${ant.file.provision1.command}" />
+
+  <!-- ADDED-BY-SEED Import tiapmoi team base file -->
+  <import file="${provision1.command.dir}/../tiapmoi-base.xml" />
+
+  <!-- ADDED-BY-SEED Import provision1 test suite -->
+  <import file="${provision1.command.dir}/provision1-test-suite.xml" />
+
+  <!-- ADDED-BY-SEED Import common test directory targets -->
+  <import file="${tl.cafe-dir.file}" />
+
+</project>

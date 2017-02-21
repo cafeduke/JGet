@@ -1,0 +1,15 @@
+./:
+data
+logs
+security
+tmp
+
+./data/:
+nodemanager
+
+./logs/:
+
+./security/:
+
+./tmp/:
+

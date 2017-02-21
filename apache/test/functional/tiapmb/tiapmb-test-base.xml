@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<project name="test.tiapmb.base">
+  <description>
+   Base file of all tiapmb tests.
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="test.tiapmb.base.dir" file="${ant.file.test.tiapmb.base}" />
+
+  <!-- ADDED-BY-SEED Import tiapmb base file -->
+  <import file="${test.tiapmb.base.dir}/tiapmb-base.xml" />
+
+  <import file="../functional-base.xml" />
+
+  <!-- Import TLR core to run with TestLogic -->
+  <import file="${testtool.3rdparty.testlogic.dir}/tlr-core-root.xml"/>
+
+  <!-- ADDED-BY-SEED Import common test file targets -->
+  <import file="${tl.cafe.file}"/>
+
+  <!-- ====================================================================
+    START: ADDED-BY-SEED Template generated code. Don't edit
+   ===================================================================== -->
+  <sequential>
+    <!--
+      Runs setup if it's neven been run. This is to help users to come to
+      any test file and just run the target. Setup is run, if it's neven
+      been run.
+     -->
+
+    <if>
+      <not><available file="${team.setup.marker.file}"/></not>
+      <then>
+        <ant antfile="${team.base.dir}/build.xml"
+             target="setup"
+        />
+      </then>
+    </if>
+
+  </sequential>
+  <!-- ====================================================================
+    END: ADDED-BY-SEED: Template generated code. Don't edit
+   ===================================================================== -->
+
+  <!-- Common validate for all tiapmb tests -->
+
+  <!-- =================================================== -->
+  <!-- prepare -->
+  <!-- =================================================== -->
+
+	<property name="testdir" location="${test.tiapmb.base.dir}/common/java/" />
+    <property name="srcdir" location="${test.tiapmb.base.dir}/common/java/" />
+
+  <target name="prepare" >
+  <description>
+     Remove any old logfiles lingering in T_WORK
+  </description>
+     <firsttimeonly>
+       <delete>
+          <fileset dir="${twork.dir}" includes="tiapmb*"/>
+       </delete>
+     </firsttimeonly>
+
+     <!-- Create an OHS instance to use -->
+     <antcall target="createOHS">
+        <param name="out.log"  value="tiapmb_mbeans_create.log"/>
+        <param name="ohs.name" value="mb1"/>
+     </antcall>
+
+     
+
+     <!-- Start OHS -->
+
+     <antcall target="startOHS">
+       <param name="out.log" value="tiapmb_mbeans_start.log"/>
+       <param name="ohs.name"  value="mb1"/>
+     </antcall>
+
+  </target>
+
+  <!-- =================================================== -->
+  <!-- setupMBeans -->
+  <!-- =================================================== -->
+  <target name="setupPart">
+  <description>
+     All initial setup of mbeans tests
+  </description>
+
+	<property name="lib.dir" value="${test.tiapmb.base.dir}/common/jars" />
+	<taskdef resource="org/testlogic/toolkit/asserts/antlib.xml">
+		<classpath>
+			<fileset dir="${lib.dir}" includes="tlt-asserts-0.3.jar" />
+		</classpath>
+	</taskdef>    
+        <antcall target="clean"/>
+	<!--antcall target="compile"/-->
+        <antcall target="run"/>
+
+  </target>
+
+  <target name="clean" >
+		<delete verbose="${full-compile}">
+			<fileset dir="${srcdir}" includes="**/*.class" />
+		</delete>
+	</target>
+	
+	<target name="compile">
+		<javac includeantruntime="false" srcdir="${srcdir}" destdir="${srcdir}" verbose="${full-compile}">
+			<classpath refid="classpath.test" />
+		</javac> 
+		<!--<java classname="MyConnection" fork="true" failonerror="true">
+                     <classpath path="${srcdir}"/>
+                     <arg value="${Admin_port}"/>
+      	        </java> -->
+	</target>
+		
+	<target name="run">
+		<!--java classname="com.za.code.MyConnection">
+				<classpath path="${srcdir}"/>
+				<classpath refid="classpath.test"/>
+			</java-->
+                        
+    			<antcall target="setupMBeans"/>
+		<!-- <junit>
+			<test name="MyConnection"/>
+			<classpath refid="classpath.test" />
+			<formatter type="brief" usefile="false" />
+		</junit> -->
+		
+	</target>
+
+  <!-- =================================================== -->
+  <!-- SetupWLS -->
+  <!-- =================================================== -->
+ <!-- <target name="setupWLS">
+  <description>
+    Params:
+      ${logFile}  - file to instantiate - expected in T_WORK
+  </description>
+
+      />
+  </target>  -->
+</project>

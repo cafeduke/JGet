@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="tiapwtEAR" default="ear" basedir=".">
+ 
+  <property name="env" environment="env" value="env"/> 
+  <property name="verbose"  value="true" />
+  <property name="src.dir"  value="${env.T_WORK}/tiapwt/src/weblogic/src" />
+  <property name="dest.dir" value="${src.dir}/tiapwtEAR" />
+  <property name="ear"      value="${env.T_WORK}/tiapwt.ear"/>
+
+  <path id="class.path">
+     <pathelement location="." />
+     <pathelement location="${env.MW_HOME}/modules/javax.servlet_1.1.0.0_3-0.jar" />
+     <pathelement location="${env.MW_HOME}/modules/javax.servlet_2.0.0.0_3-0.jar" />
+  </path>
+
+  <typedef resource="weblogic/ant/taskdefs/antlib.xml"/>
+
+  <!-- Compiles java classes to ./tiapwt/APP-INF/classes -->
+  <target name="build" description="Only compiles tiapwt application">
+    <wlcompile srcdir="${src.dir}" destdir="${dest.dir}" classpath="${class.path}" />
+  </target>
+
+  <!-- Deletes the dest.dir to clean the build -->
+  <target name="clean" description="Deletes the build directory">
+    <delete dir="${dest.dir}/APP-INF" />
+    <delete file="${env.T_WORK}/tiapwt.ear" />
+  </target>
+
+  <!-- Package a standard J2EE ear for distribution  -->
+  <target name="ear" depends="build" description="Package a standard J2EE EAR for distribution">
+    <wlpackage srcdir="${src.dir}" destdir="${dest.dir}"
+               toFile="${ear}" />
+  </target>
+
+</project>
+

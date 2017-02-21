@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="functional.tiapsm.test.suite">
+  <description>
+    tiapsm test suite in ohs team.
+
+    Edit this file to control feature test suite
+
+  </description>
+
+  <!-- ADDED-BY-SEED location of this file -->
+  <dirname property="functional.tiapsm.test.suite.dir" 
+           file="${ant.file.functional.tiapsm.test.suite}" />
+
+  <!-- ADDED-BY-SEED Id of test suite -->
+  <property name="suiteid" value="functional.tiapsm.suite" />
+
+  <!-- ADDED-BY-SEED Id of property set that is passed to test files -->
+  <property name="suite.propertysetid" 
+            value="functional.tiapsm.suite.propertysetid"/>
+
+  <!-- Importing feature suite files -->
+  <import file="${functional.tiapsm.test.suite.dir}/smoke/smoke-test-suite.xml"/>
+  <import file="${functional.tiapsm.test.suite.dir}/standalone/standalone-test-suite.xml"/>
+
+
+  <!-- ADDED-BY-SEED team test xml files -->
+  <projects id="functional.tiapsm.suite">
+     <projects refid="functional.tiapsm.smoke.suite"/>
+     <projects refid="functional.tiapsm.standalone.suite"/>
+
+  </projects>
+
+  <!-- ADDED-BY-SEED Properties that are passed to test xml files that makeup
+                     above suite -->
+  <propertyset id="functional.tiapsm.suite.propertysetid">
+    <propertyref builtin="commandline" />
+  </propertyset>
+
+</project>

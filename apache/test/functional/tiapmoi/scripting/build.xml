@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="scripting.command" default="usage">
+  <description>
+    Build and run all scripting tests in tiapmoi team. For more info, run
+    its usage target
+  </description>
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="scripting.command.dir" file="${ant.file.scripting.command}" />
+
+  <!-- ADDED-BY-SEED Import tiapmoi team base file -->
+  <import file="${scripting.command.dir}/../tiapmoi-base.xml" />
+
+  <!-- ADDED-BY-SEED Import scripting test suite -->
+  <import file="${scripting.command.dir}/scripting-test-suite.xml" />
+
+  <!-- ADDED-BY-SEED Import common test directory targets -->
+  <import file="${tl.cafe-dir.file}" />
+
+</project>

@@ -1,0 +1,17 @@
+#################
+# Configuration settings for SSLv3 testing
+# Note that all cases should fail here
+#################
+# Should be run with protocol=SSLv3
+#################
+1.SSLProtocol=default
+1.SSLCipherSuite=default
+################
+# Everything switched on
+2.SSLProtocol=TLSv1 TLSv1.1 TLSv1.2
+2.SSLCipherSuite=ALL
+################
+# Everything switched on
+3.SSLProtocol=ALL
+3.SSLCipherSuite=ALL
+################

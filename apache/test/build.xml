@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<project name="runner" default="help">
+  <description>
+    This is a default file to run/build all the tests. Do not
+    edit or delete this file.
+  </description>
+
+  <dirname property="ant.file.runner.dir" file="${ant.file.runner}" />
+  
+  <!-- Change defaults so tests can be run at this level -->
+  <property name="area.default" value=""/>
+  <property name="area" value="${area.default}" />
+  <property name="team.default" value=""/>
+  <property name="team" value="${team.default}" />
+  <property name="feature" value="" />
+  <property name="testfile" value="" />
+
+  <!-- load TestLogic library, we need AntContrib etc.. -->
+  <import file="${ant.file.runner.dir}/root.xml" />
+
+  <target name="run">
+    <description>
+      By default it prints usage for this root file. When 'team' option
+      is specified it will list the usage for the team.
+      Run 'teams'
+    </description>
+    <if>
+        <equals arg1="${team}" arg2="${team.default}" />
+      <then>
+        <antcall target="internal.usage" />
+      </then>
+      <else>
+        <antcall target="internal.team.targets" />
+      </else>
+    </if>
+  </target>
+
+  <target name="teams">
+    <description>
+      Lists all the teams under ${area} which is 'functional' by default.
+      to list teams under other area, try run 'ant -Darea=${area} teams'
+      e.g.
+         ant -Darea=unit teams.
+         
+      @param show.usage set to true if you want to display team usage. It
+      defaults to false.
+    </description>
+    <echo>################ ${area} area test teams ###############</echo>
+    <for param="curr.dir">
+      <path>
+        <dirset dir="${ant.file.runner.dir}/${area}" includes="*" />
+      </path>
+      <sequential>
+        <propertyregex property="team.name"
+                       input="@{curr.dir}"
+                       regexp=".*\${file.separator}(.*)"
+                       select="\1"
+        />
+        <if>
+          <!-- Team dir if it contains build.xml and dir is not named as shared -->
+          <and>
+            <not>
+              <equals arg1="${team.name}" arg2="lib" />
+            </not>
+            <not>
+              <equals arg1="${team.name}" arg2="profiles" />
+            </not>
+          </and>
+          <then>
+            <echo>${team.name}</echo>
+            <property name="show.usage" value="false" />
+            <if>
+              <istrue value="${show.usage}" />
+              <then>
+                <echo>===============
+                Usage:
+                ======
+                </echo>
+                <antcall target="usage">
+                  <param name="team" value="${team.name}" />
+                </antcall>
+              </then>
+            </if>
+          </then>
+        </if>
+        <var name="team.name" unset="true" />
+      </sequential>
+    </for>
+    <echo>############################################################</echo>
+  </target>
+
+  <target name="internal.team.targets">
+    <!-- FIXME: We need to have right default, for now just setting it to
+                internal.usage
+     -->
+    <property name="targets" value="usage" />
+    <property name="exec.file"
+              value="${ant.file.runner.dir}/${area}/${team}/build.xml"
+    />
+
+    <if>
+      <and>
+        <available file="${exec.file}" />
+        <available file="${ant.file.runner.dir}/${area}/${team}" type="dir" />
+      </and>
+      <then>
+        <for list="${targets}" param="curr.target" delimiter=" ">
+          <sequential>
+            <echo>Running [@{curr.target}] target  in [${exec.file}}]}]</echo>
+            <ant target="@{curr.target}"
+                 antfile="${exec.file}"
+                 inheritall="false"
+                 inheritrefs="false"
+            />
+          </sequential>
+        </for>
+      </then>
+      <else>
+        <echo>
+          ERROR: ${ant.file.runner.dir}/${area}/${team} team directory does not exist
+
+                                        OR
+
+                 ${exec.file} does not exist
+
+          Supported teams are:
+          -------------------
+        </echo>
+        <antcall target="teams" />
+      </else>
+    </if>
+  </target>
+
+  <target name="help">
+    <echo>
+     ===============================================================
+
+     Run 'ant subsystems' to view all subsystems
+
+     Following target is avilable to build/run tests on any subsystem.
+
+     ant -Dwlsqa.subsystem=webservice clean build 
+     ant -Dwlsqa.subsystem=webservice all  
+       
+     Optionally you can pass TestLogic Tags to selectivle run Tests 
+
+     By default above commands act on teams in functions area. To
+     view integration tests, pass in 'integration' for 'area'
+     property.
+
+     ant -Darea=integration teams
+
+     To view usage information for a particular team, run the
+     following command
+
+     ant -Dteam='team name' (e.g. ant -Dteam=demo)
+
+     To run any target for a team, run the following
+
+     ant -Dteam='team name' -Dtargets='target name'
+
+     For e.g.
+
+     Run the following to build demo functional tests and configurations
+
+     ant -Dteam=demo -Dtargets=build
+
+     Run the following to run all demo functional tests
+
+     ant -Dteam=demo -Dtargets=run
+
+     A particular team might have multiple targets to run
+     different kinds of tests. Run ant -D team='team name' to
+     get information about them.
+
+     e.g.
+
+     ant -Dteam=jdbc -Dtargets=run.client
+     ant -Dteam=jdbc -Dtargets=run.osgi
+     ant -Dteam=jdbc -Dtargets=run
+
+     Options to this target
+     ----------------------
+
+     - team      : name of the team for which usage will be
+                   printed. Run 'teams' target to see all teams.
+     - area      : areas that the teams belong to. Defaults to
+                   'functional'. Other valid value is
+                   'integration'
+     - file      : file on which to run the target. Default is
+                   ${team}/build.xml
+     - targets   : Name of the targets to run. It defaults to
+                   'usage'. Targets are space separated, e.g.
+                   "build run", will run build first and then
+                    run
+
+     ===============================================================
+    </echo>
+  </target>
+
+  <import file="${tl.cafe-dir.file}" />
+
+</project>

@@ -1,0 +1,17 @@
+#################
+# Configuration settings for SHA cipher testing
+#################
+# Should be run with protocol=TLSv1.2
+#################
+1.SSLProtocol=ALL
+1.SSLCipherSuite=ALL:!SHA384
+################
+2.SSLProtocol=ALL
+2.SSLCipherSuite=ALL:!SHA256
+################
+3.SSLProtocol=ALL
+3.SSLCipherSuite=SHA1
+################
+4.SSLProtocol=ALL
+4.SSLCipherSuite=SHA384:SHA256
+################

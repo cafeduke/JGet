@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="functional.tiapwt.test.suite">
+  <description>
+    tiapwt test suite in ohs team.
+
+    Edit this file to control feature test suite
+
+  </description>
+
+  <!-- ADDED-BY-SEED location of this file -->
+  <dirname property="functional.tiapwt.test.suite.dir" 
+           file="${ant.file.functional.tiapwt.test.suite}" />
+
+  <!-- ADDED-BY-SEED Id of test suite -->
+  <property name="suiteid" value="functional.tiapwt.suite" />
+
+  <!-- ADDED-BY-SEED Id of property set that is passed to test files -->
+  <property name="suite.propertysetid" 
+            value="functional.tiapwt.suite.propertysetid"/>
+
+  <!-- Importing feature suite files -->
+  <import file="${functional.tiapwt.test.suite.dir}/basic/basic-test-suite.xml"/>
+  <import file="${functional.tiapwt.test.suite.dir}/ssl/ssl-test-suite.xml"/>
+  <import file="${functional.tiapwt.test.suite.dir}/backend/backend-test-suite.xml"/>
+
+  <!-- ADDED-BY-SEED team test xml files -->
+  <projects id="functional.tiapwt.suite">
+     <projects refid="functional.tiapwt.basic.suite"/>
+	 <projects refid="functional.tiapwt.ssl.suite"/>
+	 <projects refid="functional.tiapwt.backend.suite"/>
+  </projects>
+
+  <!-- ADDED-BY-SEED Properties that are passed to test xml files that makeup
+                     above suite -->
+  <propertyset id="functional.tiapwt.suite.propertysetid">
+    <propertyref builtin="commandline" />
+  </propertyset>
+
+</project>

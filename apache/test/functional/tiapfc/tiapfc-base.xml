@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project name="tiapfc.base">
+  <description>
+    Team base file
+
+    It defines properties and libraries that are used by all team Ant file.
+    User can also add utlity targets.
+  </description>
+
+  <!-- ==================================================================== -->
+  <!-- START: Properties                                                    -->
+  <!-- ==================================================================== -->
+
+  <!-- ADDED-BY-SEED Absolute path to this file -->
+  <dirname property="tiapfc.base.dir" file="${ant.file.tiapfc.base}" />
+
+  <!-- ADDED-BY-SEED Standard property to identify team base directory -->
+  <property name="team.base.dir" value="${tiapfc.base.dir}"/>
+
+  <!-- ADDED-BY-SEED Team to which tests belong -->
+  <property name="team" value="tiapfc"/>
+
+    
+  <!-- ==================================================================== -->
+  <!-- START: Imports                                                       -->
+  <!-- ==================================================================== -->
+
+  <!-- ADDED-BY-SEED Import functional area base file -->
+  <import file="${tiapfc.base.dir}/../functional-base.xml" />
+
+
+  <!-- ADDED-BY-SEED Marker file which is created when team setup target has
+                     successfully run
+   -->
+  <property name="team.setup.marker.file"
+       value="${run.output.dir}/tiapfc-setup-marker.properties" />
+
+ </project>
