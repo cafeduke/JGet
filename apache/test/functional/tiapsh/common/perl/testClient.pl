@@ -38,9 +38,15 @@ if(!$os) {
 # Set OPENSSL_CONF to avoid error message on windows 2012
 # Config file is located in the same location as the executable
 if ($os =~ /Windows/) {
-  $myPath  = "c:\\openssl";
+  if (-e  $ENV{"OPENSSL_LOC"}."\\openssl.exe") {
+          $myPath = $ENV{"OPENSSL_LOC"};
+          print "Openssl loc from env variable:".$myPath."\n";
+  } else {
+          $myPath  = "c:\\openssl";
+          print "Openssl loc from hardcoded value:".$myPath."\n";
+  }
   $configSSL = $myPath . "\\openssl.cfg";
-  if (!-e $configSSL) { 
+  if (!-e $configSSL) {
      $cmdPath = "touch $configSSL";
      system($cmdPath);
   }
