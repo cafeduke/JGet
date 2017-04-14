@@ -42,9 +42,17 @@ if ($os =~ /Windows/) {
           $myPath = $ENV{"OPENSSL_LOC"};
           print "Openssl loc from env variable:".$myPath."\n";
   } else {
-          $myPath  = "c:\\openssl";
-          print "Openssl loc from hardcoded value:".$myPath."\n";
+	    print "Openssl Path not found. downloading..\n";
+		$ENV{"OPENSSL_LOC"} = "c:\\openssl";
+		system("mkdir ".$ENV{"OPENSSL_LOC"});
+		system("re get \"com.oracle.ohs.windows_x64:openssl:1.0.2j-fips:zip\"");
+		system("unzip openssl-1.0.2j-fips.zip -d ".$ENV{"OPENSSL_LOC"});
+		print "completed";
+
+		$myPath  = $ENV{"OPENSSL_LOC"};
+        print "new Openssl loc :".$myPath."\n";
   }
+  
   $configSSL = $myPath . "\\openssl.cfg";
   if (!-e $configSSL) {
      $cmdPath = "touch $configSSL";
