@@ -73,7 +73,7 @@ if ($ecc == 1) {
     $host = $host . ".us.oracle.com";
     $cmd = $oraCmd . " wallet add -wallet ecc"
                  . " -dn \"CN=" . $host . "\""
-                 . " -keysize 1024 -asym_alg ECC -eccurve p256"
+                 . " -asym_alg ECC -eccurve p256"
                  . " -self_signed -validity 3650"
                  . " -auto_login_only -jsafe";
     print "Running: $cmd\n";
