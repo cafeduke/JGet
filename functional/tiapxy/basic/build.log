@@ -1,0 +1,257 @@
+Buildfile: /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/build.xml
+Trying to override old definition of task taskdef
+
+all:
+
+internal.testlogic:
+     [echo] TestLogic suiteid            [functional.tiapxy.basic.suite]
+     [echo]          suite propertysetid [functional.tiapxy.basic.suite.propertysetid]
+     [echo] 
+     [echo] Base directory [/scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic]
+     [echo]     
+
+internal.testlogic.path.suite:
+
+internal.testlogic.projects.suite:
+[testlogic] core version 1.1 built Mar 12 2017 10:39 by feliliu
+[testlogic] Results directory [/ade/rbseshad_ascore_v1/oracle/work/tl_results/functional/tiapxy]
+[testlogic] 
+[testlogic] 
+[testlogic] 
+[testlogic]                %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[testlogic]                % STARTING TEST VALIDATION %
+[testlogic]                %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[testlogic] 
+[testlogic] 
+[testlogic] 
+[testlogic] Suite:
+[testlogic] =======
+[testlogic] /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/basic.test.xml
+[testlogic] [2019-02-11 10:05:33,408] ==== BEGIN file:/scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/basic.test.xml
+[testlogic] conn_http_http:
+[testlogic]  project org.apache.tools.ant.Project@30af5b6b will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic]  project org.apache.tools.ant.Project@bcef303 will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic]   1  tiapxy.basic.conn_http_http (anttest)
+[testlogic] conn_http_https:
+[testlogic]  project org.apache.tools.ant.Project@4b45dcb8 will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic]  project org.apache.tools.ant.Project@7216fb24 will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic]   2  tiapxy.basic.conn_http_https (anttest)
+[testlogic] conn_https_https:
+[testlogic]  project org.apache.tools.ant.Project@3382f8ae will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic]  project org.apache.tools.ant.Project@60641ec8 will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic]   3  tiapxy.basic.conn_https_https (anttest)
+[testlogic] conn_https_http:
+[testlogic]  project org.apache.tools.ant.Project@1d7f7be7 will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic]  project org.apache.tools.ant.Project@42f3156d will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic]   4  tiapxy.basic.conn_https_http (anttest)
+[testlogic]  project org.testlogic.impl.ant.executionPlan.model.ResourceRunnable$TLProject@58670130 will go through check tiapxy.basic  ---- /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic
+[testlogic] [2019-02-11 10:05:33,964] ==== END file:/scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/basic.test.xml  (took 0.553 seconds)
+[testlogic] 
+[testlogic] +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[testlogic] |  Total 4 test case(s) and 0 error(s), 0.744 seconds
+[testlogic] +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[testlogic] 
+[testlogic] 
+[testlogic] 
+[testlogic]                %%%%%%%%%%%%%%%%%%%%%%%%%%%
+[testlogic]                % STARTING TEST EXECUTION %
+[testlogic]                %%%%%%%%%%%%%%%%%%%%%%%%%%%
+[testlogic] 
+[testlogic] 
+[testlogic] 
+[testlogic] ==== BEGIN file:/scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/basic.test.xml
+[testlogic] prepare:
+[testlogic] [2019-02-11 10:05:34,118] [firsttimeonly] signature []. Invoking nested tasks in [prepare] target at [/scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/tiapxy-test-base.xml:55: ]
+[testlogic] startup:
+[testlogic] validate:
+[testlogic] [2019-02-11 10:05:37,031] BEGIN conn_http_http.tiapxy.basic.conn_http_http
+[testlogic] conn_http_http:
+[testlogic] sendGet:
+[testlogic] [Feb 11, 2019 10:05:37 AM PST] http://slc15grf.us.oracle.com:7777/http-http/OtdApp/Snoop.jsp
+[testlogic] URL is http://slc15grf.us.oracle.com:7777/http-http/OtdApp/Snoop.jsp
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  sending :: GET http://slc15grf.us.oracle.com:7777/http-http/OtdApp/Snoop.jsp HTTP/1.0
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  sending :: Host: slc15grf.us.oracle.com:7777
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  sending :: 
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got status :: HTTP/1.1 200 OK
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: Date: Mon, 11 Feb 2019 18:05:37 GMT
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: Server: Oracle-HTTP-Server
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: Content-Length: 671
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: Content-Type: text/plain; charset=ISO-8859-1
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: X-ORACLE-DMS-ECID: 005WQ8bsMc7Dc_G5Iz4Eyf00068h000002
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: X-ORACLE-DMS-RID: 0:1
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: Set-Cookie: JSESSIONID=m9DdvGKvNR8DibBp_-SzaH2FrhvnSEjMKi5Fgy0M6N2DYp5pq60Z!-1696008115; path=/; HttpOnly
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: Connection: close
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: 
+[testlogic] [Feb 11, 2019 10:05:37 AM PST]  got header :: 
+[testlogic] GOT responsecode: 200 EXPECTED: 200
+[testlogic] 
+[testlogic] [2019-02-11 10:05:37,368] SUCCESS conn_http_http.tiapxy.basic.conn_http_http took 0.326 sec.
+[testlogic] TestUnit: tiapxy.basic, LogicalName: conn_http_http.tiapxy.basic.conn_http_http
+[testlogic] ++++++++++++++++--------------------------------------------------+
+[testlogic] | 1 (25% of 4) Clean run :-) Pass: 1 Fail: 0 Skip: 0 Error: 0     
+[testlogic] ++++++++++++++++--------------------------------------------------+
+[testlogic] [2019-02-11 10:05:38,033] BEGIN conn_http_https.tiapxy.basic.conn_http_https
+[testlogic] conn_http_https:
+[testlogic] sendGet:
+[testlogic] [Feb 11, 2019 10:05:38 AM PST] http://slc15grf.us.oracle.com:7777/http-https/OtdApp/Snoop.jsp
+[testlogic] URL is http://slc15grf.us.oracle.com:7777/http-https/OtdApp/Snoop.jsp
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  sending :: GET http://slc15grf.us.oracle.com:7777/http-https/OtdApp/Snoop.jsp HTTP/1.0
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  sending :: Host: slc15grf.us.oracle.com:7777
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  sending :: 
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  got status :: HTTP/1.1 404 Not Found
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  got header :: Date: Mon, 11 Feb 2019 18:05:38 GMT
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  got header :: Server: Oracle-HTTP-Server
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  got header :: Content-Length: 225
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  got header :: Connection: close
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  got header :: Content-Type: text/html; charset=iso-8859-1
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  got header :: 
+[testlogic] [Feb 11, 2019 10:05:38 AM PST]  got header :: 
+[testlogic] GOT responsecode: 404 EXPECTED: 200
+[testlogic] 
+[testlogic] HttpURLConnection Test failed.
+[testlogic] Expected URL elements are as follows.
+[testlogic] target is: http://slc15grf.us.oracle.com:7777/http-https/OtdApp/Snoop.jsp
+[testlogic] connection mode: GET
+[testlogic] check mode: RESPONSE_CODE
+[testlogic] expected string: null
+[testlogic] expected headers: []
+[testlogic] expected response code: 200
+[testlogic] request headers: {}
+[testlogic] misc request headers: []
+[testlogic] testClass: null
+[testlogic] testMethod: null
+[testlogic] parameters: {}
+[testlogic] authenticate: user: null, password: null
+[testlogic] channel: false
+[testlogic] 
+[testlogic] Real URL elements are as follows.
+[testlogic] GOT responsecode: 404 EXPECTED: 200
+[testlogic] 
+[testlogic] logFailure:
+[testlogic] /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/basic.test.xml:100: ERROR: Response code is not as expected.
+[testlogic] 	at net.sf.antcontrib.logic.TryCatchTask$CatchBlock.execute(TryCatchTask.java:138)
+[testlogic] 	at net.sf.antcontrib.logic.TryCatchTask.execute(TryCatchTask.java:224)
+[testlogic] [...Full stacktrace can be found in log file.]
+[testlogic] [2019-02-11 10:05:38,480] FAILURE conn_http_https.tiapxy.basic.conn_http_https took 0.443 sec.
+[testlogic] TestUnit: tiapxy.basic, LogicalName: conn_http_https.tiapxy.basic.conn_http_https
+[testlogic] +++++++++++++++++++++++++++++++++---------------------------------+
+[testlogic] | 2 (50% of 4) Not clean :-( Pass: 1 Fail: 1 Skip: 0 Error: 0     
+[testlogic] +++++++++++++++++++++++++++++++++---------------------------------+
+[testlogic] [2019-02-11 10:05:39,035] BEGIN conn_https_https.tiapxy.basic.conn_https_https
+[testlogic] conn_https_https:
+[testlogic] sendGet:
+[testlogic] [Feb 11, 2019 10:05:39 AM PST] http://slc15grf.us.oracle.com:7777/https-http/OtdApp/Snoop.jsp
+[testlogic] URL is http://slc15grf.us.oracle.com:7777/https-http/OtdApp/Snoop.jsp
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  sending :: GET http://slc15grf.us.oracle.com:7777/https-http/OtdApp/Snoop.jsp HTTP/1.0
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  sending :: Host: slc15grf.us.oracle.com:7777
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  sending :: 
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  got status :: HTTP/1.1 404 Not Found
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  got header :: Date: Mon, 11 Feb 2019 18:05:39 GMT
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  got header :: Server: Oracle-HTTP-Server
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  got header :: Content-Length: 225
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  got header :: Connection: close
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  got header :: Content-Type: text/html; charset=iso-8859-1
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  got header :: 
+[testlogic] [Feb 11, 2019 10:05:39 AM PST]  got header :: 
+[testlogic] GOT responsecode: 404 EXPECTED: 200
+[testlogic] 
+[testlogic] HttpURLConnection Test failed.
+[testlogic] Expected URL elements are as follows.
+[testlogic] target is: http://slc15grf.us.oracle.com:7777/https-http/OtdApp/Snoop.jsp
+[testlogic] connection mode: GET
+[testlogic] check mode: RESPONSE_CODE
+[testlogic] expected string: null
+[testlogic] expected headers: []
+[testlogic] expected response code: 200
+[testlogic] request headers: {}
+[testlogic] misc request headers: []
+[testlogic] testClass: null
+[testlogic] testMethod: null
+[testlogic] parameters: {}
+[testlogic] authenticate: user: null, password: null
+[testlogic] channel: false
+[testlogic] 
+[testlogic] Real URL elements are as follows.
+[testlogic] GOT responsecode: 404 EXPECTED: 200
+[testlogic] 
+[testlogic] logFailure:
+[testlogic] /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/basic.test.xml:100: ERROR: Response code is not as expected.
+[testlogic] 	at net.sf.antcontrib.logic.TryCatchTask$CatchBlock.execute(TryCatchTask.java:138)
+[testlogic] 	at net.sf.antcontrib.logic.TryCatchTask.execute(TryCatchTask.java:224)
+[testlogic] [...Full stacktrace can be found in log file.]
+[testlogic] [2019-02-11 10:05:39,430] FAILURE conn_https_https.tiapxy.basic.conn_https_https took 0.394 sec.
+[testlogic] TestUnit: tiapxy.basic, LogicalName: conn_https_https.tiapxy.basic.conn_https_https
+[testlogic] ++++++++++++++++++++++++++++++++++++++++++++++++++----------------+
+[testlogic] | 3 (75% of 4) Not clean :-( Pass: 1 Fail: 2 Skip: 0 Error: 0     
+[testlogic] ++++++++++++++++++++++++++++++++++++++++++++++++++----------------+
+[testlogic] [2019-02-11 10:05:40,037] BEGIN conn_https_http.tiapxy.basic.conn_https_http
+[testlogic] conn_https_http:
+[testlogic] sendGet:
+[testlogic] [Feb 11, 2019 10:05:40 AM PST] http://slc15grf.us.oracle.com:7777/https-https/OtdApp/Snoop.jsp
+[testlogic] URL is http://slc15grf.us.oracle.com:7777/https-https/OtdApp/Snoop.jsp
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  sending :: GET http://slc15grf.us.oracle.com:7777/https-https/OtdApp/Snoop.jsp HTTP/1.0
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  sending :: Host: slc15grf.us.oracle.com:7777
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  sending :: 
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  got status :: HTTP/1.1 404 Not Found
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  got header :: Date: Mon, 11 Feb 2019 18:05:40 GMT
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  got header :: Server: Oracle-HTTP-Server
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  got header :: Content-Length: 226
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  got header :: Connection: close
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  got header :: Content-Type: text/html; charset=iso-8859-1
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  got header :: 
+[testlogic] [Feb 11, 2019 10:05:40 AM PST]  got header :: 
+[testlogic] GOT responsecode: 404 EXPECTED: 200
+[testlogic] 
+[testlogic] HttpURLConnection Test failed.
+[testlogic] Expected URL elements are as follows.
+[testlogic] target is: http://slc15grf.us.oracle.com:7777/https-https/OtdApp/Snoop.jsp
+[testlogic] connection mode: GET
+[testlogic] check mode: RESPONSE_CODE
+[testlogic] expected string: null
+[testlogic] expected headers: []
+[testlogic] expected response code: 200
+[testlogic] request headers: {}
+[testlogic] misc request headers: []
+[testlogic] testClass: null
+[testlogic] testMethod: null
+[testlogic] parameters: {}
+[testlogic] authenticate: user: null, password: null
+[testlogic] channel: false
+[testlogic] 
+[testlogic] Real URL elements are as follows.
+[testlogic] GOT responsecode: 404 EXPECTED: 200
+[testlogic] 
+[testlogic] logFailure:
+[testlogic] /scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/basic.test.xml:100: ERROR: Response code is not as expected.
+[testlogic] 	at net.sf.antcontrib.logic.TryCatchTask$CatchBlock.execute(TryCatchTask.java:138)
+[testlogic] 	at net.sf.antcontrib.logic.TryCatchTask.execute(TryCatchTask.java:224)
+[testlogic] [...Full stacktrace can be found in log file.]
+[testlogic] [2019-02-11 10:05:40,336] FAILURE conn_https_http.tiapxy.basic.conn_https_http took 0.299 sec.
+[testlogic] TestUnit: tiapxy.basic, LogicalName: conn_https_http.tiapxy.basic.conn_https_http
+[testlogic] +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[testlogic] | 4 (100% of 4) Not clean :-( Pass: 1 Fail: 3 Skip: 0 Error: 0    
+[testlogic] +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[testlogic] shutdown:
+[testlogic] unprepare:
+[testlogic] ==== END file:/scratch/rbseshad/view_storage/rbseshad_ascore_v1/apache/test/functional/tiapxy/basic/basic.test.xml  (took 9.169 seconds)
+[testlogic] 
+[testlogic] +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[testlogic] | Not a clean run :-(
+[testlogic] | 
+[testlogic] | Total 4 test case(s) and 0 error(s), 9.198 seconds
+[testlogic] | 
+[testlogic] | Success  : 1
+[testlogic] | Failure  : 3
+[testlogic] | Skip     : 0
+[testlogic] | 
+[testlogic] +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[testlogic] 
+[testlogic] 
+[testlogic] 
+[testlogic]                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[testlogic]                % TEST RUN COMPLETE WITH PROBLEMS %
+[testlogic]                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[testlogic] 
+[testlogic] 
+[testlogic] 
+[testlogic] Test report [/ade/rbseshad_ascore_v1/oracle/work/tl_results/functional/tiapxy/testlogic.html]

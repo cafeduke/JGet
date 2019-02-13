@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="tiapxy.basic" default="usage">
+   
+   <description>
+    functional tiapxy basic tests.
+
+    @testlogic.group type="working" values="true"  
+    @testlogic.group type="install"  values="restricted,compact,full"
+    @testlogic.group type="winFIPS" values="false"
+
+  </description>
+
+   <!-- ADDED-BY-SEED Absolute path to this file -->
+   <dirname property="tiapxy.basic.dir" file="${ant.file.tiapxy.basic}" />
+
+   <!-- ADDED-BY-SEED Import base file -->
+   <import file="${tiapxy.basic.dir}/../tiapxy-test-base.xml" />
+   
+   <property name="test.prefix" value="tiapxy_basic" />
+   
+   <target name="suite">
+      <description>Basic tests - Verify basic proxy functionality.</description>      
+      <antcall target="conn_http_http"  />
+      <antcall target="conn_http_https" />
+      <antcall target="conn_https_https"/>
+      <antcall target="conn_https_http" />
+   </target>
+
+   <target name="conn_http_http">
+      <description>Frontend=HTTP Backend=HTTP</description>
+      <antcall target="sendGet">
+         <param name="url"        value="http://${ADMIN_HOST}:${APACHE_PORT}/hh/OtdApp/Snoop.jsp" />
+         <param name="outFile"    value="${test.prefix}_hh.log" />
+         <param name="headerHost" value="vh1.com" />
+      </antcall>
+   </target>
+   
+   <target name="conn_http_https">
+      <description>Frontend=HTTP Backend=HTTPS</description>
+      <antcall target="sendGet">
+         <param name="url"     value="http://${ADMIN_HOST}:${APACHE_PORT}/hs/OtdApp/Snoop.jsp" />
+         <param name="outFile" value="${test.prefix}_hs.log" />
+         <param name="headerHost" value="vh2.com" />
+      </antcall>
+   </target>
+            
+   <target name="conn_https_http">
+      <description>Frontend=HTTPS Backend=HTTPS</description>
+      <antcall target="sendGet">
+         <param name="url"     value="http://${ADMIN_HOST}:${APACHE_PORT}/sh/OtdApp/Snoop.jsp" />
+         <param name="outFile" value="${test.prefix}_sh.log" />
+         <param name="headerHost" value="vh2.com" />
+      </antcall>
+   </target>
+            
+   <target name="conn_https_https">
+      <description>Frontend=HTTPS Backend=HTTP</description>
+      <antcall target="sendGet">
+         <param name="url"     value="http://${ADMIN_HOST}:${APACHE_PORT}/ss/OtdApp/Snoop.jsp" />
+         <param name="outFile" value="${test.prefix}_ss.log" />
+         <param name="headerHost" value="vh2.com" />
+      </antcall>
+   </target>            
+
+   <target name="sendGet">
+      <description>
+         Send a simplet GET request and assert 200 OK response
+         Params:
+         	url        - URL to be requested
+         	outFile    - Filename to store the response
+            headerHost - Host header to be sent
+      </description>
+      <trycatch property="responseContent">
+         <try>
+            <http-url-connection target="${url}" checkmode="RESPONSE_CODE" sendcookie="false">
+               <requestheader name="Host" value="${headerHost}" />
+               <expectedresponsecode>200</expectedresponsecode>
+            </http-url-connection>
+         </try>
+         <catch>
+            <antcall target="logFailure">
+               <param name="url" value="${url}" />
+               <param name="outFile" value="${outFile}" />               
+               <param name="responseContent" value="${responseContent}" />
+            </antcall>
+         </catch>
+      </trycatch>
+   </target>
+
+   <target name="logFailure">
+      <description>
+        Generic failure for a request
+         Params:
+         	url             - URL to be requested
+         	outFile         - Filename to store the response
+         	responseContent - Response received after requesting ${url}
+      </description>
+      <property name="errMsg" value="ERROR: Response code is not as expected." />
+      <echo file="${twork.dir}/${outFile}">
+${errMsg}
+========================
+${url}
+========================
+${responseContent}
+          </echo>
+      <fail message="${errMsg}" />
+   </target>
+
+</project>
+
+

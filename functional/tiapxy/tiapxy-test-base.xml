@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<project name="test.tiapxy.base">
+
+   <description>Base file of all tiapxy tests.</description>
+
+   <!-- ADDED-BY-SEED Absolute path to this file -->
+   <dirname property="test.tiapxy.base.dir" file="${ant.file.test.tiapxy.base}" />
+
+   <!-- ADDED-BY-SEED Import tiapxy base file -->
+   <import file="${test.tiapxy.base.dir}/tiapxy-base.xml" />
+
+   <!-- Import TLR core to run with TestLogic -->
+   <import file="${testtool.3rdparty.testlogic.dir}/tlr-core-root.xml" />
+
+   <!-- ADDED-BY-SEED Import common test file targets -->
+   <import file="${tl.cafe.file}" />
+
+   <!-- ====================================================================
+    START: ADDED-BY-SEED Template generated code. Don't edit
+   ===================================================================== -->
+   <sequential>
+
+      <!--
+      Runs setup if it's neven been run. This is to help users to come to
+      any test file and just run the target. Setup is run, if it's neven
+      been run.
+     -->
+
+      <if>
+         <not>
+            <available file="${team.setup.marker.file}" />
+         </not>
+         <then>
+            <ant antfile="${team.base.dir}/build.xml" target="setup" />
+         </then>
+      </if>
+
+   </sequential>
+   <!-- ====================================================================
+    END: ADDED-BY-SEED: Template generated code. Don't edit
+   ===================================================================== -->
+
+   <!-- Prepare -->
+   <target name="prepare">
+
+      <description>Prepare WebLogic and OHS</description>
+      <property name="MS1_HTTP_PORT" value="18801" />
+      <property name="MS1_HTTPS_PORT" value="17701" />
+      <property name="MS2_HTTP_PORT" value="18802" />
+      <property name="MS2_HTTPS_PORT" value="17702" />
+
+      <property name="port.file" value="${twork.dir}/ports-ohs1.txt" />
+      <loadproperties srcFile="${port.file}" />
+
+      <delete>
+         <fileset dir="${twork.dir}" includes="tiapxy_basic*" />
+      </delete>
+
+      <if>
+         <or>            
+            <not><isset property="skip.tiapxy.prepare"/></not>
+            <equals arg1="skip.tiapxy.prepare" arg2="false" />            
+         </or>               
+         <then>
+            <antcall target="SetupWebLogic" />
+            
+         </then>
+      </if>
+      
+      <antcall target="SetupOHS" />
+
+   </target>
+
+   <target name="SetupOHS">
+      <property name="master_dir" value="${ohsConfDir}/ohs1" />
+      <property name="runtime_dir" value="${ohsConfDir}/instances/ohs1" />
+
+      <!-- Backup if not already backuped -->
+      <if>
+         <not>
+            <available file="${master_dir}/httpd.conf.orig" />
+         </not>
+         <then>
+            <copy file="${master_dir}/httpd.conf" tofile="${master_dir}/httpd.conf.orig" />
+            <copy file="${runtime_dir}/httpd.conf" tofile="${runtime_dir}/httpd.conf.orig" />
+         </then>
+      </if>
+
+      <!--Modify master/runtime httpd.conf to include proxy -->
+      <concat destfile="${master_dir}/httpd.conf" append="true" fixlastline="yes">
+         <filelist dir="${tiapxy.base.dir}/common/data" files="include_proxy.txt" />
+      </concat>
+      <concat destfile="${runtime_dir}/httpd.conf" append="true" fixlastline="yes">
+         <filelist dir="${tiapxy.base.dir}/common/data" files="include_proxy.txt" />
+      </concat>
+
+      <copy file="${tiapxy.base.dir}/common/data/tiapxy_proxy.conf" todir="${twork.dir}" />
+      <replaceregexp file="${twork.dir}/tiapxy_proxy.conf" match="%ADMIN_HOST%" replace="${ADMIN_HOST}" byline="true" />
+      <replaceregexp file="${twork.dir}/tiapxy_proxy.conf" match="%APACHE_PORT%" replace="${APACHE_PORT}" byline="true" />
+      <replaceregexp file="${twork.dir}/tiapxy_proxy.conf" match="%APACHE_SSL_PORT%" replace="${APACHE_SSL_PORT}" byline="true" />
+      <replaceregexp file="${twork.dir}/tiapxy_proxy.conf" match="%MS1_HTTP_PORT%" replace="${MS1_HTTP_PORT}" byline="true" />
+      <replaceregexp file="${twork.dir}/tiapxy_proxy.conf" match="%MS2_HTTP_PORT%" replace="${MS2_HTTP_PORT}" byline="true" />
+      <replaceregexp file="${twork.dir}/tiapxy_proxy.conf" match="%MS1_HTTPS_PORT%" replace="${MS1_HTTPS_PORT}" byline="true" />
+      <replaceregexp file="${twork.dir}/tiapxy_proxy.conf" match="%MS2_HTTPS_PORT%" replace="${MS2_HTTPS_PORT}" byline="true" />
+      <replaceregexp file="${twork.dir}/tiapxy_proxy.conf" match="%FUNCTIONAL_BASE_DIR%" replace="${functional.base.dir}" byline="true" />
+
+
+      <!-- Copy basic http_http_proxy.conf as the proxy.conf in master/runtime dir -->
+      <copy file="${twork.dir}/tiapxy_proxy.conf" tofile="${master_dir}/proxy.conf" />
+      <copy file="${twork.dir}/tiapxy_proxy.conf" tofile="${runtime_dir}/proxy.conf" />
+
+      <!-- Restart OHS -->
+      <antcall target="stopOHS">
+         <param name="out.log" value="tiapxy_stop_ohs.log" />
+         <param name="ohs.name" value="ohs1" />
+      </antcall>
+
+      <antcall target="startOHS">
+         <param name="out.log" value="tiapxy_start_ohs.log" />
+         <param name="ohs.name" value="ohs1" />
+      </antcall>
+
+   </target>
+
+   <target name="SetupWebLogic">
+
+      <!-- Create managed servers, configure SSL, deploy app and start managed servers -->
+      <exec executable="${WLST_LOC}" output="${twork.dir}/tiapxy_wlst_create_managed_server.log" failonerror="true">
+         <arg value="${functional.base.dir}/common/wlst/create_managed_server.py" />
+         <arg value="--host=${ADMIN_HOST}" />
+         <arg value="--port=${ADMIN_PORT}" />
+         <arg value="--username=${WLS_USER}" />
+         <arg value="--password=${WLS_PWD}" />
+         <arg value="--domain=${DOMAIN_HOME}" />
+         <arg value="--machine=${MACHINE_NAME}" />
+         <arg value="--keystore=${functional.base.dir}/common/data/keystores/WebLogic.jks" />
+         <arg value="--alias=weblogic" />
+         <arg value="--storepass=welcome1" />
+         <arg value="--ms-http-port=${MS1_HTTP_PORT},${MS2_HTTP_PORT}" />
+         <arg value="--ms-ssl-port=${MS1_HTTPS_PORT},${MS2_HTTPS_PORT}" />
+         <arg value="--web-app-path=${functional.base.dir}/common/data/web-app/OtdApp.war" />
+      </exec>
+
+   </target>
+
+</project>
