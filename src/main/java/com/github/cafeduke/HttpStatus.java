@@ -1,0 +1,384 @@
+package com.github.cafeduke;
+
+/**
+ * Constants enumerating the HTTP status codes.
+ * All status codes defined in RFC1945 (HTTP/1.0, RFC2616 (HTTP/1.1), and
+ * RFC2518 (WebDAV) are supported.
+ */
+public class HttpStatus
+{
+    // --- 1xx Informational ---
+
+    /**
+     * <b>100 Continue</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_CONTINUE = 100;
+
+    /**
+     * <b>101 Switching Protocols</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_SWITCHING_PROTOCOLS = 101;
+
+    /**
+     * <b>102 Processing</b> (WebDAV - RFC 2518)
+     */
+    public static final int SC_PROCESSING = 102;
+
+    // --- 2xx Success ---
+
+    /**
+     * <b>200 OK</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_OK = 200;
+
+    /**
+     * <b>201 Created</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_CREATED = 201;
+
+    /**
+     * <b>202 Accepted</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_ACCEPTED = 202;
+
+    /**
+     * <b>203 Non Authoritative Information</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_NON_AUTHORITATIVE_INFORMATION = 203;
+
+    /**
+     * <b>204 No Content</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_NO_CONTENT = 204;
+
+    /**
+     * <b>205 Reset Content</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_RESET_CONTENT = 205;
+
+    /**
+     * <b>206 Partial Content</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_PARTIAL_CONTENT = 206;
+    /**
+     * <b>207 Multi-Status</b> (WebDAV - RFC 2518) or <b>207 Partial Update
+     * OK</b> (HTTP/1.1 - draft-ietf-http-v11-spec-rev-01?)
+     */
+    public static final int SC_MULTI_STATUS = 207;
+
+    // --- 3xx Redirection ---
+
+    /**
+     * <b>300 Mutliple Choices</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_MULTIPLE_CHOICES = 300;
+
+    /**
+     * <b>301 Moved Permanently</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_MOVED_PERMANENTLY = 301;
+
+    /**
+     * <b>302 Moved Temporarily</b> (Sometimes <b>Found</b>) (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_MOVED_TEMPORARILY = 302;
+
+    /**
+     * <b>303 See Other</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_SEE_OTHER = 303;
+
+    /**
+     * <b>304 Not Modified</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_NOT_MODIFIED = 304;
+
+    /**
+     * <b>305 Use Proxy</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_USE_PROXY = 305;
+
+    /**
+     * <b>307 Temporary Redirect</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_TEMPORARY_REDIRECT = 307;
+
+    // --- 4xx Client Error ---
+
+    /**
+     * <b>400 Bad Request</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_BAD_REQUEST = 400;
+
+    /**
+     * <b>401 Unauthorized</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_UNAUTHORIZED = 401;
+
+    /**
+     * <b>402 Payment Required</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_PAYMENT_REQUIRED = 402;
+
+    /**
+     * <b>403 Forbidden</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_FORBIDDEN = 403;
+
+    /**
+     * <b>404 Not Found</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_NOT_FOUND = 404;
+
+    /**
+     * <b>405 Method Not Allowed</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_METHOD_NOT_ALLOWED = 405;
+
+    /**
+     * <b>406 Not Acceptable</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_NOT_ACCEPTABLE = 406;
+
+    /**
+     * <b>407 Proxy Authentication Required</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_PROXY_AUTHENTICATION_REQUIRED = 407;
+
+    /**
+     * <b>408 Request Timeout</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_REQUEST_TIMEOUT = 408;
+
+    /**
+     * <b>409 Conflict</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_CONFLICT = 409;
+
+    /**
+     * <b>410 Gone</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_GONE = 410;
+
+    /**
+     * <b>411 Length Required</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_LENGTH_REQUIRED = 411;
+
+    /**
+     * <b>412 Precondition Failed</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_PRECONDITION_FAILED = 412;
+
+    /**
+     * <b>413 Request Entity Too Large</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_REQUEST_TOO_LONG = 413;
+
+    /**
+     * <b>414 Request-URI Too Long</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_REQUEST_URI_TOO_LONG = 414;
+
+    /**
+     * <b>415 Unsupported Media Type</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_UNSUPPORTED_MEDIA_TYPE = 415;
+
+    /**
+     * <b>416 Requested Range Not Satisfiable</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
+
+    /**
+     * <b>417 Expectation Failed</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_EXPECTATION_FAILED = 417;
+
+    /**
+     * Static constant for a 418 error.
+     * <b>418 Unprocessable Entity</b> (WebDAV drafts?)
+     * or <b>418 Reauthentication Required</b> (HTTP/1.1 drafts?)
+     */
+    // not used
+    // public static final int SC_UNPROCESSABLE_ENTITY = 418;
+
+    /**
+     * Static constant for a 419 error.
+     * <b>419 Insufficient Space on Resource</b>
+     * (WebDAV - draft-ietf-webdav-protocol-05?)
+     * or <b>419 Proxy Reauthentication Required</b>
+     * (HTTP/1.1 drafts?)
+     */
+    public static final int SC_INSUFFICIENT_SPACE_ON_RESOURCE = 419;
+    /**
+     * Static constant for a 420 error.
+     * <b>420 Method Failure</b>
+     * (WebDAV - draft-ietf-webdav-protocol-05?)
+     */
+    public static final int SC_METHOD_FAILURE = 420;
+
+    /**
+     * <b>422 Unprocessable Entity</b> (WebDAV - RFC 2518)
+     */
+    public static final int SC_UNPROCESSABLE_ENTITY = 422;
+
+    /**
+     * <b>423 Locked</b> (WebDAV - RFC 2518)
+     */
+    public static final int SC_LOCKED = 423;
+
+    /**
+     * <b>424 Failed Dependency</b> (WebDAV - RFC 2518)
+     */
+    public static final int SC_FAILED_DEPENDENCY = 424;
+
+    // --- 5xx Server Error ---
+
+    /**
+     * <b>500 Server Error</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_INTERNAL_SERVER_ERROR = 500;
+
+    /**
+     * <b>501 Not Implemented</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_NOT_IMPLEMENTED = 501;
+
+    /**
+     * <b>502 Bad Gateway</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_BAD_GATEWAY = 502;
+
+    /**
+     * <b>503 Service Unavailable</b> (HTTP/1.0 - RFC 1945)
+     */
+    public static final int SC_SERVICE_UNAVAILABLE = 503;
+
+    /**
+     * <b>504 Gateway Timeout</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_GATEWAY_TIMEOUT = 504;
+
+    /**
+     * <b>505 HTTP Version Not Supported</b> (HTTP/1.1 - RFC 2616)
+     */
+    public static final int SC_HTTP_VERSION_NOT_SUPPORTED = 505;
+
+    /**
+     * <b>507 Insufficient Storage</b> (WebDAV - RFC 2518)
+     */
+    public static final int SC_INSUFFICIENT_STORAGE = 507;
+
+    /**
+     * Reason phrases lookup table.
+     */
+    private static final String[][] REASON_PHRASES = new String[][] {
+            new String[0],
+            new String[3],
+            new String[8],
+            new String[8],
+            new String[25],
+            new String[8]
+    };
+
+    /**
+     * Store the given reason phrase, by status code.
+     * 
+     * @param statusCode The status code to lookup
+     * @param reasonPhrase The reason phrase for this status code
+     */
+    private static void addStatusCodeMap(int statusCode, String reasonPhrase)
+    {
+        int classIndex = statusCode / 100;
+        REASON_PHRASES[classIndex][statusCode - classIndex * 100] = reasonPhrase;
+    }
+
+    /**
+     * Set up status code to "reason phrase" map.
+     */
+    static
+    {
+        // HTTP 1.0 Server status codes -- see RFC 1945
+        addStatusCodeMap(SC_OK, "OK");
+        addStatusCodeMap(SC_CREATED, "Created");
+        addStatusCodeMap(SC_ACCEPTED, "Accepted");
+        addStatusCodeMap(SC_NO_CONTENT, "No Content");
+        addStatusCodeMap(SC_MOVED_PERMANENTLY, "Moved Permanently");
+        addStatusCodeMap(SC_MOVED_TEMPORARILY, "Moved Temporarily");
+        addStatusCodeMap(SC_NOT_MODIFIED, "Not Modified");
+        addStatusCodeMap(SC_BAD_REQUEST, "Bad Request");
+        addStatusCodeMap(SC_UNAUTHORIZED, "Unauthorized");
+        addStatusCodeMap(SC_FORBIDDEN, "Forbidden");
+        addStatusCodeMap(SC_NOT_FOUND, "Not Found");
+        addStatusCodeMap(SC_INTERNAL_SERVER_ERROR, "Internal Server Error");
+        addStatusCodeMap(SC_NOT_IMPLEMENTED, "Not Implemented");
+        addStatusCodeMap(SC_BAD_GATEWAY, "Bad Gateway");
+        addStatusCodeMap(SC_SERVICE_UNAVAILABLE, "Service Unavailable");
+
+        // HTTP 1.1 Server status codes -- see RFC 2048
+        addStatusCodeMap(SC_CONTINUE, "Continue");
+        addStatusCodeMap(SC_TEMPORARY_REDIRECT, "Temporary Redirect");
+        addStatusCodeMap(SC_METHOD_NOT_ALLOWED, "Method Not Allowed");
+        addStatusCodeMap(SC_CONFLICT, "Conflict");
+        addStatusCodeMap(SC_PRECONDITION_FAILED, "Precondition Failed");
+        addStatusCodeMap(SC_REQUEST_TOO_LONG, "Request Too Long");
+        addStatusCodeMap(SC_REQUEST_URI_TOO_LONG, "Request-URI Too Long");
+        addStatusCodeMap(SC_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+        addStatusCodeMap(SC_MULTIPLE_CHOICES, "Multiple Choices");
+        addStatusCodeMap(SC_SEE_OTHER, "See Other");
+        addStatusCodeMap(SC_USE_PROXY, "Use Proxy");
+        addStatusCodeMap(SC_PAYMENT_REQUIRED, "Payment Required");
+        addStatusCodeMap(SC_NOT_ACCEPTABLE, "Not Acceptable");
+        addStatusCodeMap(SC_PROXY_AUTHENTICATION_REQUIRED, "Proxy Authentication Required");
+        addStatusCodeMap(SC_REQUEST_TIMEOUT, "Request Timeout");
+
+        addStatusCodeMap(SC_SWITCHING_PROTOCOLS, "Switching Protocols");
+        addStatusCodeMap(SC_NON_AUTHORITATIVE_INFORMATION, "Non Authoritative Information");
+        addStatusCodeMap(SC_RESET_CONTENT, "Reset Content");
+        addStatusCodeMap(SC_PARTIAL_CONTENT, "Partial Content");
+        addStatusCodeMap(SC_GATEWAY_TIMEOUT, "Gateway Timeout");
+        addStatusCodeMap(SC_HTTP_VERSION_NOT_SUPPORTED, "Http Version Not Supported");
+        addStatusCodeMap(SC_GONE, "Gone");
+        addStatusCodeMap(SC_LENGTH_REQUIRED, "Length Required");
+        addStatusCodeMap(SC_REQUESTED_RANGE_NOT_SATISFIABLE, "Requested Range Not Satisfiable");
+        addStatusCodeMap(SC_EXPECTATION_FAILED, "Expectation Failed");
+
+        // WebDAV Server-specific status codes
+        addStatusCodeMap(SC_PROCESSING, "Processing");
+        addStatusCodeMap(SC_MULTI_STATUS, "Multi-Status");
+        addStatusCodeMap(SC_UNPROCESSABLE_ENTITY, "Unprocessable Entity");
+        addStatusCodeMap(SC_INSUFFICIENT_SPACE_ON_RESOURCE, "Insufficient Space On Resource");
+        addStatusCodeMap(SC_METHOD_FAILURE, "Method Failure");
+        addStatusCodeMap(SC_LOCKED, "Locked");
+        addStatusCodeMap(SC_INSUFFICIENT_STORAGE, "Insufficient Storage");
+        addStatusCodeMap(SC_FAILED_DEPENDENCY, "Failed Dependency");
+    }
+
+    /**
+     * Get the reason phrase for a particular status code.
+     * 
+     * This method always returns the English text as specified in the relevant RFCs and is not internationalized.
+     * 
+     * @param statusCode the numeric status code
+     * @return the reason phrase associated with the given status code
+     *         or null if the status code is not recognized.
+     * 
+     */
+    public static String getStatusText(int statusCode)
+    {
+
+        if (statusCode < 0)
+        {
+            throw new IllegalArgumentException("status code may not be negative");
+        }
+        int classIndex = statusCode / 100;
+        int codeIndex = statusCode - classIndex * 100;
+        if (classIndex < 1 || classIndex > (REASON_PHRASES.length - 1)
+                || codeIndex < 0 || codeIndex > (REASON_PHRASES[classIndex].length - 1))
+        {
+            return null;
+        }
+        return REASON_PHRASES[classIndex][codeIndex];
+    }
+}

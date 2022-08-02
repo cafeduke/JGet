@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="SuiteAll" parallel="false" preserve-order="true" time-out="5000">
+
+  <test name="basic" preserve-order="true">
+    <classes>      
+      <class name="com.github.cafeduke.Sanity"/>
+    </classes>
+  </test>
+
+</suite>
