@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import com.github.cafeduke.common.ToolsUtil;
-import com.github.cafeduke.common.Util;
+import com.github.cafeduke.jreq.common.ToolsUtil;
+import com.github.cafeduke.jreq.common.Util;
 
 /**
  * A Java based HTTP Client that exposes APIs to send multiple sequential/simultaneous requests and optionally capture the response body/headers.

@@ -26,7 +26,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.io.FileUtils;
 
-import com.github.cafeduke.common.Util;
+import com.github.cafeduke.jreq.common.Util;
 
 /**
  * This class encapsulates JReq arguments.

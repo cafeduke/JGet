@@ -3,8 +3,8 @@ package com.github.cafeduke.jreq;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.cafeduke.common.Util;
 import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
+import com.github.cafeduke.jreq.common.Util;
 
 /**
  * An argument builder for JReq

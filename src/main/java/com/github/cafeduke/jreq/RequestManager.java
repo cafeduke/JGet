@@ -19,9 +19,9 @@ import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 
-import com.github.cafeduke.common.Util;
 import com.github.cafeduke.jreq.ArgProcessor.HttpMethod;
 import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
+import com.github.cafeduke.jreq.common.Util;
 
 /**
  * RequestManager manages one or more sequential/simultaneous requests to be spawned.

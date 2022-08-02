@@ -42,11 +42,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import com.github.cafeduke.common.Util;
 import com.github.cafeduke.jreq.ArgProcessor.HttpMethod;
 import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
 import com.github.cafeduke.jreq.ArgProcessor.OutputMode;
 import com.github.cafeduke.jreq.JReq.Context;
+import com.github.cafeduke.jreq.common.Util;
 
 /**
  * A request is encapsulated as a SingleClient. Each SingleClient has its own
