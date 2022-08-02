@@ -1,8 +1,10 @@
-package com.github.cafeduke;
+package com.github.cafeduke.jreq;
 
 import javax.net.ssl.HostnameVerifier;
 
 /**
+ * Allow all SSL Verifier
+ * 
  * @author Raghunandan.Seshadri
  */
 public class SSLVerifier implements HostnameVerifier

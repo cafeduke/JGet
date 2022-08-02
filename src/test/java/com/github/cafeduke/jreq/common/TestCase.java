@@ -1,8 +1,8 @@
-package com.github.cafeduke.common;
+package com.github.cafeduke.jreq.common;
 
 import org.testng.annotations.BeforeClass;
 
-import com.github.cafeduke.Fireduke;
+import com.github.cafeduke.jreq.JReq;
 
 public class TestCase
 {
@@ -12,11 +12,11 @@ public class TestCase
 
     public final String TestPrefix = getClass().getName().replaceFirst(PackagePrefixDot, "");
 
-    protected Fireduke fireduke = null;
+    protected JReq fireduke = null;
 
     @BeforeClass
     public void setup()
     {
-        fireduke = Fireduke.getInstance();
+        fireduke = JReq.getInstance();
     }
 }

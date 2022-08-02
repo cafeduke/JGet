@@ -4,13 +4,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.cafeduke</groupId>
-  <artifactId>fireduke</artifactId>
+  <artifactId>jreq</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>
 
-  <name>FireDuke</name>
+  <name>JReq</name>
   <description>A Java API library/utility to send HTTP/2 requests and capture response</description>
-  <url>https://github.com/cafeduke/FireDuke</url>
+  <url>https://github.com/cafeduke/JReq</url>
 
   <licenses>
     <license>
@@ -29,9 +29,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/cafeduke/FireDuke.git</connection>
-    <developerConnection>scm:git:ssh://github.com:cafeduke/FireDuke.git</developerConnection>
-    <url>https://github.com/cafeduke/fireduke/tree/master</url>
+    <connection>scm:git:git://github.com/cafeduke/JReq.git</connection>
+    <developerConnection>scm:git:ssh://github.com:cafeduke/JReq.git</developerConnection>
+    <url>https://github.com/cafeduke/JReq/tree/master</url>
   </scm>
 
   <distributionManagement>

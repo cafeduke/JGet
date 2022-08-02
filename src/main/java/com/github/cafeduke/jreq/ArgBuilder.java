@@ -1,13 +1,13 @@
-package com.github.cafeduke;
+package com.github.cafeduke.jreq;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.cafeduke.ArgProcessor.MultiThreadMode;
 import com.github.cafeduke.common.Util;
+import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
 
 /**
- * An argument builder for Fireduke
+ * An argument builder for JReq
  * 
  * @author Raghunandan.Seshadri
  */

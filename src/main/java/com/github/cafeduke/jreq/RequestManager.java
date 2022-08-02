@@ -1,4 +1,4 @@
-package com.github.cafeduke;
+package com.github.cafeduke.jreq;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,9 +19,9 @@ import java.util.logging.Logger;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 
-import com.github.cafeduke.ArgProcessor.HttpMethod;
-import com.github.cafeduke.ArgProcessor.MultiThreadMode;
 import com.github.cafeduke.common.Util;
+import com.github.cafeduke.jreq.ArgProcessor.HttpMethod;
+import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
 
 /**
  * RequestManager manages one or more sequential/simultaneous requests to be spawned.
@@ -55,7 +55,7 @@ public class RequestManager implements Runnable
     private ArgProcessor cmdArg = null;
 
     /**
-     * Unique ID for each Fireduke client.
+     * Unique ID for each JReq client.
      */
     private String clientId = null;
 
@@ -78,15 +78,15 @@ public class RequestManager implements Runnable
     /**
      * Reference to context
      */
-    private Fireduke.Context context = null;
+    private JReq.Context context = null;
 
     /**
      * Create a request manager instance.
      * 
-     * @param context Fireduke context
-     * @param arg Fireduke request arguments.
+     * @param context JReq context
+     * @param arg JReq request arguments.
      */
-    public RequestManager(Fireduke.Context context, String arg[])
+    public RequestManager(JReq.Context context, String arg[])
     {
         this.context = context;
         this.arg = arg;
@@ -178,7 +178,7 @@ public class RequestManager implements Runnable
             /* Unique request header */
             if (cmdArg.sendClientId)
             {
-                cmdArg.mapHeaderValue.put(Fireduke.CLIENT_ID_HEADER, clientId);
+                cmdArg.mapHeaderValue.put(JReq.CLIENT_ID_HEADER, clientId);
                 logger.fine("InstanceId Header = " + clientId);
             }
 
@@ -256,7 +256,7 @@ public class RequestManager implements Runnable
             propAvgMeta.setProperty(key[i], "" + avg[i]);
         }
 
-        propAvgMeta.store(new FileWriter("jget.avg.properties"), "Connection Average Meta Data");
+        propAvgMeta.store(new FileWriter("jreq.avg.properties"), "Connection Average Meta Data");
     }
 
     /**

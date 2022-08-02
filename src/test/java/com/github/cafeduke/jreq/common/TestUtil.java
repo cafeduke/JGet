@@ -1,4 +1,4 @@
-package com.github.cafeduke.common;
+package com.github.cafeduke.jreq.common;
 
 import java.io.File;
 import java.io.IOException;

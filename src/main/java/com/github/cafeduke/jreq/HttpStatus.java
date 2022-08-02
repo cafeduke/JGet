@@ -1,4 +1,4 @@
-package com.github.cafeduke;
+package com.github.cafeduke.jreq;
 
 /**
  * Constants enumerating the HTTP status codes.
@@ -7,8 +7,6 @@ package com.github.cafeduke;
  */
 public class HttpStatus
 {
-    // --- 1xx Informational ---
-
     /**
      * <b>100 Continue</b> (HTTP/1.1 - RFC 2616)
      */

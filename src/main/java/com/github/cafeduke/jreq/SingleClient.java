@@ -1,4 +1,4 @@
-package com.github.cafeduke;
+package com.github.cafeduke.jreq;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -42,11 +42,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import com.github.cafeduke.ArgProcessor.HttpMethod;
-import com.github.cafeduke.ArgProcessor.MultiThreadMode;
-import com.github.cafeduke.ArgProcessor.OutputMode;
-import com.github.cafeduke.Fireduke.Context;
 import com.github.cafeduke.common.Util;
+import com.github.cafeduke.jreq.ArgProcessor.HttpMethod;
+import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
+import com.github.cafeduke.jreq.ArgProcessor.OutputMode;
+import com.github.cafeduke.jreq.JReq.Context;
 
 /**
  * A request is encapsulated as a SingleClient. Each SingleClient has its own
@@ -148,12 +148,12 @@ public class SingleClient implements Runnable
         Arrays.sort(headerToIngore);
     }
 
-    private Fireduke.Context context = null;
+    private JReq.Context context = null;
 
     /**
      * Create a SingleClient object - Takes care of one request.
      * 
-     * @param context Fireduke context.
+     * @param context JReq context.
      * @param cmdArg Argument object.
      * @throws MalformedURLException Exception if the URL is malformed
      */
@@ -417,7 +417,7 @@ public class SingleClient implements Runnable
     }
 
     /**
-     * If session binding is enabled, add cookies present in Fireduke context to HttpURLConnection.
+     * If session binding is enabled, add cookies present in JReq context to HttpURLConnection.
      * 
      * @param conn HttpURLConnection object
      */
@@ -658,7 +658,7 @@ public class SingleClient implements Runnable
 
     /**
      * If session binding is enabled, process the response headers map to extract all cookies
-     * from Set-Cookie header value and populate the cookie map in Fireduke context.
+     * from Set-Cookie header value and populate the cookie map in JReq context.
      * 
      * @param mapHeaderValue Map having response headers
      */
@@ -836,14 +836,14 @@ public class SingleClient implements Runnable
         String fileMetaData = null;
 
         if (fileOutput == null)
-            fileMetaData = "jget.properties";
+            fileMetaData = "jreq.properties";
         else
         {
             fileMetaData = fileOutput.getName();
             int index = fileMetaData.lastIndexOf('.');
             if (index != -1)
                 fileMetaData = fileMetaData.substring(0, index);
-            fileMetaData = fileMetaData + ".jget.properties";
+            fileMetaData = fileMetaData + ".jreq.properties";
         }
         propConnInfo.store(new FileWriter(fileMetaData), "Connection Meta Data");
     }

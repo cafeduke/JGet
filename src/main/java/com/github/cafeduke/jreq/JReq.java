@@ -1,4 +1,4 @@
-package com.github.cafeduke;
+package com.github.cafeduke.jreq;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Version;
@@ -18,23 +18,23 @@ import com.github.cafeduke.common.Util;
  * A Java based HTTP Client that exposes APIs to send multiple sequential/simultaneous requests and optionally capture the response body/headers.
  *
  * <ul>
- * <li>Fireduke is capable of sending requests of all request method types (Get, Post, Head, Delete, Put, Trace and Options).
- * <li>Fireduke can operate in the following threading mode.
+ * <li>JReq is capable of sending requests of all request method types (Get, Post, Head, Delete, Put, Trace and Options).
+ * <li>JReq can operate in the following threading mode.
  * <ul>
  * <li>Single Client (SC) - A single thread is used to send requests sequentially.
  * <li>Multiple Similar Clients (MSC): Spawns multiple threads, all threads requesting the same URL.
  * <li>Multiple Unique Clients (MUC): Spawns multiple threads, each thread picks a URL from an input URL file.
  * </ul>
- * <li>Each Fireduke thread can send its own set of request headers and/or request body.
- * <li>Fireduke can optionally maintain cookie based session.
+ * <li>Each JReq thread can send its own set of request headers and/or request body.
+ * <li>JReq can optionally maintain cookie based session.
  * </ul>
  * 
  * @author Raghunandan.Seshadri
  */
-public class Fireduke
+public class JReq
 {
     /**
-     * The request header name which will have a unique value for every Fireduke instance.
+     * The request header name which will have a unique value for every JReq instance.
      */
     public static final String CLIENT_ID_HEADER = "ClientId";
 
@@ -45,22 +45,22 @@ public class Fireduke
     public static final int TIMEOUT_RESPONSE_CODE = 5 * 60;
 
     /**
-     * Request Manager for this Fireduke instance
+     * Request Manager for this JReq instance
      */
     private RequestManager requestManager = null;
 
     /**
-     * List of Fireduke Arguments used by all send methods.
+     * List of JReq Arguments used by all send methods.
      */
     private List<String> listCommonArg = new ArrayList<String>();
 
     /**
-     * Default Fireduke Logger
+     * Default JReq Logger
      */
-    private static final Logger DEFAULT_LOGGER = ToolsUtil.getLogger(Fireduke.class.getName(), "Fireduke.log");
+    private static final Logger DEFAULT_LOGGER = ToolsUtil.getLogger(JReq.class.getName(), "JReq.log");
 
     /**
-     * Fireduke context
+     * JReq context
      */
     private final Context context = new Context();
 
@@ -69,34 +69,34 @@ public class Fireduke
         setHTTPProperties();
     }
 
-    private Fireduke()
+    private JReq()
     {
         context.setLogger(DEFAULT_LOGGER);
         setSessionBinding(false);
     }
 
     /**
-     * Get a new instance of Fireduke.
+     * Get a new instance of JReq.
      * 
-     * Every new instance of Fireduke sends a unique request ID. This helps origin server differentiate
+     * Every new instance of JReq sends a unique request ID. This helps origin server differentiate
      * among requests from different instances.
      * 
-     * @return Fireduke instance
+     * @return JReq instance
      */
-    public static Fireduke getInstance()
+    public static JReq getInstance()
     {
-        return new Fireduke();
+        return new JReq();
     }
 
     /**
-     * Main method to enable Fireduke to also run as a stand alone HTTP client.
+     * Main method to enable JReq to also run as a stand alone HTTP client.
      * 
      * @param arg Arguments to main.
      * @throws Exception An exception (if any) sending request.
      */
     public static void main(String arg[]) throws Exception
     {
-        Fireduke.getInstance().sendRequest(arg);
+        JReq.getInstance().sendRequest(arg);
     }
 
     /**
@@ -126,12 +126,12 @@ public class Fireduke
     /**
      * Send request with arguments {@code arg}
      * 
-     * @param arg Arguments for Fireduke
+     * @param arg Arguments for JReq
      * @return Array of response codes.
      */
     public int[] sendRequest(String arg[])
     {
-        return sendRequest(Fireduke.getArgAsList(arg));
+        return sendRequest(JReq.getArgAsList(arg));
     }
 
     /**
@@ -144,18 +144,18 @@ public class Fireduke
     public int[] sendRequest(List<String> listArg)
     {
         listArg.addAll(listCommonArg);
-        context.logger.info("Executing Fireduke: " + Util.join(listArg, ' '));
+        context.logger.info("Executing JReq: " + Util.join(listArg, ' '));
 
         requestManager = new RequestManager(context, listArg.toArray(new String[0]));
         return requestManager.sendRequest();
     }
 
     /* ------------------------------------------------------------------- */
-    /* Fireduke Getters/Setters                                                */
+    /* JReq Getters/Setters                                                */
     /* ------------------------------------------------------------------- */
 
     /**
-     * Set a custom logger for Fireduke
+     * Set a custom logger for JReq
      * 
      * @param logger The logger object to be used.
      */
@@ -182,7 +182,7 @@ public class Fireduke
 
     /**
      * Sets if HTTP redirects (requests with response code 3xx) should be automatically followed. By
-     * default, Fireduke APIs follow redirects automatically.
+     * default, JReq APIs follow redirects automatically.
      * 
      * If true, follow the HTTP redirects otherwise return the 3xx response.
      * 
@@ -197,7 +197,7 @@ public class Fireduke
     }
 
     /**
-     * Sets the blocking mode. By default, Fireduke APIs are blocking.
+     * Sets the blocking mode. By default, JReq APIs are blocking.
      * 
      * If true
      * <ul>
@@ -392,14 +392,14 @@ public class Fireduke
     /**
      * A Context class holds context that
      * <ul>
-     * <li>Specific to a given Fireduke instance
+     * <li>Specific to a given JReq instance
      * <li>Needs to be shared with other instances like RequestManager or SingleClient.
-     * <li>Can be ONLY modified by Fireduke instance.
+     * <li>Can be ONLY modified by JReq instance.
      * </ul>
      */
     static class Context
     {
-        private Logger logger = Fireduke.DEFAULT_LOGGER;
+        private Logger logger = JReq.DEFAULT_LOGGER;
 
         private String clientId = UUID.randomUUID().toString();
 
@@ -426,7 +426,7 @@ public class Fireduke
         /* Public getters */
 
         /**
-         * @return Logger set by client OR default Fireduke logger.
+         * @return Logger set by client OR default JReq logger.
          */
         public Logger getLogger()
         {
@@ -434,7 +434,7 @@ public class Fireduke
         }
 
         /**
-         * @return Unique ID for Fireduke instance.
+         * @return Unique ID for JReq instance.
          */
         public String getClientId()
         {

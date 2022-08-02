@@ -1,4 +1,4 @@
-package com.github.cafeduke;
+package com.github.cafeduke.jreq;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,7 +29,7 @@ import org.apache.commons.io.FileUtils;
 import com.github.cafeduke.common.Util;
 
 /**
- * This class encapsulates Fireduke arguments.
+ * This class encapsulates JReq arguments.
  * Handles the processing of arguments with includes parsing,
  * validation and reporting invalid usage.
  * 
@@ -116,7 +116,7 @@ public class ArgProcessor
         }
 
         /**
-         * @return Return the Fireduke switch/options for the HTTP header  
+         * @return Return the JReq switch/options for the HTTP header  
          */
         public String toArg()
         {
@@ -187,7 +187,7 @@ public class ArgProcessor
         OPTIONS;
 
         /**
-         * @return Return the Fireduke switch/options for the HTTP method 
+         * @return Return the JReq switch/options for the HTTP method 
          */
         public String toArg()
         {
@@ -239,7 +239,7 @@ public class ArgProcessor
         QUIET;
 
         /**
-         * @return Return the Fireduke switch/options for the output mode 
+         * @return Return the JReq switch/options for the output mode 
          */
         public String toArg()
         {
@@ -541,14 +541,14 @@ public class ArgProcessor
     private String arg[] = null;
 
     /**
-     * If true, a unique client ID is generated for every Fireduke instance
+     * If true, a unique client ID is generated for every JReq instance
      * and is sent as a request header.
      */
     public static final String DISABLE_CLIENT_ID = "-disableClientId";
     boolean sendClientId = true;
 
     /**
-     * If true, exception during Fireduke request is logged.
+     * If true, exception during JReq request is logged.
      */
     public static final String DISABLE_ERROR_LOG = "-disableErrorLog";
     boolean enableErrorLog = true;
@@ -876,7 +876,7 @@ public class ArgProcessor
                 if (fileKeystore == null || passwordKeyStore == null)
                     dieUsage("Please specify both -keystore and -storepass OR omit both of them.");
 
-                Fireduke.setKeyStore(fileKeystore.getAbsolutePath(), passwordKeyStore);
+                JReq.setKeyStore(fileKeystore.getAbsolutePath(), passwordKeyStore);
 
                 KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
                 InputStream in = new java.io.FileInputStream(fileKeystore);
@@ -977,7 +977,7 @@ public class ArgProcessor
     {
         StringBuilder builder = new StringBuilder();
         builder.append("Usage:" + Util.LineSep);
-        builder.append("java Fireduke" + Util.LineSep);
+        builder.append("java JReq" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URL + " <URL>]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URI_FILE + " <File having URLs>]" + Util.LineSep);
         builder.append("     [" + Util.LineSep);
@@ -1029,7 +1029,7 @@ public class ArgProcessor
             modeValue = modeValue + currMode.name() + " | ";
         modeValue = modeValue.substring(0, modeValue.length() - 2);
         builder.append("     [" + ArgProcessor.MULTI_THREAD_MODE + modeValue + "]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.RECORD_META_DATA + " (Record meta data. Stored in <output file>.jget.properties)]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.RECORD_META_DATA + " (Record meta data. Stored in <output file>.jreq.properties)]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.SOCKET_TIMEOUT + " <Socket timeout in milliseconds for each thread> ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.RESPONSE_BODY_TIMEOUT + " <Timeout after which all threads shall abort processing of response body." + Util.LineSep);
         builder.append("                       Applicable with MSC/MUC only.>" + Util.LineSep);

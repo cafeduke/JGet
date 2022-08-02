@@ -1,14 +1,14 @@
-package com.github.cafeduke;
+package com.github.cafeduke.jreq;
 
-import static com.github.cafeduke.common.TestUtil.*;
+import static com.github.cafeduke.jreq.common.TestUtil.*;
 
 import java.util.Arrays;
 
 import org.testng.annotations.Test;
 
-import com.github.cafeduke.ArgBuilder;
-import com.github.cafeduke.ArgProcessor.MultiThreadMode;
-import com.github.cafeduke.common.TestCase;
+import com.github.cafeduke.jreq.ArgBuilder;
+import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
+import com.github.cafeduke.jreq.common.TestCase;
 
 public class Sanity extends TestCase
 {
