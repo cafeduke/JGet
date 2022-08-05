@@ -12,11 +12,11 @@ public class TestCase
 
     public final String TestPrefix = getClass().getName().replaceFirst(PackagePrefixDot, "");
 
-    protected JReq fireduke = null;
+    protected JReq jreq = null;
 
     @BeforeClass
     public void setup()
     {
-        fireduke = JReq.getInstance();
+        jreq = JReq.getInstance();
     }
 }

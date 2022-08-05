@@ -14,14 +14,11 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
-import java.net.ProxySelector;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
-import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -62,6 +59,16 @@ public class SingleClient implements Runnable
 {
 
     /* Attributes WITH setter */
+
+    /**
+     * A context object obtained from JReq
+     */
+    private JReq.Context context = null;
+
+    /**
+     * The HttpClient object to be used by all SingleClient
+     */
+    private HttpClient httpClient = null;
 
     /**
      * Reference to the command line argument processor.
@@ -128,10 +135,8 @@ public class SingleClient implements Runnable
     private Properties propConnInfo = new Properties();
 
     /**
-     * Proxy (if any) to be used by this SingleClient.
+     * If true response body processing shall be aborted
      */
-    private ProxySelector proxy = null;
-
     private boolean abortResponseBodyProcessing = false;
 
     /* Static Attributes */
@@ -148,18 +153,18 @@ public class SingleClient implements Runnable
         Arrays.sort(headerToIngore);
     }
 
-    private JReq.Context context = null;
-
     /**
      * Create a SingleClient object - Takes care of one request.
      * 
      * @param context JReq context.
+     * @param httpClient HttpClient object to be used by all SingleClients
      * @param cmdArg Argument object.
      * @throws MalformedURLException Exception if the URL is malformed
      */
-    public SingleClient(Context context, ArgProcessor cmdArg) throws MalformedURLException
+    public SingleClient(Context context, HttpClient httpClient, ArgProcessor cmdArg) throws MalformedURLException
     {
         this.context = context;
+        this.httpClient = httpClient;
         this.logger = context.getLogger();
         this.cmdArg = cmdArg;
 
@@ -184,12 +189,6 @@ public class SingleClient implements Runnable
 
         if (cmdArg.listRequestHeaderFile.size() == 1)
             this.fileRequestHeader = cmdArg.listRequestHeaderFile.get(0);
-
-        if (cmdArg.proxyHost != null)
-        {
-            String tokenProxy[] = Util.cut(cmdArg.proxyHost, ':');
-            proxy = ProxySelector.of(new InetSocketAddress(tokenProxy[0], Integer.valueOf(tokenProxy[1])));
-        }
 
         if (cmdArg.proxyAuth != null)
         {
@@ -278,19 +277,13 @@ public class SingleClient implements Runnable
             {
                 long timeBeforeConn = System.currentTimeMillis();
 
-                /* Create a HttpClient builder */
-                HttpClient.Builder builderHttpClient = context.getHttpClientBuilder();
-
                 /* Build HttpRequest */
-                HttpRequest request = prepareRequest(builderHttpClient);
-
-                /* Build HttpClient */
-                HttpClient client = builderHttpClient.build();
+                HttpRequest request = prepareRequest();
 
                 /* Send request */
-                propConnInfo.setProperty("client.http.version", client.version().toString());
+                propConnInfo.setProperty("client.http.version", httpClient.version().toString());
                 propConnInfo.setProperty("request.http.version", request.version().toString());
-                HttpResponse<InputStream> response = client.send(request, BodyHandlers.ofInputStream());
+                HttpResponse<InputStream> response = httpClient.send(request, BodyHandlers.ofInputStream());
 
                 /* Process Response */
                 propConnInfo.setProperty("response.http.version", response.version().toString());
@@ -342,17 +335,11 @@ public class SingleClient implements Runnable
      * @throws IOException
      * @throws URISyntaxException
      */
-    private HttpRequest prepareRequest(HttpClient.Builder builderClient) throws IOException, URISyntaxException
+    private HttpRequest prepareRequest() throws IOException, URISyntaxException
     {
         logger.fine("Prepare for request");
 
         long timeBefore = System.currentTimeMillis();
-
-        /* Set HTTPClient properties */
-        builderClient = builderClient.followRedirects(cmdArg.followRedirect ? Redirect.ALWAYS : Redirect.NEVER);
-
-        if (proxy != null)
-            builderClient = builderClient.proxy(proxy);
 
         HttpRequest.Builder builderReq = HttpRequest.newBuilder().uri(url.toURI());
 

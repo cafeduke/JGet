@@ -3,13 +3,10 @@ package com.github.cafeduke.jreq;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -17,12 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.io.FileUtils;
 
@@ -502,14 +493,12 @@ public class ArgProcessor
     boolean recordMetaData = false;
 
     /**
-     * Default socket timeout. 
-     * See {@link HttpURLConnection#setConnectTimeout(int)}
+     * Default socket {@link java.net.http.HttpRequest.Builder#timeout(java.time.Duration) timeout}.
      */
     public static final int DEFAULT_SOCKET_TIMEOUT = 2 * 60 * 60 * 1000;
 
     /**
-     * Socket timeout. 
-     * See {@link HttpURLConnection#setConnectTimeout(int)}
+     * Socket {@link java.net.http.HttpRequest.Builder#timeout(java.time.Duration) timeout}. 
      */
     public static final String SOCKET_TIMEOUT = "-socketTimeout";
     int timeoutSocket = DEFAULT_SOCKET_TIMEOUT;
@@ -846,47 +835,14 @@ public class ArgProcessor
         /* Keystore */
         if (isSSL)
         {
-            if (fileKeystore == null && passwordKeyStore == null)
-            {
-
-                TrustManager[] trustAllCerts = new TrustManager[] {
-                        new X509TrustManager()
-                        {
-                            public java.security.cert.X509Certificate[] getAcceptedIssuers()
-                            {
-                                return null;
-                            }
-
-                            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
-                            {
-                            }
-
-                            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
-                            {
-                            }
-                        }
-                };
-
-                SSLContext context = SSLContext.getInstance("SSL");
-                context.init(null, trustAllCerts, null);
-                HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-            }
-            else
-            {
-                if (fileKeystore == null || passwordKeyStore == null)
-                    dieUsage("Please specify both -keystore and -storepass OR omit both of them.");
-
-                JReq.setKeyStore(fileKeystore.getAbsolutePath(), passwordKeyStore);
-
-                KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-                InputStream in = new java.io.FileInputStream(fileKeystore);
-                ks.load(in, passwordKeyStore.toCharArray());
-
-                SSLContext context = SSLContext.getInstance("TLS");
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                tmf.init(ks);
-                context.init(null, tmf.getTrustManagers(), null);
-            }
+            /**
+             * Note: ^ is an XOR operator
+             * If a, b are two expressions then a ^ b is true when
+             *      - a == true  b == false
+             *      - a == false b == true 
+             */
+            if (fileKeystore == null ^ passwordKeyStore == null)
+                dieUsage("Please specify both -keystore and -storepass OR omit both of them.");
         }
     }
 

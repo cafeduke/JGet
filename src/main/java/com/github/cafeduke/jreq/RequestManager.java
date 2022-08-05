@@ -3,9 +3,21 @@ package com.github.cafeduke.jreq;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.ProxySelector;
+import java.net.Socket;
+import java.net.http.HttpClient;
+import java.net.http.HttpClient.Redirect;
 import java.nio.charset.Charset;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -15,6 +27,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedTrustManager;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -45,11 +63,6 @@ public class RequestManager implements Runnable
     private static final int SLEEP_AFTER_EACH_ATTEMPT = 10;
 
     /**
-     * Raw arguments for sending request
-     */
-    private String arg[] = null;
-
-    /**
      * Processed argument object.
      */
     private ArgProcessor cmdArg = null;
@@ -63,7 +76,7 @@ public class RequestManager implements Runnable
      * An array of SingleClients. Each SingleClient abstracts a request.
      * The RequestManager should create/manage the SingleClients.
      */
-    private SingleClient webClient[] = null;
+    private SingleClient client[] = null;
 
     /**
      * Executor service
@@ -81,6 +94,11 @@ public class RequestManager implements Runnable
     private JReq.Context context = null;
 
     /**
+     * The prepared HttpClient object to be used by all SingleClients  
+     */
+    private HttpClient httpClient = null;
+
+    /**
      * Create a request manager instance.
      * 
      * @param context JReq context
@@ -89,9 +107,10 @@ public class RequestManager implements Runnable
     public RequestManager(JReq.Context context, String arg[])
     {
         this.context = context;
-        this.arg = arg;
+        this.cmdArg = new ArgProcessor(arg);
         this.clientId = context.getClientId();
         this.logger = context.getLogger();
+        this.httpClient = null;
     }
 
     /**
@@ -102,13 +121,13 @@ public class RequestManager implements Runnable
      */
     public int[] getResponseCode()
     {
-        if (webClient == null)
+        if (client == null)
             return null;
 
-        int respCode[] = new int[webClient.length];
+        int respCode[] = new int[client.length];
 
         for (int index = 0; index < respCode.length; ++index)
-            respCode[index] = (webClient[index] == null) ? -1 : webClient[index].getResponseCode();
+            respCode[index] = (client[index] == null) ? -1 : client[index].getResponseCode();
 
         return respCode;
     }
@@ -132,9 +151,10 @@ public class RequestManager implements Runnable
     {
         try
         {
-            this.cmdArg = new ArgProcessor(arg);
             if (!cmdArg.processArg())
                 return getResponseCode();
+
+            this.httpClient = buildHttpClient();
 
             if (this.cmdArg.blockRequest)
             {
@@ -186,18 +206,18 @@ public class RequestManager implements Runnable
             {
                 if (cmdArg.fileURI == null)
                 {
-                    webClient = new SingleClient[] { new SingleClient(context, cmdArg) };
-                    webClient[0].run();
+                    client = new SingleClient[] { new SingleClient(context, httpClient, cmdArg) };
+                    client[0].run();
                     logReponseCode();
                 }
                 else
                 {
                     List<String> listURI = FileUtils.readLines(cmdArg.fileURI, Charset.defaultCharset());
                     createSingleClients(listURI.size());
-                    for (int index = 0; index < webClient.length; ++index)
+                    for (int index = 0; index < client.length; ++index)
                     {
-                        webClient[index].setURI(listURI.get(index));
-                        webClient[index].run();
+                        client[index].setURI(listURI.get(index));
+                        client[index].run();
                     }
                     logResponseCodeURI(listURI);
                 }
@@ -212,8 +232,8 @@ public class RequestManager implements Runnable
             {
                 List<String> listURI = FileUtils.readLines(cmdArg.fileURI, Charset.defaultCharset());
                 createSingleClients(listURI.size());
-                for (int index = 0; index < webClient.length; ++index)
-                    webClient[index].setURI(listURI.get(index));
+                for (int index = 0; index < client.length; ++index)
+                    client[index].setURI(listURI.get(index));
                 syncParallelSingleClients();
                 logResponseCodeURI(listURI);
             }
@@ -232,6 +252,76 @@ public class RequestManager implements Runnable
     }
 
     /**
+     * Prepare HttpClient.Builder with properties that shall apply to all clients.
+     */
+    private HttpClient buildHttpClient() throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, KeyManagementException
+    {
+        ProxySelector proxySelector = HttpClient.Builder.NO_PROXY;
+        if (cmdArg.proxyHost != null)
+        {
+            String tokenProxy[] = Util.cut(cmdArg.proxyHost, ':');
+            proxySelector = ProxySelector.of(new InetSocketAddress(tokenProxy[0], Integer.valueOf(tokenProxy[1])));
+        }
+
+        SSLContext context = SSLContext.getInstance("TLS");
+        if (cmdArg.fileKeystore == null && cmdArg.passwordKeyStore == null)
+        {
+            context.init(null, new TrustManager[] {
+                    new X509ExtendedTrustManager()
+                    {
+                        public X509Certificate[] getAcceptedIssuers()
+                        {
+                            return null;
+                        }
+
+                        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type)
+                        {
+                        }
+
+                        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type)
+                        {
+                        }
+
+                        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket)
+                        {
+                        }
+
+                        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket)
+                        {
+                        }
+
+                        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine)
+                        {
+                        }
+
+                        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine)
+                        {
+                        }
+                    }
+            }, null);
+        }
+        else
+        {
+            JReq.setKeyStore(cmdArg.fileKeystore.getAbsolutePath(), cmdArg.passwordKeyStore);
+
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            InputStream in = new java.io.FileInputStream(cmdArg.fileKeystore);
+            ks.load(in, cmdArg.passwordKeyStore.toCharArray());
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(ks);
+            context.init(null, tmf.getTrustManagers(), null);
+        }
+
+        HttpClient.Builder builder = HttpClient.newBuilder()
+            .followRedirects(cmdArg.followRedirect ? Redirect.ALWAYS : Redirect.NEVER)
+            .proxy(proxySelector)
+            .sslContext(context);
+
+        return builder.build();
+    }
+
+    /**
      * Write the aggregation of the meta data obtained from SingleClients.
      */
     private void writeAggregateMetaData() throws IOException
@@ -244,15 +334,15 @@ public class RequestManager implements Runnable
         String key[] = new String[] { "RequestDataSendDuration", "ResponseDataReceiveDuration" };
         long avg[] = new long[key.length];
 
-        for (int i = 0; i < webClient.length; ++i)
+        for (int i = 0; i < client.length; ++i)
         {
             for (int j = 0; j < key.length; ++j)
-                avg[j] += webClient[i].getIntegerMetaData(key[j]);
+                avg[j] += client[i].getIntegerMetaData(key[j]);
         }
 
         for (int i = 0; i < key.length; ++i)
         {
-            avg[i] = avg[i] / webClient.length;
+            avg[i] = avg[i] / client.length;
             propAvgMeta.setProperty(key[i], "" + avg[i]);
         }
 
@@ -363,40 +453,40 @@ public class RequestManager implements Runnable
      */
     private void createSingleClients(int count) throws MalformedURLException
     {
-        webClient = new SingleClient[count];
+        client = new SingleClient[count];
 
         for (int i = 0; i < count; i++)
         {
-            webClient[i] = new SingleClient(context, cmdArg);
+            client[i] = new SingleClient(context, httpClient, cmdArg);
 
             String currClientId = String.format("%04d", (i + 1));
 
             if (cmdArg.outputFile != null)
-                webClient[i].setFileResponse(new File(cmdArg.outputFile + currClientId + ".out"));
+                client[i].setFileResponse(new File(cmdArg.outputFile + currClientId + ".out"));
 
             if (cmdArg.outputFileHeader != null)
-                webClient[i].setFileResponseHeader(new File(cmdArg.outputFileHeader + currClientId + ".out"));
+                client[i].setFileResponseHeader(new File(cmdArg.outputFileHeader + currClientId + ".out"));
 
             if (cmdArg.httpMethod == HttpMethod.POST)
             {
                 if (cmdArg.postBody != null)
-                    webClient[i].setPostBody(cmdArg.postBody);
+                    client[i].setPostBody(cmdArg.postBody);
                 else if (cmdArg.listPostBodyFile.size() == 1)
-                    webClient[i].setFilePostBody(cmdArg.listPostBodyFile.get(0));
+                    client[i].setFilePostBody(cmdArg.listPostBodyFile.get(0));
                 else if (i < cmdArg.listPostBodyFile.size())
-                    webClient[i].setFilePostBody(cmdArg.listPostBodyFile.get(i));
+                    client[i].setFilePostBody(cmdArg.listPostBodyFile.get(i));
                 else
-                    webClient[i].setPostBody("");
+                    client[i].setPostBody("");
             }
 
             if (cmdArg.listHeader.size() > 0)
-                webClient[i].setRequestHeader(cmdArg.listHeader);
+                client[i].setRequestHeader(cmdArg.listHeader);
             else if (cmdArg.listRequestHeaderFile.size() > 0)
             {
                 if (cmdArg.listRequestHeaderFile.size() == 1)
-                    webClient[i].setFileRequestHeader(cmdArg.listRequestHeaderFile.get(0));
+                    client[i].setFileRequestHeader(cmdArg.listRequestHeaderFile.get(0));
                 else if (i < cmdArg.listRequestHeaderFile.size())
-                    webClient[i].setFileRequestHeader(cmdArg.listRequestHeaderFile.get(i));
+                    client[i].setFileRequestHeader(cmdArg.listRequestHeaderFile.get(i));
             }
         }
     }
@@ -407,7 +497,7 @@ public class RequestManager implements Runnable
      * 
      * The sequence of events are as follows:
      * <ul>
-     * <li>Create a thread for every {@code webClient} instance.
+     * <li>Create a thread for every {@code client} instance.
      * <li>Create a SyncObject and assign the same for every runnable SingleClient instance.
      * <li>Start all threads
      * <ul>
@@ -426,20 +516,20 @@ public class RequestManager implements Runnable
      * </ul>
      * 
      * @param cmdArg An instance of command line arguments
-     * @param webClient An array of SingleClient, each having its own request properties.
+     * @param client An array of SingleClient, each having its own request properties.
      * @throws InterruptedException
      * @throws MalformedURLException
      */
     private void syncParallelSingleClients() throws InterruptedException, MalformedURLException
     {
-        CyclicBarrier syncBarrier = new CyclicBarrier(webClient.length);
+        CyclicBarrier syncBarrier = new CyclicBarrier(client.length);
 
-        for (SingleClient currSingleClient : webClient)
+        for (SingleClient currSingleClient : client)
             currSingleClient.setCyclicBarrier(syncBarrier);
 
-        executor = Executors.newFixedThreadPool(webClient.length);
-        for (int i = 0; i < webClient.length; ++i)
-            executor.submit(webClient[i]);
+        executor = Executors.newFixedThreadPool(client.length);
+        for (int i = 0; i < client.length; ++i)
+            executor.submit(client[i]);
 
         /**
          * Once the last thread invokes barrier.await(), all thread come out of wait.
@@ -487,8 +577,8 @@ public class RequestManager implements Runnable
             return;
 
         logger.warning("Aborting response body processing.");
-        for (int i = 0; i < webClient.length; ++i)
-            webClient[i].abortResponseBodyProcessing();
+        for (int i = 0; i < client.length; ++i)
+            client[i].abortResponseBodyProcessing();
 
         executor.shutdownNow();
     }
