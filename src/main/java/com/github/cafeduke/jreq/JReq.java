@@ -445,6 +445,10 @@ public class JReq
         }
     }
 
+    /**
+     * A class to build JReq arguments 
+     * @author CafeDuke
+     */
     public static class ArgBuilder
     {
         private List<String> listArg = new ArrayList<>();
@@ -522,7 +526,6 @@ public class JReq
 
         /**
          * @param server The proxy server to be used. 
-         * 
          * @return this ArgBuilder instance
          */
         public ArgBuilder proxy(String server)
@@ -608,6 +611,7 @@ public class JReq
         }
 
         /**
+         * Do not output response
          * @return this ArgBuilder instance
          */
         public ArgBuilder quiet()
@@ -730,6 +734,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor.MultiThreadMode}
          * @param mode The parallel mode to be used.
          * @return this ArgBuilder instance
          */
@@ -772,6 +777,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor.HttpMethod#GET}
          * @return this ArgBuilder instance
          */
         public ArgBuilder doGet()
@@ -781,6 +787,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor.HttpMethod#POST}
          * @return this ArgBuilder instance
          */
         public ArgBuilder doPost()
@@ -790,6 +797,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor.HttpMethod#HEAD}
          * @return this ArgBuilder instance
          */
         public ArgBuilder doHead()
@@ -799,6 +807,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor.HttpMethod#PUT}
          * @return this ArgBuilder instance
          */
         public ArgBuilder doPut()
@@ -808,6 +817,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor.HttpMethod#DELETE}
          * @return this ArgBuilder instance
          */
         public ArgBuilder doDelete()
@@ -817,6 +827,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor.HttpMethod#TRACE}
          * @return this ArgBuilder instance
          */
         public ArgBuilder doTrace()
@@ -826,6 +837,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor.HttpMethod#OPTIONS}
          * @return this ArgBuilder instance
          */
         public ArgBuilder doOptions()
@@ -835,6 +847,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor#SHOW_HEADER}
          * @return this ArgBuilder instance
          */
         public ArgBuilder showHeaders()
@@ -844,6 +857,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor#SHOW_ALL_HEADER}
          * @return this ArgBuilder instance
          */
         public ArgBuilder showAllHeaders()
@@ -853,6 +867,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor#DISABLE_FOLLOW_REDIRECT}
          * @return this ArgBuilder instance
          */
         public ArgBuilder dontFollowRedirect()
@@ -862,6 +877,8 @@ public class JReq
         }
 
         /**
+         * Requests are blocking by default.
+         * For details, see {@link ArgProcessor#NON_BLOCKING_REQUEST}
          * @return this ArgBuilder instance
          */
         public ArgBuilder dontWaitForResponse()
@@ -871,6 +888,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor#DISABLE_ERROR_LOG}
          * @return this ArgBuilder instance
          */
         public ArgBuilder dontLogError()
@@ -880,6 +898,7 @@ public class JReq
         }
 
         /**
+         * For details, see {@link ArgProcessor#DISABLE_CLIENT_ID}
          * @return this ArgBuilder instance
          */
         public ArgBuilder dontSendClientId()

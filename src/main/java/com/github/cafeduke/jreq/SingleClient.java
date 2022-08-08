@@ -350,7 +350,9 @@ public class SingleClient implements Runnable
         HttpRequest.BodyPublisher bodyPublisher = prepareRequestBody(builderReq);
 
         /* Build HTTPRequest */
-        HttpRequest request = builderReq.timeout(Duration.ofMillis(cmdArg.timeoutSocket)).method(cmdArg.httpMethod.name(), bodyPublisher).build();
+        HttpRequest request = builderReq.timeout(Duration.ofMillis(cmdArg.timeoutSocket))
+            .method(cmdArg.httpMethod.name(), bodyPublisher)
+            .build();
 
         long timeAfter = System.currentTimeMillis();
         propConnInfo.setProperty("RequestDataSendDuration", "" + (timeAfter - timeBefore));
@@ -369,8 +371,9 @@ public class SingleClient implements Runnable
      */
     private void prepareRequestHeaders(HttpRequest.Builder builderReq) throws IOException
     {
+        builderReq.header("Content-Type", "application/x-www-form-urlencoded");
+
         for (String currHeaderName : cmdArg.mapHeaderValue.keySet())
-            // conn.setRequestProperty(currHeaderName, cmdArg.mapHeaderValue.get(currHeaderName));
             builderReq = builderReq.setHeader(currHeaderName, cmdArg.mapHeaderValue.get(currHeaderName));
 
         prepareRequestCookie(builderReq);
