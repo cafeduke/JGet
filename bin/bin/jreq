@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# -------------------------------------------------------------------------------------------------
+# Functions
+# -------------------------------------------------------------------------------------------------
+BASEDIR=$(dirname $(readlink -f ${0}))
+BASENAME=$(basename ${0})
+JREQ_HOME="$(readlink -f ${BASEDIR}/..)"
+
+function timestamp ()
+{
+  echo $(date +"%a, %d-%b-%Y %I:%M:%S %p")
+}
+
+function timeInMilli ()
+{
+  echo $(($(date +%s%N)/1000000))
+}
+
+# -------------------------------------------------------------------------------------------------
+# Main
+# -------------------------------------------------------------------------------------------------
+
+if [[ "${@}" =~ "-rco" ]]
+then
+  ${JAVA_HOME}/bin/java -jar ${JREQ_HOME}/jreq.jar "$@"
+  exit 0
+fi
+
+echo "-------------------------------------------------------------------------------------------------"
+echo "CafeDuke JReq"
+echo "-------------------------------------------------------------------------------------------------"
+rm -f /tmp/jreq.resp.txt
+echo "[$(timestamp)] Started executing"
+tstart=$(timeInMilli)
+${JAVA_HOME}/bin/java ${JREQ_JAVA_OPTIONS} -jar ${JREQ_HOME}/jreq.jar -rco /tmp/jreq.resp.txt "$@"
+tend=$(timeInMilli)
+if [[ -e /tmp/jreq.resp.txt ]]
+then
+  cat /tmp/jreq.resp.txt
+fi
+echo "[$(timestamp)] Finished executing"
+echo "[$(timestamp)] Time taken = "$(( (tend - tstart) / 1000 ))"."$(( (tend - tstart) ))"s"

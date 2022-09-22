@@ -208,14 +208,15 @@
             <configuration>
               <target>
                 <echo message="--------------------------------------------------------------------------------" />
-                <echo message="Build ${project.build.directory}/${project.build.finalName}.zip" />
+                <echo message="Build ${basedir}/${project.build.finalName}.zip" />
                 <echo message="--------------------------------------------------------------------------------" />
+                <delete file="${basedir}/jreq*.zip" />
                 <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.build.archive.directory}/jreq.jar" />
                 <copy todir="${project.build.archive.directory}">
                   <fileset dir="${project.basedir}/src/main/resources" includes="bin/*" />
                 </copy>
                 <chmod dir="${project.build.archive.directory}/bin" perm="755" includes="*" />
-                <zip destfile="${project.build.directory}/${project.build.finalName}.zip" basedir="${project.build.archive.directory}" />
+                <zip destfile="${basedir}/${project.build.finalName}.zip" basedir="${project.build.archive.directory}" />
               </target>
             </configuration>
           </execution>
