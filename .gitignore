@@ -1,2 +1,4 @@
-**/.ade_path
+classes
+lib
+work
 **/*.class

@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="SuiteAll" preserve-order="true">
+
+  <parameter name="ohs-id" value="1"/>
+
+  <test name="packA" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.packA.ClassA1" />
+    </classes>
+  </test>
+
+  <test name="packB" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.packB.ClassB1" />
+    </classes>
+  </test>
+
+</suite>

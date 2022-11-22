@@ -1,0 +1,18 @@
+<ivy-module version="2.0">
+  <info organisation="com.oracle" module="ohsqa" />
+
+  <configurations defaultconfmapping="core->master;all->default">
+    <conf name="all" description="Map ivy config 'all' to 'default' config of maven" />
+    <conf name="core" description="Map ivy config 'core' to 'master' config of maven" />
+  </configurations>
+
+  <dependencies defaultconf="core">
+    <dependency org="com.github.cafeduke" name="jreportng" rev="1.3.1" conf="all"/>
+    <dependency org="com.github.cafeduke" name="jreq" rev="3.0"  conf="all"/>
+    <dependency org="org.apache.commons" name="commons-lang3" rev="3.12.0"/>
+    <dependency org="commons-io" name="commons-io" rev="2.11.0"/>
+    <dependency org="commons-codec" name="commons-codec" rev="1.15"/>
+    <dependency org="org.slf4j" name="slf4j-nop" rev="1.7.36"/>
+  </dependencies>
+
+</ivy-module>

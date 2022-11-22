@@ -1,203 +1,335 @@
-<?xml version="1.0"?>
-<project name="runner" default="help">
-  <description>
-    This is a default file to run/build all the tests. Do not
-    edit or delete this file.
-  </description>
+<project name="OHSQA" default="all" xmlns:ivy="antlib:org.apache.ivy.ant">
 
-  <dirname property="ant.file.runner.dir" file="${ant.file.runner}" />
-  
-  <!-- Change defaults so tests can be run at this level -->
-  <property name="area.default" value=""/>
-  <property name="area" value="${area.default}" />
-  <property name="team.default" value=""/>
-  <property name="team" value="${team.default}" />
-  <property name="feature" value="" />
-  <property name="testfile" value="" />
-
-  <!-- load TestLogic library, we need AntContrib etc.. -->
-  <import file="${ant.file.runner.dir}/root.xml" />
-
-  <target name="run">
-    <description>
-      By default it prints usage for this root file. When 'team' option
-      is specified it will list the usage for the team.
-      Run 'teams'
-    </description>
-    <if>
-        <equals arg1="${team}" arg2="${team.default}" />
-      <then>
-        <antcall target="internal.usage" />
-      </then>
-      <else>
-        <antcall target="internal.team.targets" />
-      </else>
-    </if>
+  <target name="all">
+    <antcall target="clean" />
+    <antcall target="mats" />
   </target>
 
-  <target name="teams">
-    <description>
-      Lists all the teams under ${area} which is 'functional' by default.
-      to list teams under other area, try run 'ant -Darea=${area} teams'
-      e.g.
-         ant -Darea=unit teams.
-         
-      @param show.usage set to true if you want to display team usage. It
-      defaults to false.
-    </description>
-    <echo>################ ${area} area test teams ###############</echo>
-    <for param="curr.dir">
-      <path>
-        <dirset dir="${ant.file.runner.dir}/${area}" includes="*" />
-      </path>
-      <sequential>
-        <propertyregex property="team.name"
-                       input="@{curr.dir}"
-                       regexp=".*\${file.separator}(.*)"
-                       select="\1"
-        />
+  <target name="mats" depends="gen-test-properties">
+    <testng suiteThreadPoolSize="1" suitename="MATs" classpathref="classpath.testsource" workingDir="${dir.work}" outputdir="${dir.report}" listeners="${report.listeners}" useDefaultListeners="false">
+      <sysproperty key="PropertyFile" value="${file.test.properties}" />
+      <sysproperty key="jreport.home" value="${report.home}" />
+      <sysproperty key="jreport.org.prefix" value="${report.package.prefix}" />
+      <sysproperty key="jreport.title" value="${report.title}" />
+      <xmlfileset dir="${dir.config}" includes="${suites.mats}" />
+    </testng>
+  </target>
+
+  <target name="srg" depends="gen-test-properties">
+    <testng suiteThreadPoolSize="${ThreadPoolSize}" classpathref="classpath.testsource" workingDir="${dir.work}" outputdir="${dir.report}" listeners="${report.listeners}" useDefaultListeners="false">
+      <sysproperty key="PropertyFile" value="${file.test.properties}" />
+      <sysproperty key="jreport.home" value="${report.home}" />
+      <sysproperty key="jreport.org.prefix" value="${report.package.prefix}" />
+      <sysproperty key="jreport.title" value="${report.title}" />
+      <xmlfileset dir="${dir.config}" includes="${suites.srg}" />
+    </testng>
+  </target>
+
+  <target name="test" depends="gen-test-properties">
+    <if>
+      <not>
+        <equals arg1="${classes}" arg2="" />
+      </not>
+      <then>
+        <heading mesg="Custom run: classes=${classes}" />
+
+        <resourcecount property="count.class">
+          <fileset dir="${dir.classes}" includes="${classes}" />
+        </resourcecount>
         <if>
-          <!-- Team dir if it contains build.xml and dir is not named as shared -->
-          <and>
-            <not>
-              <equals arg1="${team.name}" arg2="lib" />
-            </not>
-            <not>
-              <equals arg1="${team.name}" arg2="profiles" />
-            </not>
-          </and>
+          <equals arg1="${count.class}" arg2="0" />
           <then>
-            <echo>${team.name}</echo>
-            <property name="show.usage" value="false" />
-            <if>
-              <istrue value="${show.usage}" />
-              <then>
-                <echo>===============
-                Usage:
-                ======
-                </echo>
-                <antcall target="usage">
-                  <param name="team" value="${team.name}" />
-                </antcall>
-              </then>
-            </if>
+            <fail message="No classes matched '${classes}'" />
           </then>
         </if>
-        <var name="team.name" unset="true" />
-      </sequential>
-    </for>
-    <echo>############################################################</echo>
-  </target>
 
-  <target name="internal.team.targets">
-    <!-- FIXME: We need to have right default, for now just setting it to
-                internal.usage
-     -->
-    <property name="targets" value="usage" />
-    <property name="exec.file"
-              value="${ant.file.runner.dir}/${area}/${team}/build.xml"
-    />
-
-    <if>
-      <and>
-        <available file="${exec.file}" />
-        <available file="${ant.file.runner.dir}/${area}/${team}" type="dir" />
-      </and>
-      <then>
-        <for list="${targets}" param="curr.target" delimiter=" ">
-          <sequential>
-            <echo>Running [@{curr.target}] target  in [${exec.file}}]}]</echo>
-            <ant target="@{curr.target}"
-                 antfile="${exec.file}"
-                 inheritall="false"
-                 inheritrefs="false"
-            />
-          </sequential>
-        </for>
+        <testng suitename="MySuite"
+                testname="MyTest"
+                suiteThreadPoolSize="1"
+                classpathref="classpath.testsource"
+                workingDir="${dir.work}"
+                outputdir="${dir.report}"
+                listeners="${report.listeners}"
+                useDefaultListeners="false">
+          <sysproperty key="PropertyFile" value="${file.test.properties}" />
+          <sysproperty key="jreport.home" value="${report.home}" />
+          <sysproperty key="jreport.org.prefix" value="${report.package.prefix}" />
+          <sysproperty key="jreport.title" value="${report.title}" />
+          <sysproperty key="ohs-id" value="1" />
+          <classfileset dir="${dir.classes}" includes="${classes}" />
+        </testng>
       </then>
+      <elseif>
+        <not>
+          <equals arg1="${tests}" arg2="" />
+        </not>
+        <then>
+          <heading mesg="Custom run: tests=${tests}" />
+          <testng testnames="${tests}"
+                  suiteThreadPoolSize="1"
+                  classpathref="classpath.testsource"
+                  workingDir="${dir.work}"
+                  outputdir="${dir.report}"
+                  listeners="${report.listeners}"
+                  useDefaultListeners="false"
+                  haltonfailure="true">
+            <sysproperty key="PropertyFile" value="${file.test.properties}" />
+            <sysproperty key="jreport.home" value="${report.home}" />
+            <sysproperty key="jreport.org.prefix" value="${report.package.prefix}" />
+            <sysproperty key="jreport.title" value="${report.title}" />
+            <sysproperty key="ohs-id" value="1" />
+            <xmlfileset dir="${dir.config}" includes="SuiteAll.xml" />
+          </testng>
+        </then>
+      </elseif>
+      <elseif>
+        <not>
+          <equals arg1="${suites}" arg2="" />
+        </not>
+        <then>
+          <heading mesg="Custom run: suites=${suites} ThreadPoolSize=${ThreadPoolSize}" />
+
+          <resourcecount property="count.suite">
+            <fileset dir="${dir.config}" includes="${suites}" />
+          </resourcecount>
+          <if>
+            <equals arg1="${count.suite}" arg2="0" />
+            <then>
+              <fail message="No suites matched '${classes}'" />
+            </then>
+          </if>
+
+          <testng suiteThreadPoolSize="${ThreadPoolSize}"
+                  classpathref="classpath.testsource"
+                  workingDir="${dir.work}"
+                  outputdir="${dir.report}"
+                  listeners="${report.listeners}"
+                  useDefaultListeners="false"
+                  haltonfailure="true">
+            <sysproperty key="PropertyFile" value="${file.test.properties}" />
+            <sysproperty key="jreport.home" value="${report.home}" />
+            <sysproperty key="jreport.org.prefix" value="${report.package.prefix}" />
+            <sysproperty key="jreport.title" value="${report.title}" />
+            <xmlfileset dir="${dir.config}" includes="${suites}" />
+          </testng>
+        </then>
+      </elseif>
       <else>
-        <echo>
-          ERROR: ${ant.file.runner.dir}/${area}/${team} team directory does not exist
-
-                                        OR
-
-                 ${exec.file} does not exist
-
-          Supported teams are:
-          -------------------
-        </echo>
-        <antcall target="teams" />
+        <fail message="One among suites,tests or classes has to be specified for a custom run" />
       </else>
     </if>
   </target>
 
-  <target name="help">
-    <echo>
-     ===============================================================
 
-     Run 'ant subsystems' to view all subsystems
+  <!--
+    Generate test.properties File
+       - Delete existing test.properties file
+       - test.properties = user prop from command line + install.properties + config.properties 
+    -->
+  <target name="gen-test-properties" depends="install">
 
-     Following target is avilable to build/run tests on any subsystem.
+    <fail message="File ${file.install.properties} not found">
+      <condition>
+        <not>
+          <available file="${file.install.properties}" />
+        </not>
+      </condition>
+    </fail>
 
-     ant -Dwlsqa.subsystem=webservice clean build 
-     ant -Dwlsqa.subsystem=webservice all  
-       
-     Optionally you can pass TestLogic Tags to selectivle run Tests 
+    <delete file="${file.test.properties}" failonerror="false" />
+    <touch file="${file.test.properties}" />
 
-     By default above commands act on teams in functions area. To
-     view integration tests, pass in 'integration' for 'area'
-     property.
+    <!--
+           Create test.properties using user provided command line properties.
+           These properties are provided using -Dproperty_name=property_value
+          -->
+    <echoproperties destfile="${file.test.properties}">
+      <propertyset>
+        <propertyref builtin="commandline" />
+      </propertyset>
+    </echoproperties>
 
-     ant -Darea=integration teams
+    <!-- Add requisite properties to Test.properties -->
+    <propertyfile file="${file.test.properties}">
+      <entry key="TestHome" value="${TestHome}" />
+      <entry key="OHSInstanceCount" value="${OHSInstanceCount}" />
+    </propertyfile>
 
-     To view usage information for a particular team, run the
-     following command
+    <!-- Convert ${file.install.properties} to valid properties file format -->
+    <fixcrlf file="${file.install.properties}" />
+    <replaceregexp file="${file.install.properties}" match="(^\-|^\*)" replace="# " byline="true" />
 
-     ant -Dteam='team name' (e.g. ant -Dteam=demo)
+    <!-- test.properties = install.properties + config.properties -->
+    <concat destfile="${file.test.properties}" append="true" fixlastline="yes">
+      <filelist files="${file.install.properties},${file.config.properties}" />
+    </concat>
 
-     To run any target for a team, run the following
-
-     ant -Dteam='team name' -Dtargets='target name'
-
-     For e.g.
-
-     Run the following to build demo functional tests and configurations
-
-     ant -Dteam=demo -Dtargets=build
-
-     Run the following to run all demo functional tests
-
-     ant -Dteam=demo -Dtargets=run
-
-     A particular team might have multiple targets to run
-     different kinds of tests. Run ant -D team='team name' to
-     get information about them.
-
-     e.g.
-
-     ant -Dteam=jdbc -Dtargets=run.client
-     ant -Dteam=jdbc -Dtargets=run.osgi
-     ant -Dteam=jdbc -Dtargets=run
-
-     Options to this target
-     ----------------------
-
-     - team      : name of the team for which usage will be
-                   printed. Run 'teams' target to see all teams.
-     - area      : areas that the teams belong to. Defaults to
-                   'functional'. Other valid value is
-                   'integration'
-     - file      : file on which to run the target. Default is
-                   ${team}/build.xml
-     - targets   : Name of the targets to run. It defaults to
-                   'usage'. Targets are space separated, e.g.
-                   "build run", will run build first and then
-                    run
-
-     ===============================================================
-    </echo>
   </target>
 
-  <import file="${tl.cafe-dir.file}" />
+  <target name="install" depends="compile" unless="skip.install">
+    <!-- Replace placeholders to generate dir.work/config.properties -->
+    <copy file="${dir.data}/config.properties" todir="${dir.work}" />
+    <replace file="${file.config.properties}">
+      <replacefilter token="__HOSTNAME__" value="${HOSTNAME}" />
+      <replacefilter token="__T_WORK__" value="${dir.work}" />
+    </replace>
+
+    <!-- Install and configure as per config.properties -->
+    <touch file="${file.install.properties}" />
+
+    <touch file="${dir.work}/INSTALL.suc" />
+  </target>
+
+  <target name="compile" depends="setup">
+    <javac srcdir="${dir.source}" destdir="${dir.classes}" includes="**/*.java" classpathref="classpath.testsource" />
+  </target>
+
+  <!--
+     Download dependent libraries (If not already present)
+     Setup classpath and testng task
+    -->
+  <target name="setup" depends="properties">
+
+    <if>
+      <isset property="skip.setup.lib" />
+      <then>
+        <echo message="Skip downloading dependent libraries." />
+      </then>
+      <else>
+        <manage-dependency />
+        <touch file="${dir.work}/SETUP_LIB.suc" />
+      </else>
+    </if>
+
+    <!-- Classpath for test source -->
+    <path id="classpath.testsource">
+      <pathelement location="${dir.classes}" />
+      <fileset dir="${dir.lib.project}" includes="**/*.jar" />
+    </path>
+    <taskdef resource="testngtasks" classpathref="classpath.testsource" />
+  </target>
+
+  <target name="clean" depends="properties">
+    <delete dir="classes" />
+    <delete dir="${dir.report}" />
+    <delete>
+      <fileset dir="${dir.work}" includes="*.suc,*.dif,test.properties" excludes="INSTALL.suc,SETUP_LIB.suc" />
+    </delete>
+    <!-- clean shall unset skip properties. Skip properties need to be evaluated everytime properties is invoked -->
+    <var name="skip.setup.lib" unset="true" />
+    <var name="skip.install" unset="true" />
+  </target>
+
+  <target name="cleanall" depends="clean">
+    <delete file="${dir.work}/setup.lib.suc" />
+    <delete dir="${dir.lib}" />    
+  </target>
+
+  <target name="properties">
+
+    <!-- Test dir structure properties  -->
+    <property name="dir.source" value="${basedir}/src" />
+    <property name="dir.config" value="${basedir}/config" />
+    <property name="dir.data" value="${basedir}/data" />
+    <property name="dir.lib" value="${basedir}/lib" />
+    <property name="dir.lib.antplugin" value="${dir.lib}/ant-plugin" />
+    <property name="dir.lib.project" value="${dir.lib}/project" />
+    <property name="dir.classes" value="${basedir}/classes" />
+    <property name="dir.work" value="${basedir}/work" />
+    <property name="dir.report" value="${dir.work}/report" />
+
+    <property name="report.package.prefix" value="com.oracle.ohsqa" />
+    <property name="report.home" value="${dir.report}" />
+    <property name="report.title" value="HTTP Server Test Report" />
+    <property name="report.listeners"
+              value="com.oracle.ohsqa.common.TestListener,com.github.cafeduke.jreportng.TestListener,org.uncommons.reportng.HTMLReporter,org.uncommons.reportng.JUnitXMLReporter" />
+
+    <!--  Boostrap jars -->
+    <property name="bootstrap.jar.ivy" value="${dir.lib}/ant-plugin/ivy-2.4.0.jar" />
+    <property name="bootstrap.jar.ant-contrib" value="${dir.lib}/ant-plugin/ant-contrib-1.0b3.jar" />
+
+    <!-- Create core dir -->
+    <mkdir dir="${dir.work}" />
+    <mkdir dir="${dir.classes}" />
+    <mkdir dir="${dir.lib.antplugin}" />
+    <mkdir dir="${dir.lib.project}" />
+
+    <!-- file properties -->
+    <property name="file.config.properties" value="${dir.work}/config.properties" />
+    <property name="file.install.properties" value="${dir.work}/install.properties" />
+    <property name="file.test.properties" value="${dir.work}/test.properties" />
+
+    <!-- Bootstrap libraries -->
+    <bootstrap />
+    
+    <!-- Setup skip properties if corresponding .suc exist -->
+    <available property="skip.setup.lib" file="${dir.work}/SETUP_LIB.suc"/>
+    <available property="skip.install" file="${dir.work}/INSTALL.suc" />
+
+    <!-- suite properties -->
+    <property name="suites.mats" value="MATs.xml" />
+
+    <!-- Properties that could be overridden by command line -->
+    <property name="suites" value="" />
+    <property name="tests" value="" />
+    <property name="classes" value="" />
+    <property name="TestHome" value="${basedir}" />
+    <property name="parallel" value="true" />
+    <if>
+      <equals arg1="${parallel}" arg2="false" />
+      <then>
+        <property name="ThreadPoolSize" value="1" />
+        <property name="suites.srg" value="SuiteAll.xml" />
+      </then>
+      <else>
+        <property name="ThreadPoolSize" value="3" />
+        <property name="suites.srg" value="SuiteA.xml,SuiteB.xml" />
+      </else>
+    </if>
+
+    <!-- Test Properties -->
+    <hostinfo />
+    <property name="OHSInstanceCount" value="2" />
+    <property name="HOSTNAME" value="${NAME}.${DOMAIN}" />
+
+  </target>
+
+  <!--
+    Download core jars that are required to define ant tasks
+    -->
+  <macrodef name="bootstrap">
+    <sequential>
+      <!-- Set proxy 
+      <setproxy proxyhost="www-proxy.us.oracle.com" proxyport="80" />
+      -->
+
+      <!--  Get Bootstrap JARs -->
+      <get dest="${bootstrap.jar.ivy}" src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/2.5.0/ivy-2.5.0.jar" skipexisting="true" />
+      <get dest="${bootstrap.jar.ant-contrib}" src="https://repo1.maven.org/maven2/ant-contrib/ant-contrib/1.0b3/ant-contrib-1.0b3.jar" skipexisting="true" />
+
+      <!--  Define bootstrap tasks -->
+      <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpath="${bootstrap.jar.ivy}" />
+      <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpath="${bootstrap.jar.ant-contrib}" />
+    </sequential>
+  </macrodef>
+
+  <!--
+    Download project jars and dependent jars using ivy
+    -->
+  <macrodef name="manage-dependency">
+    <sequential>
+      <ivy:retrieve pattern="${dir.lib.project}/[organisation]-[artifact]-[revision].[ext]" type="jar,bundle" log="quiet" />
+      <ivy:report conf="all" todir="${dir.work}" graph="false" />
+    </sequential>
+  </macrodef>
+
+  <macrodef name="heading">
+    <attribute name="mesg" />
+    <sequential>
+      <echo message="-------------------------------------------------------------------------------" />
+      <echo message="@{mesg}" />
+      <echo message="-------------------------------------------------------------------------------" />
+    </sequential>
+  </macrodef>
 
 </project>

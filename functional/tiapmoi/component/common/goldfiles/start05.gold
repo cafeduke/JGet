@@ -1,1 +1,0 @@
-weblogic.nodemanager.NMException: Received error message from Node Manager Server: .*Server start command for OHS server 'comp1' failed.*

@@ -1,7 +1,0 @@
-Requested Certificates: 
-User Certificates:
-Subject:        CN=www.oracle3.com
-Subject:        CN=www.oracle2.com
-Subject:        CN=www.oracle1.com
-Trusted Certificates: 
-Subject:        CN=.*

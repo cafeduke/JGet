@@ -1,0 +1,22 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="SuiteB" preserve-order="true">
+
+  <parameter name="ohs-id" value="2"/>
+  
+  <test name="packB" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.packB.ClassB1" />
+      <class name="com.oracle.ohsqa.packB.ClassB2" />
+    </classes>
+  </test>
+
+  <test name="neg" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.neg.TestFailure" />
+      <class name="com.oracle.ohsqa.neg.BeforeClassFailure" />
+      <class name="com.oracle.ohsqa.neg.BeforeClassFailure" />
+    </classes>
+  </test>
+
+</suite>

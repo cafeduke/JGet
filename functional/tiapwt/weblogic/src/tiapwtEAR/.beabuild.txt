@@ -1,3 +1,0 @@
-#
-#Tue Feb 09 13:50:20 PST 2016
-bea.srcdir=/ade/kdclark_12211_slc06pqn/apache/test/functional/tiapwt/weblogic/src

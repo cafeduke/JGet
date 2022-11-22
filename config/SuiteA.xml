@@ -1,0 +1,32 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="SuiteA" preserve-order="true">
+
+  <parameter name="ohs-id" value="1"/>
+  
+  <test name="packA" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.packA.ClassA1" />
+      <class name="com.oracle.ohsqa.packA.ClassA2" />
+    </classes>
+  </test>
+
+  <test name="basic" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.basic.HelloWorld" />
+    </classes>
+  </test>
+  
+  <test name="h2" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.h2.Http2Sanity" />
+    </classes>
+  </test>  
+  
+  <test name="binding" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.binding.SessionBinding" />
+    </classes>
+  </test>    
+
+</suite>

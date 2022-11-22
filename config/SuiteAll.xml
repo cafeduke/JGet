@@ -1,0 +1,48 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="SuiteAll" preserve-order="true">
+
+  <parameter name="ohs-id" value="1" />
+
+  <test name="basic" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.basic.HelloWorld" />
+
+    </classes>
+  </test>
+
+  <test name="h2" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.h2.Http2Sanity" />
+    </classes>
+  </test>  
+  
+  <test name="binding" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.binding.SessionBinding" />
+    </classes>
+  </test>    
+
+  <test name="neg" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.neg.TestFailure" />
+      <class name="com.oracle.ohsqa.neg.BeforeClassFailure" />
+      <class name="com.oracle.ohsqa.neg.BeforeClassFailure" />
+    </classes>
+  </test>
+
+  <test name="packA" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.packA.ClassA1" />
+      <class name="com.oracle.ohsqa.packA.ClassA2" />
+    </classes>
+  </test>
+
+  <test name="packB" preserve-order="true">
+    <classes>
+      <class name="com.oracle.ohsqa.packB.ClassB1" />
+      <class name="com.oracle.ohsqa.packB.ClassB2" />
+    </classes>
+  </test>
+
+</suite>
