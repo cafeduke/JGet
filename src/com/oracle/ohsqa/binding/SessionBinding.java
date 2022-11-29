@@ -12,14 +12,14 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import com.github.cafeduke.jreq.JReq;
-import com.github.cafeduke.jreq.JReq.ArgBuilder;
+import com.github.cafeduke.jget.JGet;
+import com.github.cafeduke.jget.JGet.ArgBuilder;
 import com.oracle.ohsqa.common.TestCase;
 import com.oracle.ohsqa.common.Util;
 
 public class SessionBinding extends TestCase
 {
-    private JReq user1, user2;
+    private JGet user1, user2;
 
     private ArgBuilder builderBase;
 
@@ -31,9 +31,9 @@ public class SessionBinding extends TestCase
     @BeforeClass
     public void setup()
     {
-        user1 = jreq;
-        user2 = getJReq();
-        builderBase = JReq.newBuilder()
+        user1 = jget;
+        user2 = getJGet();
+        builderBase = JGet.newBuilder()
             .url(URLDukeCart)
             .doPost();
     }
@@ -54,8 +54,8 @@ public class SessionBinding extends TestCase
         sendCartRequest(user2, "item=Apple", TestPrefix + ".u2r3.properties");
 
         // List cart
-        user1.sendRequest(JReq.newBuilder().url(URLDukeCart).outputToFile(TestPrefix + ".u1.cart.properties").build());
-        user2.sendRequest(JReq.newBuilder().url(URLDukeCart).outputToFile(TestPrefix + ".u2.cart.properties").build());
+        user1.sendRequest(JGet.newBuilder().url(URLDukeCart).outputToFile(TestPrefix + ".u1.cart.properties").build());
+        user2.sendRequest(JGet.newBuilder().url(URLDukeCart).outputToFile(TestPrefix + ".u2.cart.properties").build());
 
         // Assert cart entries
         Properties cartUser1 = Util.loadProperties(TestPrefix + ".u1.cart.properties");
@@ -68,10 +68,10 @@ public class SessionBinding extends TestCase
         logger.info("Cart entries of user2 are fine");
     }
 
-    private void sendCartRequest(JReq user, String body, String output) throws IOException
+    private void sendCartRequest(JGet user, String body, String output) throws IOException
     {
         // Create a list of all arguments
-        ArgBuilder builderAppend = JReq.newBuilder().postBody(body).outputToFile(output);
+        ArgBuilder builderAppend = JGet.newBuilder().postBody(body).outputToFile(output);
         List<String> listArg = new ArrayList<>(builderBase.build());
         listArg.addAll(builderAppend.build());
 
@@ -83,7 +83,7 @@ public class SessionBinding extends TestCase
     @AfterClass
     public void cleanup()
     {
-        ArgBuilder builder = JReq.newBuilder()
+        ArgBuilder builder = JGet.newBuilder()
             .url("http://localhost:18801/DukeApp/cart.jsp?ctrl=rm")
             .doPost();
 

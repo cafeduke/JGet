@@ -5,7 +5,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Parameters;
 
 import com.github.cafeduke.jreportng.AbstractTestCase;
-import com.github.cafeduke.jreq.JReq;
+import com.github.cafeduke.jget.JGet;
 
 public abstract class TestCase extends AbstractTestCase
 {
@@ -17,7 +17,7 @@ public abstract class TestCase extends AbstractTestCase
 
     protected HttpServer ohs = null;
 
-    protected JReq jreq = null;
+    protected JGet jget = null;
 
     private int id = -1;
 
@@ -32,8 +32,8 @@ public abstract class TestCase extends AbstractTestCase
         ohs.setLogger(logger);
 
         logger.info(String.format("[Class=%s ohs-id=%d] Class level setup", ohs.getClass(), id));
-        jreq = JReq.getInstance();
-        jreq.setLogger(logger);
+        jget = JGet.getInstance();
+        jget.setLogger(logger);
     }
 
     @AfterClass
@@ -42,10 +42,10 @@ public abstract class TestCase extends AbstractTestCase
         logger.info(String.format("[Class=%s ohs-id=%d] Class level cleanup", ohs.getClass(), id));
     }
 
-    protected JReq getJReq()
+    protected JGet getJGet()
     {
-        JReq jreq = JReq.getInstance();
-        jreq.setLogger(logger);
-        return jreq;
+        JGet jget = JGet.getInstance();
+        jget.setLogger(logger);
+        return jget;
     }
 }

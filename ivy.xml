@@ -8,7 +8,7 @@
 
   <dependencies defaultconf="core">
     <dependency org="com.github.cafeduke" name="jreportng" rev="1.3.1" conf="all"/>
-    <dependency org="com.github.cafeduke" name="jreq" rev="3.0"  conf="all"/>
+    <dependency org="com.github.cafeduke" name="jget" rev="1.0"  conf="all"/>
     <dependency org="org.apache.commons" name="commons-lang3" rev="3.12.0"/>
     <dependency org="commons-io" name="commons-io" rev="2.11.0"/>
     <dependency org="commons-codec" name="commons-codec" rev="1.15"/>
