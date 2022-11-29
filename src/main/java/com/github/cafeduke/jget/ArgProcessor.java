@@ -1,10 +1,11 @@
-package com.github.cafeduke.jreq;
+package com.github.cafeduke.jget;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.http.HttpClient;
 import java.nio.charset.Charset;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -17,7 +18,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
-import com.github.cafeduke.jreq.common.Util;
+import com.github.cafeduke.jget.common.Util;
 
 /**
  * This class encapsulates JReq arguments.
@@ -293,6 +294,12 @@ public class ArgProcessor
          */
         MUC;
     }
+    
+    /**
+     * The HTTP Protocol version preferred by the client
+     */
+    public static final String HTTP_PROTOCOL_VERSION = "-v|-version";
+    HttpClient.Version httpVersion = HttpClient.Version.HTTP_2;
 
     /**
      * URL to be requested
@@ -750,6 +757,14 @@ public class ArgProcessor
             {
                 enableSessionBinding = true;
             }
+            else if (currArg.matches(HTTP_PROTOCOL_VERSION))
+            {
+            	String version = Util.getSwitchValue(arg, index++);
+            	if (version.equals("1.1"))
+            		httpVersion = HttpClient.Version.HTTP_1_1;
+            	else if (version.equals("2") || version.equals("2.0"))
+            		httpVersion = HttpClient.Version.HTTP_2;
+            }
             else
             {
                 dieUsage("Unknown argument '" + currArg + "'");
@@ -950,6 +965,8 @@ public class ArgProcessor
         builder.append("        " + ArgProcessor.KEYSTORE + " <Path to Java Key Store (JKS)>" + Util.LineSep);
         builder.append("        " + ArgProcessor.KEYSTORE_PASSWORD + " <Password to access JKS>" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
+        
+        builder.append("     [" + ArgProcessor.HTTP_PROTOCOL_VERSION + " <HTTP protocol version> ]" + Util.LineSep);
 
         for (HttpHeader currHeader : HttpHeader.values())
             builder.append("     [" + currHeader.toArg() + " <" + currHeader.toString() + " header>]" + Util.LineSep);
@@ -985,7 +1002,7 @@ public class ArgProcessor
             modeValue = modeValue + currMode.name() + " | ";
         modeValue = modeValue.substring(0, modeValue.length() - 2);
         builder.append("     [" + ArgProcessor.MULTI_THREAD_MODE + modeValue + "]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.RECORD_META_DATA + " (Record meta data. Stored in <output file>.jreq.properties)]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.RECORD_META_DATA + " (Record meta data. Stored in <output file>.jget.properties)]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.SOCKET_TIMEOUT + " <Socket timeout in milliseconds for each thread> ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.RESPONSE_BODY_TIMEOUT + " <Timeout after which all threads shall abort processing of response body." + Util.LineSep);
         builder.append("                       Applicable with MSC/MUC only.>" + Util.LineSep);

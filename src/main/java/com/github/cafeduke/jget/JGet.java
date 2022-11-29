@@ -1,4 +1,4 @@
-package com.github.cafeduke.jreq;
+package com.github.cafeduke.jget;
 
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpResponse;
@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
-import com.github.cafeduke.jreq.common.ToolsUtil;
-import com.github.cafeduke.jreq.common.Util;
+import com.github.cafeduke.jget.ArgProcessor.MultiThreadMode;
+import com.github.cafeduke.jget.common.ToolsUtil;
+import com.github.cafeduke.jget.common.Util;
 
 /**
  * A Java based HTTP Client that exposes APIs to send multiple sequential/simultaneous requests and optionally capture the response body/headers.
@@ -31,7 +31,7 @@ import com.github.cafeduke.jreq.common.Util;
  * 
  * @author Raghunandan.Seshadri
  */
-public class JReq
+public class JGet
 {
     /**
      * The request header name which will have a unique value for every JReq instance.
@@ -57,7 +57,7 @@ public class JReq
     /**
      * Default JReq Logger
      */
-    private static final Logger DEFAULT_LOGGER = ToolsUtil.getLogger(JReq.class.getName(), "JReq.log");
+    private static final Logger DEFAULT_LOGGER = ToolsUtil.getLogger(JGet.class.getName(), "JGet.log");
 
     /**
      * JReq context
@@ -69,7 +69,7 @@ public class JReq
         setHTTPProperties();
     }
 
-    private JReq()
+    private JGet()
     {
         context.setLogger(DEFAULT_LOGGER);
         setSessionBinding(false);
@@ -83,17 +83,17 @@ public class JReq
      * 
      * @return JReq instance
      */
-    public static JReq getInstance()
+    public static JGet getInstance()
     {
-        return new JReq();
+        return new JGet();
     }
 
     /**
      * @return A builder used to build arguments for JReq
      */
-    public static JReq.ArgBuilder newBuilder()
+    public static JGet.ArgBuilder newBuilder()
     {
-        return new JReq.ArgBuilder();
+        return new JGet.ArgBuilder();
     }
 
     /**
@@ -104,7 +104,7 @@ public class JReq
      */
     public static void main(String arg[]) throws Exception
     {
-        JReq.getInstance().sendRequest(arg);
+        JGet.getInstance().sendRequest(arg);
     }
 
     /**
@@ -128,7 +128,7 @@ public class JReq
      */
     public int[] sendRequest(String arg[])
     {
-        return sendRequest(JReq.getArgAsList(arg));
+        return sendRequest(JGet.getArgAsList(arg));
     }
 
     /**
@@ -396,7 +396,7 @@ public class JReq
      */
     static class Context
     {
-        private Logger logger = JReq.DEFAULT_LOGGER;
+        private Logger logger = JGet.DEFAULT_LOGGER;
 
         private String clientId = UUID.randomUUID().toString();
 

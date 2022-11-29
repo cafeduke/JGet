@@ -1,8 +1,8 @@
-package com.github.cafeduke.jreq.common;
+package com.github.cafeduke.jget.common;
 
 import org.testng.annotations.BeforeClass;
 
-import com.github.cafeduke.jreq.JReq;
+import com.github.cafeduke.jget.JGet;
 
 public class TestCase
 {
@@ -12,11 +12,11 @@ public class TestCase
 
     public final String TestPrefix = getClass().getName().replaceFirst(PackagePrefixDot, "");
 
-    protected JReq jreq = null;
+    protected JGet jget = null;
 
     @BeforeClass
     public void setup()
     {
-        jreq = JReq.getInstance();
+        jget = JGet.getInstance();
     }
 }

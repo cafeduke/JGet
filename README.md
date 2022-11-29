@@ -1,27 +1,27 @@
-# JReq
+# JGet
 A Java HTTP library/tool to send HTTP/1.1 and HTTP/2 reqeusts
 
 # Pre-requisite
 JDK15+
 
 # Install
-- Download the latest `jreq-<version>.zip` from [Releases](https://github.com/cafeduke/JReq/releases)
-- Extract archive to an empty directory (say $HOME/Programs/JReq)
-- Provide execute permission to `$HOME/Programs/JReq/bin/*`
+- Download the latest `jget-<version>.zip` from [Releases](https://github.com/cafeduke/JGet/releases)
+- Extract archive to an empty directory (say $HOME/Programs/JGet)
+- Provide execute permission to `$HOME/Programs/JGet/bin/*`
 
 ```bash
-wget -q https://github.com/cafeduke/JReq/releases/download/v3.0/jreq-3.0.zip -O /tmp/jreq.zip \
-   && unzip -q /tmp/jreq.zip -d $HOME/Programs/JReq \
-   && chmod 755 $HOME/Programs/JReq/bin/* \
-   && rm /tmp/jreq.zip 
+wget -q https://github.com/cafeduke/JGet/releases/download/v3.0/jget-3.0.zip -O /tmp/jget.zip \
+   && unzip -q /tmp/jget.zip -d $HOME/Programs/JGet \
+   && chmod 755 $HOME/Programs/JGet/bin/* \
+   && rm /tmp/jget.zip 
 ```
 # Sample request
 
 ```bash
-cd $HOME/Programs/JReq
-> bin/jreq -q -u "https://www.google.co.in" -sh -ho head.txt
+cd $HOME/Programs/JGet
+> bin/jget -q -u "https://www.google.co.in" -sh -ho head.txt
 -------------------------------------------------------------------------------------------------
-CafeDuke JReq
+CafeDuke JGet
 -------------------------------------------------------------------------------------------------
 [Thu, 22-Sep-2022 04:46:30 pm] Started executing
 ResponseCode=200

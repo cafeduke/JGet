@@ -1,4 +1,4 @@
-package com.github.cafeduke.jreq;
+package com.github.cafeduke.jget;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -37,9 +37,9 @@ import javax.net.ssl.X509ExtendedTrustManager;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 
-import com.github.cafeduke.jreq.ArgProcessor.HttpMethod;
-import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
-import com.github.cafeduke.jreq.common.Util;
+import com.github.cafeduke.jget.ArgProcessor.HttpMethod;
+import com.github.cafeduke.jget.ArgProcessor.MultiThreadMode;
+import com.github.cafeduke.jget.common.Util;
 
 /**
  * RequestManager manages one or more sequential/simultaneous requests to be spawned.
@@ -91,7 +91,7 @@ public class RequestManager implements Runnable
     /**
      * Reference to context
      */
-    private JReq.Context context = null;
+    private JGet.Context context = null;
 
     /**
      * The prepared HttpClient object to be used by all SingleClients  
@@ -104,7 +104,7 @@ public class RequestManager implements Runnable
      * @param context JReq context
      * @param arg JReq request arguments.
      */
-    public RequestManager(JReq.Context context, String arg[])
+    public RequestManager(JGet.Context context, String arg[])
     {
         this.context = context;
         this.cmdArg = new ArgProcessor(arg);
@@ -198,7 +198,7 @@ public class RequestManager implements Runnable
             /* Unique request header */
             if (cmdArg.sendClientId)
             {
-                cmdArg.mapHeaderValue.put(JReq.CLIENT_ID_HEADER, clientId);
+                cmdArg.mapHeaderValue.put(JGet.CLIENT_ID_HEADER, clientId);
                 logger.fine("InstanceId Header = " + clientId);
             }
 
@@ -302,7 +302,7 @@ public class RequestManager implements Runnable
         }
         else
         {
-            JReq.setKeyStore(cmdArg.fileKeystore.getAbsolutePath(), cmdArg.passwordKeyStore);
+            JGet.setKeyStore(cmdArg.fileKeystore.getAbsolutePath(), cmdArg.passwordKeyStore);
 
             KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
             InputStream in = new java.io.FileInputStream(cmdArg.fileKeystore);
@@ -346,7 +346,7 @@ public class RequestManager implements Runnable
             propAvgMeta.setProperty(key[i], "" + avg[i]);
         }
 
-        propAvgMeta.store(new FileWriter("jreq.avg.properties"), "Connection Average Meta Data");
+        propAvgMeta.store(new FileWriter("jget.avg.properties"), "Connection Average Meta Data");
     }
 
     /**

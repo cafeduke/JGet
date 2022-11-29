@@ -4,13 +4,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.cafeduke</groupId>
-  <artifactId>jreq</artifactId>
-  <version>3.0</version>
+  <artifactId>jget</artifactId>
+  <version>2.0</version>
   <packaging>jar</packaging>
 
-  <name>JReq</name>
+  <name>jget</name>
   <description>A Java API library/utility to send HTTP/2 requests and capture response</description>
-  <url>https://github.com/cafeduke/JReq</url>
+  <url>https://github.com/cafeduke/jget</url>
 
   <licenses>
     <license>
@@ -29,9 +29,9 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/cafeduke/JReq.git</connection>
-    <developerConnection>scm:git:ssh://github.com:cafeduke/JReq.git</developerConnection>
-    <url>https://github.com/cafeduke/JReq/tree/master</url>
+    <connection>scm:git:git://github.com/cafeduke/jget.git</connection>
+    <developerConnection>scm:git:ssh://github.com:cafeduke/jget.git</developerConnection>
+    <url>https://github.com/cafeduke/jget/tree/master</url>
   </scm>
 
   <distributionManagement>
@@ -49,7 +49,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <mainClass>com.github.cafeduke.jreq.JReq</mainClass>
+    <mainClass>com.github.cafeduke.jget.JGet</mainClass>
     <project.build.archive.directory>${project.build.directory}/archive</project.build.archive.directory>
   </properties>
 
@@ -132,7 +132,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.9.1</version>
+        <version>3.4.1</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -210,8 +210,8 @@
                 <echo message="--------------------------------------------------------------------------------" />
                 <echo message="Build ${basedir}/${project.build.finalName}.zip" />
                 <echo message="--------------------------------------------------------------------------------" />
-                <delete file="${basedir}/jreq*.zip" />
-                <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.build.archive.directory}/jreq.jar" />
+                <delete file="${basedir}/jget*.zip" />
+                <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.build.archive.directory}/jget.jar" />
                 <copy todir="${project.build.archive.directory}">
                   <fileset dir="${project.basedir}/src/main/resources" includes="bin/*" />
                 </copy>

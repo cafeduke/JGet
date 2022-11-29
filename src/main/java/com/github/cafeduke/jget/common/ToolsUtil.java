@@ -1,4 +1,4 @@
-package com.github.cafeduke.jreq.common;
+package com.github.cafeduke.jget.common;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -1,4 +1,4 @@
-package com.github.cafeduke.jreq;
+package com.github.cafeduke.jget;
 
 /**
  * Constants enumerating the HTTP status codes.

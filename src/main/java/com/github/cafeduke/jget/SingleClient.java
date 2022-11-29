@@ -1,4 +1,4 @@
-package com.github.cafeduke.jreq;
+package com.github.cafeduke.jget;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -39,11 +39,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
-import com.github.cafeduke.jreq.ArgProcessor.HttpMethod;
-import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
-import com.github.cafeduke.jreq.ArgProcessor.OutputMode;
-import com.github.cafeduke.jreq.JReq.Context;
-import com.github.cafeduke.jreq.common.Util;
+import com.github.cafeduke.jget.ArgProcessor.HttpMethod;
+import com.github.cafeduke.jget.ArgProcessor.MultiThreadMode;
+import com.github.cafeduke.jget.ArgProcessor.OutputMode;
+import com.github.cafeduke.jget.JGet.Context;
+import com.github.cafeduke.jget.common.Util;
 
 /**
  * A request is encapsulated as a SingleClient. Each SingleClient has its own
@@ -63,7 +63,7 @@ public class SingleClient implements Runnable
     /**
      * A context object obtained from JReq
      */
-    private JReq.Context context = null;
+    private JGet.Context context = null;
 
     /**
      * The HttpClient object to be used by all SingleClient
@@ -350,7 +350,8 @@ public class SingleClient implements Runnable
         HttpRequest.BodyPublisher bodyPublisher = prepareRequestBody(builderReq);
 
         /* Build HTTPRequest */
-        HttpRequest request = builderReq.timeout(Duration.ofMillis(cmdArg.timeoutSocket))
+        HttpRequest request = builderReq.version(cmdArg.httpVersion)
+    		.timeout(Duration.ofMillis(cmdArg.timeoutSocket))
             .method(cmdArg.httpMethod.name(), bodyPublisher)
             .build();
 
@@ -826,14 +827,14 @@ public class SingleClient implements Runnable
         String fileMetaData = null;
 
         if (fileOutput == null)
-            fileMetaData = "jreq.properties";
+            fileMetaData = "jget.properties";
         else
         {
             fileMetaData = fileOutput.getName();
             int index = fileMetaData.lastIndexOf('.');
             if (index != -1)
                 fileMetaData = fileMetaData.substring(0, index);
-            fileMetaData = fileMetaData + ".jreq.properties";
+            fileMetaData = fileMetaData + ".jget.properties";
         }
         propConnInfo.store(new FileWriter(fileMetaData), "Connection Meta Data");
     }

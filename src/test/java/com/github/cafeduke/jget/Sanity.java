@@ -1,6 +1,6 @@
-package com.github.cafeduke.jreq;
+package com.github.cafeduke.jget;
 
-import static com.github.cafeduke.jreq.common.TestUtil.*;
+import static com.github.cafeduke.jget.common.TestUtil.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +14,9 @@ import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.cafeduke.jreq.ArgProcessor.MultiThreadMode;
-import com.github.cafeduke.jreq.common.TestCase;
+import com.github.cafeduke.jget.JGet;
+import com.github.cafeduke.jget.ArgProcessor.MultiThreadMode;
+import com.github.cafeduke.jget.common.TestCase;
 
 public class Sanity extends TestCase
 {
@@ -23,12 +24,12 @@ public class Sanity extends TestCase
     public void ping()
     {
         String outHeader = TestPrefix + ".ping.head.out";
-        JReq.ArgBuilder builder = JReq.newBuilder()
+        JGet.ArgBuilder builder = JGet.newBuilder()
             .url("https://www.google.co.in/")
             .outputHeadersToFile(outHeader)
             .showAllHeaders()
             .quiet();
-        int respCode = jreq.sendRequest(builder.build())[0];
+        int respCode = jget.sendRequest(builder.build())[0];
         println("[" + TestPrefix + "] ResponseCode=" + respCode);
         assertResponseOK(respCode);
     }
@@ -37,7 +38,7 @@ public class Sanity extends TestCase
     public void pings()
     {
         String outHeader = TestPrefix + ".pings.head";
-        List<String> listArg = JReq.newBuilder()
+        List<String> listArg = JGet.newBuilder()
             .url("https://www.google.co.in/")
             .outputHeadersToFile(outHeader)
             .mode(MultiThreadMode.MSC)
@@ -45,7 +46,7 @@ public class Sanity extends TestCase
             .showAllHeaders()
             .quiet()
             .build();
-        int respCode[] = jreq.sendRequest(listArg);
+        int respCode[] = jget.sendRequest(listArg);
         println("[" + TestPrefix + "] ResponseCode=" + Arrays.toString(respCode));
         assertResponseOK(respCode, 5);
     }
@@ -54,12 +55,12 @@ public class Sanity extends TestCase
     public void doPost() throws JSONException, IOException
     {
         String output = TestPrefix + ".doPost.json";
-        JReq.ArgBuilder builder = JReq.newBuilder()
+        JGet.ArgBuilder builder = JGet.newBuilder()
             .url("https://httpbin.org/post")
             .outputToFile(output)
             .doPost()
             .postBody("item=Apple&count=12");
-        int respCode = jreq.sendRequest(builder.build())[0];
+        int respCode = jget.sendRequest(builder.build())[0];
         assertResponseOK(respCode);
 
         JSONObject jsonRoot = new JSONObject(FileUtils.readFileToString(new File(output), Charset.defaultCharset()));

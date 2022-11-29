@@ -1,4 +1,4 @@
-package com.github.cafeduke.jreq.common;
+package com.github.cafeduke.jget.common;
 
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
