@@ -10,7 +10,7 @@ JDK15+
 - Provide execute permission to `$HOME/Programs/JGet/bin/*`
 
 ```bash
-wget -q https://github.com/cafeduke/JGet/releases/download/v3.0/jget-3.0.zip -O /tmp/jget.zip \
+wget -q https://github.com/cafeduke/JGet/releases/download/v1.0/jget-1.0.zip -O /tmp/jget.zip \
    && unzip -q /tmp/jget.zip -d $HOME/Programs/JGet \
    && chmod 755 $HOME/Programs/JGet/bin/* \
    && rm /tmp/jget.zip 
