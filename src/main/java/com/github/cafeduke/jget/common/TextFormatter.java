@@ -63,7 +63,7 @@ public class TextFormatter extends Formatter
         String strMethod = record.getSourceMethodName();
 
         /* ThreadID */
-        String strThreadID = "" + record.getLongThreadID();
+        String strThreadID = "" + record.getThreadID();
 
         /* Message */
         String strMessage = record.getMessage();

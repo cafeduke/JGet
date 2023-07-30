@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 
@@ -299,7 +300,7 @@ public class ArgProcessor
      * The HTTP Protocol version preferred by the client
      */
     public static final String HTTP_PROTOCOL_VERSION = "-v|-version";
-    HttpClient.Version httpVersion = HttpClient.Version.HTTP_2;
+    HttpClient.Version httpVersion = HttpClient.Version.HTTP_1_1;
 
     /**
      * URL to be requested
@@ -434,6 +435,19 @@ public class ArgProcessor
      */
     public static final String KEYSTORE_PASSWORD = "-storepass";
     String passwordKeyStore = null;
+    
+    /**
+     * Ciphers (comma separated list) to be used by JGet 
+     */
+    String ciphers = null;    
+    public static final String CIPHERS = "-ciphers";
+    
+    /**
+     * TLS version to be used by JGet. 
+     * Version: 1.3|1.2|1.1|1
+     */
+    String tlsVersion = null;    
+    public static final String TLS_VERSION = "-tls";    
 
     /**
      * The mode for writing HTTP response.
@@ -677,6 +691,14 @@ public class ArgProcessor
             {
                 passwordKeyStore = Util.getSwitchValue(arg, index++);
             }
+            else if (currArg.matches(CIPHERS))
+            {
+              ciphers = Util.getSwitchValue(arg, index++);
+            }
+            else if (currArg.matches(TLS_VERSION))
+            {
+              tlsVersion = Util.getSwitchValue(arg, index++);
+            }
             else if ((currOutputMode = isOutputMode(currArg)) != null)
             {
                 outputMode = currOutputMode;
@@ -764,6 +786,8 @@ public class ArgProcessor
             		httpVersion = HttpClient.Version.HTTP_1_1;
             	else if (version.equals("2") || version.equals("2.0"))
             		httpVersion = HttpClient.Version.HTTP_2;
+            	else
+            	    dieUsage("Option " + HTTP_PROTOCOL_VERSION + " must be 2 or 1. CurrentValue=" + version);
             }
             else
             {
@@ -846,6 +870,9 @@ public class ArgProcessor
             if (numberOfRequestHeaderFile > numberOfThread)
                 dieUsage("Number of ReqHeaderFiles :" + numberOfRequestHeaderFile + " exceeds NumberOfThreads :" + numberOfThread);
         }
+        
+        if (url != null && url.getProtocol().equalsIgnoreCase("https"))
+            isSSL = true;
 
         /* Keystore */
         if (isSSL)
@@ -859,6 +886,20 @@ public class ArgProcessor
             if (fileKeystore == null ^ passwordKeyStore == null)
                 dieUsage("Please specify both -keystore and -storepass OR omit both of them.");
         }
+
+//        Setting properties is not working with HTTP/2 APIs
+//        --------------------------------------------------        
+//        if (ciphers != null)
+//            System.setProperty ("jdk.tls.client.cipherSuites", ciphers);
+//          
+//        if (tlsVersion != null)
+//        {
+//            final Set<String> setTLSVersion = Set.of("1", "1.1", "1.2", "1.3");
+//            if (!setTLSVersion.contains(tlsVersion))
+//                dieUsage("Option " + TLS_VERSION + " must have a value among " + setTLSVersion + "CurrentValue=" + tlsVersion);
+//            tlsVersion = "TLSv" + tlsVersion;        
+//            System.setProperty ("jdk.tls.client.protocols", tlsVersion);
+//        }
     }
 
     private HttpHeader isHttpHeader(String currArg)
@@ -965,8 +1006,10 @@ public class ArgProcessor
         builder.append("        " + ArgProcessor.KEYSTORE + " <Path to Java Key Store (JKS)>" + Util.LineSep);
         builder.append("        " + ArgProcessor.KEYSTORE_PASSWORD + " <Password to access JKS>" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.HTTP_PROTOCOL_VERSION + " <HTTP protocol version 2|1.1> ]" + Util.LineSep);
+        builder.append("     [ " + ArgProcessor.CIPHERS + " <cipher1>[,<cipher2>,<cipher3>...<cipherN>]]" + Util.LineSep);
+        builder.append("     [ " + ArgProcessor.TLS_VERSION + " <tls version Eg: 1.3|1.2|1.1|1>]" + Util.LineSep);
         
-        builder.append("     [" + ArgProcessor.HTTP_PROTOCOL_VERSION + " <HTTP protocol version> ]" + Util.LineSep);
 
         for (HttpHeader currHeader : HttpHeader.values())
             builder.append("     [" + currHeader.toArg() + " <" + currHeader.toString() + " header>]" + Util.LineSep);

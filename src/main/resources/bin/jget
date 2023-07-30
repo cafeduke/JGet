@@ -5,7 +5,7 @@
 # -------------------------------------------------------------------------------------------------
 BASEDIR=$(dirname $(readlink -f ${0}))
 BASENAME=$(basename ${0})
-JREQ_HOME="$(readlink -f ${BASEDIR}/..)"
+JGET_HOME="$(readlink -f ${BASEDIR}/..)"
 
 function timestamp ()
 {
@@ -23,17 +23,17 @@ function timeInMilli ()
 
 if [[ "${@}" =~ "-rco" ]]
 then
-  ${JAVA_HOME}/bin/java -jar ${JREQ_HOME}/jget.jar "$@"
+  ${JAVA_HOME}/bin/java -jar ${JGET_HOME}/jget.jar "$@"
   exit 0
 fi
 
 echo "-------------------------------------------------------------------------------------------------"
-echo "CafeDuke JGet"
+echo "JGet"
 echo "-------------------------------------------------------------------------------------------------"
 rm -f /tmp/jget.resp.txt
 echo "[$(timestamp)] Started executing"
 tstart=$(timeInMilli)
-${JAVA_HOME}/bin/java ${JREQ_JAVA_OPTIONS} -jar ${JREQ_HOME}/jget.jar -rco /tmp/jget.resp.txt "$@"
+${JAVA_HOME}/bin/java ${JAVA_OPTIONS} -jar ${JGET_HOME}/jget.jar -rco /tmp/jget.resp.txt "$@"
 tend=$(timeInMilli)
 if [[ -e /tmp/jget.resp.txt ]]
 then

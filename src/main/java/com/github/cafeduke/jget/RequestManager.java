@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509ExtendedTrustManager;
@@ -263,61 +264,76 @@ public class RequestManager implements Runnable
             proxySelector = ProxySelector.of(new InetSocketAddress(tokenProxy[0], Integer.valueOf(tokenProxy[1])));
         }
 
-        SSLContext context = SSLContext.getInstance("TLS");
-        if (cmdArg.fileKeystore == null && cmdArg.passwordKeyStore == null)
+        /* Add non-ssl parameters */
+        HttpClient.Builder builder = HttpClient.newBuilder()
+            .followRedirects(cmdArg.followRedirect ? Redirect.ALWAYS : Redirect.NEVER)
+            .proxy(proxySelector);
+        
+        /* Add ssl parameters */
+        if (cmdArg.isSSL)
         {
-            context.init(null, new TrustManager[] {
+            SSLContext context = SSLContext.getInstance("TLS");
+            if (cmdArg.fileKeystore == null && cmdArg.passwordKeyStore == null)
+            {
+                context.init(null, new TrustManager[] 
+                {
                     new X509ExtendedTrustManager()
                     {
                         public X509Certificate[] getAcceptedIssuers()
                         {
                             return null;
                         }
-
+    
                         public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type)
                         {
                         }
-
+    
                         public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type)
                         {
                         }
-
+    
                         public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket)
                         {
                         }
-
+    
                         public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket)
                         {
                         }
-
+    
                         public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine)
                         {
                         }
-
+    
                         public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine)
                         {
                         }
                     }
-            }, null);
+                }, null);
+            }
+            else
+            {
+                JGet.setKeyStore(cmdArg.fileKeystore.getAbsolutePath(), cmdArg.passwordKeyStore);
+    
+                KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+                InputStream in = new java.io.FileInputStream(cmdArg.fileKeystore);
+                ks.load(in, cmdArg.passwordKeyStore.toCharArray());
+    
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                tmf.init(ks);
+                context.init(null, tmf.getTrustManagers(), null);
+            }
+            
+            SSLParameters params = new SSLParameters();
+            if (cmdArg.ciphers != null)
+                params.setCipherSuites(cmdArg.ciphers.split(","));
+            
+            if (cmdArg.tlsVersion != null)
+                params.setProtocols(new String[]{"TLSv" + cmdArg.tlsVersion});
+            
+            builder.sslContext(context)
+                .sslParameters(params);
+            
         }
-        else
-        {
-            JGet.setKeyStore(cmdArg.fileKeystore.getAbsolutePath(), cmdArg.passwordKeyStore);
-
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-            InputStream in = new java.io.FileInputStream(cmdArg.fileKeystore);
-            ks.load(in, cmdArg.passwordKeyStore.toCharArray());
-
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(ks);
-            context.init(null, tmf.getTrustManagers(), null);
-        }
-
-        HttpClient.Builder builder = HttpClient.newBuilder()
-            .followRedirects(cmdArg.followRedirect ? Redirect.ALWAYS : Redirect.NEVER)
-            .proxy(proxySelector)
-            .sslContext(context);
-
         return builder.build();
     }
 
