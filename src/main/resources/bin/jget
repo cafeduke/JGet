@@ -21,6 +21,12 @@ function timeInMilli ()
 # Main
 # -------------------------------------------------------------------------------------------------
 
+if [[ "${#}" == 0 ]]
+then
+  ${JAVA_HOME}/bin/java -jar ${JGET_HOME}/jget.jar
+  exit 0
+fi
+
 if [[ "${@}" =~ "-rco" ]]
 then
   ${JAVA_HOME}/bin/java -jar ${JGET_HOME}/jget.jar "$@"

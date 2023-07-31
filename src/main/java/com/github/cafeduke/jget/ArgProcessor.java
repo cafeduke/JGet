@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.io.FileUtils;
-
 import com.github.cafeduke.jget.common.Util;
 
 /**
@@ -296,10 +293,27 @@ public class ArgProcessor
         MUC;
     }
     
+    public static final String HELP = "-h|-help";
+    
+    /**
+     * The JGet version as per pom.xml
+     */
+    public static final String JGET_VERSION= "-v|-version";
+    
+    /**
+     * The JGet version string
+     */
+    public static final String JGET_VERSION_STRING = "1.2";
+    
+    /**
+     * If true print version string
+     */
+    private boolean doShowVersion = false;
+    
     /**
      * The HTTP Protocol version preferred by the client
      */
-    public static final String HTTP_PROTOCOL_VERSION = "-v|-version";
+    public static final String HTTP_PROTOCOL_VERSION = "-http";
     HttpClient.Version httpVersion = HttpClient.Version.HTTP_1_1;
 
     /**
@@ -594,7 +608,14 @@ public class ArgProcessor
             usage();
             return false;
         }
-        parseArg();
+        
+        parseArg();        
+        if (doShowVersion == true)
+        {
+            System.out.println("JGet HTTP Client v" + JGET_VERSION_STRING);
+            return false;
+        }        
+        
         parseSystemArg();
         validateUsage();
         return true;
@@ -609,8 +630,13 @@ public class ArgProcessor
         for (int index = 0; index < arg.length; index++)
         {
             String currArg = arg[index];
-
-            if (currArg.matches(URL))
+            
+            if (currArg.matches(JGET_VERSION))
+            {
+                doShowVersion = true;
+                index++;
+            }
+            else if (currArg.matches(URL))
             {
                 url = validateArgUrl(arg, index++);
                 if (url.getProtocol().equalsIgnoreCase("https"))
@@ -787,7 +813,7 @@ public class ArgProcessor
             	else if (version.equals("2") || version.equals("2.0"))
             		httpVersion = HttpClient.Version.HTTP_2;
             	else
-            	    dieUsage("Option " + HTTP_PROTOCOL_VERSION + " must be 2 or 1. CurrentValue=" + version);
+            	    dieUsage("Option " + HTTP_PROTOCOL_VERSION + " must be 2 or 1.1 CurrentValue=" + version);
             }
             else
             {
@@ -989,7 +1015,8 @@ public class ArgProcessor
     {
         StringBuilder builder = new StringBuilder();
         builder.append("Usage:" + Util.LineSep);
-        builder.append("java JReq" + Util.LineSep);
+        builder.append("java JGet" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.JGET_VERSION + "]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URL + " <URL>]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URI_FILE + " <File having URLs>]" + Util.LineSep);
         builder.append("     [" + Util.LineSep);
@@ -1007,8 +1034,8 @@ public class ArgProcessor
         builder.append("        " + ArgProcessor.KEYSTORE_PASSWORD + " <Password to access JKS>" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.HTTP_PROTOCOL_VERSION + " <HTTP protocol version 2|1.1> ]" + Util.LineSep);
-        builder.append("     [ " + ArgProcessor.CIPHERS + " <cipher1>[,<cipher2>,<cipher3>...<cipherN>]]" + Util.LineSep);
-        builder.append("     [ " + ArgProcessor.TLS_VERSION + " <tls version Eg: 1.3|1.2|1.1|1>]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.CIPHERS + " <cipher1>[,<cipher2>,<cipher3>...<cipherN>]]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.TLS_VERSION + " <tls version Eg: 1.3|1.2|1.1|1>]" + Util.LineSep);
         
 
         for (HttpHeader currHeader : HttpHeader.values())
