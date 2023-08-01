@@ -2,7 +2,7 @@
 A Java HTTP library/tool to send HTTP/1.1 and HTTP/2 reqeusts
 
 # Pre-requisite
-JDK15+
+JDK11+
 
 # Install
 - Download the latest `jget-<version>.zip` from [Releases](https://github.com/cafeduke/JGet/releases)
