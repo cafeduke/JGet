@@ -4,11 +4,16 @@ import java.net.http.HttpClient.Version;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.github.cafeduke.jget.ArgProcessor.MultiThreadMode;
 import com.github.cafeduke.jget.common.ToolsUtil;
@@ -16,25 +21,24 @@ import com.github.cafeduke.jget.common.Util;
 
 /**
  * A Java based HTTP Client that exposes APIs to send multiple sequential/simultaneous requests and optionally capture the response body/headers.
- *
  * <ul>
- * <li>JReq is capable of sending requests of all request method types (Get, Post, Head, Delete, Put, Trace and Options).
- * <li>JReq can operate in the following threading mode.
+ * <li>JGet is capable of sending requests of all request method types (Get, Post, Head, Delete, Put, Trace and Options).
+ * <li>JGet can operate in the following threading mode.
  * <ul>
  * <li>Single Client (SC) - A single thread is used to send requests sequentially.
  * <li>Multiple Similar Clients (MSC): Spawns multiple threads, all threads requesting the same URL.
  * <li>Multiple Unique Clients (MUC): Spawns multiple threads, each thread picks a URL from an input URL file.
  * </ul>
- * <li>Each JReq thread can send its own set of request headers and/or request body.
- * <li>JReq can optionally maintain cookie based session.
+ * <li>Each JGet thread can send its own set of request headers and/or request body.
+ * <li>JGet can optionally maintain cookie based session.
  * </ul>
- * 
+ *
  * @author Raghunandan.Seshadri
  */
 public class JGet
 {
     /**
-     * The request header name which will have a unique value for every JReq instance.
+     * The request header name which will have a unique value for every JGet instance.
      */
     public static final String CLIENT_ID_HEADER = "ClientId";
 
@@ -45,22 +49,22 @@ public class JGet
     public static final int TIMEOUT_RESPONSE_CODE = 5 * 60;
 
     /**
-     * Request Manager for this JReq instance
+     * Request Manager for this JGet instance
      */
     private RequestManager requestManager = null;
 
     /**
-     * List of JReq Arguments used by all send methods.
+     * List of JGet Arguments used by all send methods.
      */
     private List<String> listCommonArg = new ArrayList<String>();
 
     /**
-     * Default JReq Logger
+     * Default JGet Logger
      */
     private static final Logger DEFAULT_LOGGER = ToolsUtil.getLogger(JGet.class.getName(), "JGet.log");
 
     /**
-     * JReq context
+     * JGet context
      */
     private final Context context = new Context();
 
@@ -76,12 +80,11 @@ public class JGet
     }
 
     /**
-     * Get a new instance of JReq.
-     * 
-     * Every new instance of JReq sends a unique request ID. This helps origin server differentiate
+     * Get a new instance of JGet.
+     * Every new instance of JGet sends a unique request ID. This helps origin server differentiate
      * among requests from different instances.
-     * 
-     * @return JReq instance
+     *
+     * @return JGet instance
      */
     public static JGet getInstance()
     {
@@ -89,7 +92,7 @@ public class JGet
     }
 
     /**
-     * @return A builder used to build arguments for JReq
+     * @return A builder used to build arguments for JGet
      */
     public static JGet.ArgBuilder newBuilder()
     {
@@ -97,8 +100,8 @@ public class JGet
     }
 
     /**
-     * Main method to enable JReq to also run as a stand alone HTTP client.
-     * 
+     * Main method to enable JGet to also run as a stand alone HTTP client.
+     *
      * @param arg Arguments to main.
      * @throws Exception An exception (if any) sending request.
      */
@@ -109,7 +112,7 @@ public class JGet
 
     /**
      * Return the status line for the response object
-     * 
+     *
      * @param <T> the response body type
      * @param response HttpResponse object
      * @return The status line of the format {@code HTTP/<version> <status message>}
@@ -122,8 +125,8 @@ public class JGet
 
     /**
      * Send request with arguments {@code arg}
-     * 
-     * @param arg Arguments for JReq
+     *
+     * @param arg Arguments for JGet
      * @return Array of response codes.
      */
     public int[] sendRequest(String arg[])
@@ -134,26 +137,26 @@ public class JGet
     /**
      * Send request with arguments {@code listArg}
      * <b>Note:</b> All sendRequest/sendQuietRequest finally resolve to this method.
-     * 
+     *
      * @param listArg List of arguments
      * @return Array of response codes.
      */
     public int[] sendRequest(List<String> listArg)
     {
         listArg.addAll(listCommonArg);
-        context.logger.info("Executing JReq: " + Util.join(listArg, ' '));
+        context.logger.info("Executing JGet: " + Util.join(listArg, ' '));
 
         requestManager = new RequestManager(context, listArg.toArray(new String[0]));
         return requestManager.sendRequest();
     }
 
     /* ------------------------------------------------------------------- */
-    /* JReq Getters/Setters                                                */
+    /* JGet Getters/Setters */
     /* ------------------------------------------------------------------- */
 
     /**
-     * Set a custom logger for JReq
-     * 
+     * Set a custom logger for JGet
+     *
      * @param logger The logger object to be used.
      */
     public void setLogger(Logger logger)
@@ -163,7 +166,7 @@ public class JGet
 
     /**
      * If {@code trackSession} is true, session is managed using Cookies.
-     * 
+     *
      * @param trackSession If true, session is managed using Cookies.
      */
     public void setSessionBinding(boolean trackSession)
@@ -179,10 +182,9 @@ public class JGet
 
     /**
      * Sets if HTTP redirects (requests with response code 3xx) should be automatically followed. By
-     * default, JReq APIs follow redirects automatically.
-     * 
+     * default, JGet APIs follow redirects automatically.
      * If true, follow the HTTP redirects otherwise return the 3xx response.
-     * 
+     *
      * @param followRedirect If true, follow the HTTP redirects otherwise return the 3xx response.
      */
     public void setFollowRedirect(boolean followRedirect)
@@ -194,23 +196,21 @@ public class JGet
     }
 
     /**
-     * Sets the blocking mode. By default, JReq APIs are blocking.
-     * 
+     * Sets the blocking mode. By default, JGet APIs are blocking.
      * If true
      * <ul>
-     *   <li>Wait until all threads have finished execution or have timed out.
-     *   <li>Methods like sendXxxRequest () will not return until all threads have completed execution.
-     *   <li>Array returned will have response code corresponding to the request.
+     * <li>Wait until all threads have finished execution or have timed out.
+     * <li>Methods like sendXxxRequest () will not return until all threads have completed execution.
+     * <li>Array returned will have response code corresponding to the request.
      * </ul>
-     * 
      * If false
      * <ul>
-     *   <li>Does NOT wait for threads to finish execution.
-     *   <li>Methods like sendXxxRequest () will return almost immediately.
-     *   <li>Array returned may be null as the threads might not have completed execution.
-     *   <li>Poll using {@link #getResponseCode()} to retrieve response code.
+     * <li>Does NOT wait for threads to finish execution.
+     * <li>Methods like sendXxxRequest () will return almost immediately.
+     * <li>Array returned may be null as the threads might not have completed execution.
+     * <li>Poll using {@link #getResponseCode()} to retrieve response code.
      * </ul>
-     * 
+     *
      * @param isBlocking If true, requests shall be blocking
      */
     public void setBlockingMode(boolean isBlocking)
@@ -227,11 +227,19 @@ public class JGet
     public static void setHTTPProperties()
     {
         System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+
+        String csvList = System.getProperty("jdk.httpclient.allowRestrictedHeaders");
+        Set<String> setAllow = new HashSet<>();
+        setAllow.add("host");
+        if (csvList != null)
+            Collections.addAll(setAllow, csvList.split(","));
+        csvList = StringUtils.join(setAllow, ",");
+        System.setProperty("jdk.httpclient.allowRestrictedHeaders", csvList);
     }
 
     /**
      * Set the Java Key Store (JKS) for the instance
-     * 
+     *
      * @param keyStore Path to the JKS.
      * @param storePass Password for the JKS.
      */
@@ -242,7 +250,7 @@ public class JGet
         System.setProperty("javax.net.ssl.keyStoreType", "JKS");
         System.setProperty("javax.net.ssl.keyStorePassword", storePass);
 
-        /* Set trust store properties  */
+        /* Set trust store properties */
         System.setProperty("javax.net.ssl.trustStore", keyStore);
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
         System.setProperty("javax.net.ssl.trustStorePassword", storePass);
@@ -252,7 +260,7 @@ public class JGet
 
     /**
      * Header name and value - This header will be added to all requests with this instance.
-     * 
+     *
      * @param name Header name
      * @param value Header value
      */
@@ -264,7 +272,7 @@ public class JGet
     /**
      * Get the current status of response codes immediately. Each response code
      * maps to the corresponding request.
-     * 
+     *
      * @return An array of response codes or null if no response code is available yet.
      */
     public int[] getCurrResponseCode()
@@ -275,7 +283,7 @@ public class JGet
     /**
      * Invoke {@code getResponseCode(TIMEOUT_RESPONSE_CODE, true); }
      * See {@link #getResponseCode(int, boolean)}
-     * 
+     *
      * @return An array of response codes or null if no response code is available.
      */
     public int[] getResponseCode()
@@ -285,8 +293,9 @@ public class JGet
 
     /**
      * Invoke getResponseCode(timeout, true);
-     * <br>See {@link #getResponseCode(int, boolean)} for details.
-     * 
+     * <br>
+     * See {@link #getResponseCode(int, boolean)} for details.
+     *
      * @param timeout Max number of seconds to poll for response codes to be available.
      * @return An array of response codes or null if no response code is available.
      */
@@ -298,7 +307,7 @@ public class JGet
     /**
      * Invoke getResponseCode(timeout, 2, waitForAllThreads); <br>
      * See {@link #getResponseCode(int, int, boolean)} for details.
-     * 
+     *
      * @param timeout Max number of seconds to poll for response codes to be available.
      * @param waitForAllThreads If true, wait until all threads have response code or timeout.
      * @return An array of response codes or null if no response code is available.
@@ -311,15 +320,13 @@ public class JGet
     /**
      * An array of response codes or null if no response code is available event after
      * {@code timeout}.
-     * 
      * After every {@code pollInterval} seconds check if the response codes are available. If so, the
      * response codes are returned. If not, sleep for {@code pollInterval} and retry again. This is
      * iterated until {@code timeout} seconds are reached.
-     * 
      * If waitForAllThreads is true, check if response codes are available from all threads. If so, the
      * response codes are returned. If waitForAllThreads is false, it is sufficient if a subset of threads
      * have response codes for the function to return.
-     * 
+     *
      * @param timeout Max number of seconds to poll for response codes to be available.
      * @param pollInterval Time to sleep in seconds before retrying again.
      * @param waitForAllThreads If true, wait until all threads have response code or timeout.
@@ -376,7 +383,7 @@ public class JGet
 
     /**
      * Add arguments in {@code arg} to argument list.
-     * 
+     *
      * @param arg Array of arguments
      */
     private static List<String> getArgAsList(String arg[])
@@ -389,9 +396,9 @@ public class JGet
     /**
      * A Context class holds context that
      * <ul>
-     * <li>Specific to a given JReq instance
+     * <li>Specific to a given JGet instance
      * <li>Needs to be shared with other instances like RequestManager or SingleClient.
-     * <li>Can be ONLY modified by JReq instance.
+     * <li>Can be ONLY modified by JGet instance.
      * </ul>
      */
     static class Context
@@ -421,7 +428,7 @@ public class JGet
         /* Public getters */
 
         /**
-         * @return Logger set by client OR default JReq logger.
+         * @return Logger set by client OR default JGet logger.
          */
         public Logger getLogger()
         {
@@ -429,7 +436,7 @@ public class JGet
         }
 
         /**
-         * @return Unique ID for JReq instance.
+         * @return Unique ID for JGet instance.
          */
         public String getClientId()
         {
@@ -446,7 +453,8 @@ public class JGet
     }
 
     /**
-     * A class to build JReq arguments 
+     * A class to build JGet arguments
+     *
      * @author CafeDuke
      */
     public static class ArgBuilder
@@ -525,7 +533,7 @@ public class JGet
         }
 
         /**
-         * @param server The proxy server to be used. 
+         * @param server The proxy server to be used.
          * @return this ArgBuilder instance
          */
         public ArgBuilder proxy(String server)
@@ -612,6 +620,7 @@ public class JGet
 
         /**
          * Do not output response
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder quiet()
@@ -735,6 +744,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor.MultiThreadMode}
+         *
          * @param mode The parallel mode to be used.
          * @return this ArgBuilder instance
          */
@@ -778,6 +788,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor.HttpMethod#GET}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder doGet()
@@ -788,6 +799,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor.HttpMethod#POST}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder doPost()
@@ -798,6 +810,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor.HttpMethod#HEAD}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder doHead()
@@ -808,6 +821,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor.HttpMethod#PUT}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder doPut()
@@ -818,6 +832,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor.HttpMethod#DELETE}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder doDelete()
@@ -828,6 +843,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor.HttpMethod#TRACE}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder doTrace()
@@ -838,6 +854,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor.HttpMethod#OPTIONS}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder doOptions()
@@ -848,6 +865,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor#SHOW_HEADER}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder showHeaders()
@@ -858,6 +876,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor#SHOW_ALL_HEADER}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder showAllHeaders()
@@ -868,6 +887,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor#DISABLE_FOLLOW_REDIRECT}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder dontFollowRedirect()
@@ -879,6 +899,7 @@ public class JGet
         /**
          * Requests are blocking by default.
          * For details, see {@link ArgProcessor#NON_BLOCKING_REQUEST}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder dontWaitForResponse()
@@ -889,6 +910,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor#DISABLE_ERROR_LOG}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder dontLogError()
@@ -899,6 +921,7 @@ public class JGet
 
         /**
          * For details, see {@link ArgProcessor#DISABLE_CLIENT_ID}
+         *
          * @return this ArgBuilder instance
          */
         public ArgBuilder dontSendClientId()

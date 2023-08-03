@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -49,15 +48,15 @@ public class Util
     public static final String PathSep = File.pathSeparator;
 
     /**
-     * Concatenate the Strings in the {@code list} using {@code delim}
+     * Joins the elements of the provided Iterable into a single String containing the provided elements.
      * 
-     * @param list Strings to be concatenated.
-     * @param delim Delimiter
+     * @param iterable Elements to join
+     * @param delim delimiter
      * @return Resultant concatenated string.
      */
-    public static String join(List<String> list, char delim)
+    public static String join(Iterable<?> iterable, char delim)
     {
-        return StringUtils.join(list, delim);
+        return StringUtils.join(iterable, delim);
     }
 
     /**

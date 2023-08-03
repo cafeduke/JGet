@@ -15,14 +15,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+
 import org.apache.commons.io.FileUtils;
+
 import com.github.cafeduke.jget.common.Util;
 
 /**
- * This class encapsulates JReq arguments.
+ * This class encapsulates JGet arguments.
  * Handles the processing of arguments with includes parsing,
  * validation and reporting invalid usage.
- * 
+ *
  * @author Raghunandan.Seshadri
  */
 public class ArgProcessor
@@ -106,7 +108,7 @@ public class ArgProcessor
         }
 
         /**
-         * @return Return the JReq switch/options for the HTTP header  
+         * @return Return the JGet switch/options for the HTTP header
          */
         public String toArg()
         {
@@ -177,7 +179,7 @@ public class ArgProcessor
         OPTIONS;
 
         /**
-         * @return Return the JReq switch/options for the HTTP method 
+         * @return Return the JGet switch/options for the HTTP method
          */
         public String toArg()
         {
@@ -229,7 +231,7 @@ public class ArgProcessor
         QUIET;
 
         /**
-         * @return Return the JReq switch/options for the output mode 
+         * @return Return the JGet switch/options for the output mode
          */
         public String toArg()
         {
@@ -270,9 +272,9 @@ public class ArgProcessor
     /**
      * An enumeration of multiple thread modes.
      * <ul>
-     *  <li>SC = Single Client
-     *  <li>MSC = Multiple Similar Clients
-     *  <li>MUC = Multiple Unique Clients
+     * <li>SC = Single Client
+     * <li>MSC = Multiple Similar Clients
+     * <li>MUC = Multiple Unique Clients
      * </ul>
      */
     public static enum MultiThreadMode
@@ -292,24 +294,24 @@ public class ArgProcessor
          */
         MUC;
     }
-    
+
+    /**
+     * Show usage and exit
+     */
     public static final String HELP = "-h|-help";
-    
+    boolean showHelp = false;
+
     /**
      * The JGet version as per pom.xml
      */
-    public static final String JGET_VERSION= "-v|-version";
-    
+    public static final String JGET_VERSION = "-v|-version";
+
     /**
      * The JGet version string
      */
-    public static final String JGET_VERSION_STRING = "1.2";
-    
-    /**
-     * If true print version string
-     */
-    private boolean doShowVersion = false;
-    
+    public static final String JGET_VERSION_STRING = "1.4";
+    private boolean showVersion = false;
+
     /**
      * The HTTP Protocol version preferred by the client
      */
@@ -449,19 +451,19 @@ public class ArgProcessor
      */
     public static final String KEYSTORE_PASSWORD = "-storepass";
     String passwordKeyStore = null;
-    
+
     /**
-     * Ciphers (comma separated list) to be used by JGet 
+     * Ciphers (comma separated list) to be used by JGet
      */
-    String ciphers = null;    
+    String ciphers = null;
     public static final String CIPHERS = "-ciphers";
-    
+
     /**
-     * TLS version to be used by JGet. 
+     * TLS version to be used by JGet.
      * Version: 1.3|1.2|1.1|1
      */
-    String tlsVersion = null;    
-    public static final String TLS_VERSION = "-tls";    
+    String tlsVersion = null;
+    public static final String TLS_VERSION = "-tls";
 
     /**
      * The mode for writing HTTP response.
@@ -533,7 +535,7 @@ public class ArgProcessor
     public static final int DEFAULT_SOCKET_TIMEOUT = 2 * 60 * 60 * 1000;
 
     /**
-     * Socket {@link java.net.http.HttpRequest.Builder#timeout(java.time.Duration) timeout}. 
+     * Socket {@link java.net.http.HttpRequest.Builder#timeout(java.time.Duration) timeout}.
      */
     public static final String SOCKET_TIMEOUT = "-socketTimeout";
     int timeoutSocket = DEFAULT_SOCKET_TIMEOUT;
@@ -565,14 +567,14 @@ public class ArgProcessor
     private String arg[] = null;
 
     /**
-     * If true, a unique client ID is generated for every JReq instance
+     * If true, a unique client ID is generated for every JGet instance
      * and is sent as a request header.
      */
     public static final String DISABLE_CLIENT_ID = "-disableClientId";
     boolean sendClientId = true;
 
     /**
-     * If true, exception during JReq request is logged.
+     * If true, exception during JGet request is logged.
      */
     public static final String DISABLE_ERROR_LOG = "-disableErrorLog";
     boolean enableErrorLog = true;
@@ -585,7 +587,7 @@ public class ArgProcessor
 
     /**
      * Process arguments and validate usage
-     * 
+     *
      * @param arg arguments to process
      */
     public ArgProcessor(String arg[])
@@ -603,19 +605,20 @@ public class ArgProcessor
      */
     public boolean processArg() throws KeyManagementException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
     {
-        if (arg.length == 0)
+        parseArg();
+
+        if (arg.length == 0 || showHelp == true)
         {
             usage();
             return false;
         }
-        
-        parseArg();        
-        if (doShowVersion == true)
+
+        if (showVersion == true)
         {
             System.out.println("JGet HTTP Client v" + JGET_VERSION_STRING);
             return false;
-        }        
-        
+        }
+
         parseSystemArg();
         validateUsage();
         return true;
@@ -630,10 +633,15 @@ public class ArgProcessor
         for (int index = 0; index < arg.length; index++)
         {
             String currArg = arg[index];
-            
+
             if (currArg.matches(JGET_VERSION))
             {
-                doShowVersion = true;
+                showVersion = true;
+                index++;
+            }
+            else if (currArg.matches(HELP))
+            {
+                showHelp = true;
                 index++;
             }
             else if (currArg.matches(URL))
@@ -719,11 +727,11 @@ public class ArgProcessor
             }
             else if (currArg.matches(CIPHERS))
             {
-              ciphers = Util.getSwitchValue(arg, index++);
+                ciphers = Util.getSwitchValue(arg, index++);
             }
             else if (currArg.matches(TLS_VERSION))
             {
-              tlsVersion = Util.getSwitchValue(arg, index++);
+                tlsVersion = Util.getSwitchValue(arg, index++);
             }
             else if ((currOutputMode = isOutputMode(currArg)) != null)
             {
@@ -807,13 +815,13 @@ public class ArgProcessor
             }
             else if (currArg.matches(HTTP_PROTOCOL_VERSION))
             {
-            	String version = Util.getSwitchValue(arg, index++);
-            	if (version.equals("1.1"))
-            		httpVersion = HttpClient.Version.HTTP_1_1;
-            	else if (version.equals("2") || version.equals("2.0"))
-            		httpVersion = HttpClient.Version.HTTP_2;
-            	else
-            	    dieUsage("Option " + HTTP_PROTOCOL_VERSION + " must be 2 or 1.1 CurrentValue=" + version);
+                String version = Util.getSwitchValue(arg, index++);
+                if (version.equals("1.1"))
+                    httpVersion = HttpClient.Version.HTTP_1_1;
+                else if (version.equals("2") || version.equals("2.0"))
+                    httpVersion = HttpClient.Version.HTTP_2;
+                else
+                    dieUsage("Option " + HTTP_PROTOCOL_VERSION + " must be 2 or 1.1 CurrentValue=" + version);
             }
             else
             {
@@ -836,7 +844,7 @@ public class ArgProcessor
 
     /**
      * Validate Usage of arguments and flag error for invalid usage.
-     * 
+     *
      * @throws IOException
      * @throws KeyStoreException
      * @throws CertificateException
@@ -896,7 +904,7 @@ public class ArgProcessor
             if (numberOfRequestHeaderFile > numberOfThread)
                 dieUsage("Number of ReqHeaderFiles :" + numberOfRequestHeaderFile + " exceeds NumberOfThreads :" + numberOfThread);
         }
-        
+
         if (url != null && url.getProtocol().equalsIgnoreCase("https"))
             isSSL = true;
 
@@ -906,26 +914,12 @@ public class ArgProcessor
             /**
              * Note: ^ is an XOR operator
              * If a, b are two expressions then a ^ b is true when
-             *      - a == true  b == false
-             *      - a == false b == true 
+             * - a == true b == false
+             * - a == false b == true
              */
             if (fileKeystore == null ^ passwordKeyStore == null)
                 dieUsage("Please specify both -keystore and -storepass OR omit both of them.");
         }
-
-//        Setting properties is not working with HTTP/2 APIs
-//        --------------------------------------------------        
-//        if (ciphers != null)
-//            System.setProperty ("jdk.tls.client.cipherSuites", ciphers);
-//          
-//        if (tlsVersion != null)
-//        {
-//            final Set<String> setTLSVersion = Set.of("1", "1.1", "1.2", "1.3");
-//            if (!setTLSVersion.contains(tlsVersion))
-//                dieUsage("Option " + TLS_VERSION + " must have a value among " + setTLSVersion + "CurrentValue=" + tlsVersion);
-//            tlsVersion = "TLSv" + tlsVersion;        
-//            System.setProperty ("jdk.tls.client.protocols", tlsVersion);
-//        }
     }
 
     private HttpHeader isHttpHeader(String currArg)
@@ -998,7 +992,7 @@ public class ArgProcessor
 
     /**
      * ReportError, print the message and also usage
-     * 
+     *
      * @param mesg
      */
     private static void dieUsage(String mesg)
@@ -1036,7 +1030,6 @@ public class ArgProcessor
         builder.append("     [" + ArgProcessor.HTTP_PROTOCOL_VERSION + " <HTTP protocol version 2|1.1> ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.CIPHERS + " <cipher1>[,<cipher2>,<cipher3>...<cipherN>]]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.TLS_VERSION + " <tls version Eg: 1.3|1.2|1.1|1>]" + Util.LineSep);
-        
 
         for (HttpHeader currHeader : HttpHeader.values())
             builder.append("     [" + currHeader.toArg() + " <" + currHeader.toString() + " header>]" + Util.LineSep);

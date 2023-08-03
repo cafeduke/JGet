@@ -46,7 +46,7 @@ import com.github.cafeduke.jget.common.Util;
  * RequestManager manages one or more sequential/simultaneous requests to be spawned.
  * Each request is encapsulated as a SingleClient. Hence, RequestMananger handles creation
  * and synchronization of multiple SingleClients.
- * 
+ *
  * @author Raghunandan.Seshadri
  */
 public class RequestManager implements Runnable
@@ -95,13 +95,17 @@ public class RequestManager implements Runnable
     private JGet.Context context = null;
 
     /**
-     * The prepared HttpClient object to be used by all SingleClients  
+     * The prepared HttpClient object to be used by all SingleClients
      */
     private HttpClient httpClient = null;
 
+    public static final HttpClient.Version DEFAULT_HTTP_VERSION = HttpClient.Version.HTTP_1_1;
+
+    public static final String[] SSL_PARAMS_DEFAULT_PROTOCOLS = new String[] { "TLSv1.2", "TLSv1.1" };
+
     /**
      * Create a request manager instance.
-     * 
+     *
      * @param context JReq context
      * @param arg JReq request arguments.
      */
@@ -116,7 +120,7 @@ public class RequestManager implements Runnable
 
     /**
      * Array of response codes corresponding to the requests.
-     * 
+     *
      * @return Response code for the sent request. If non blocking APIs were used
      *         the array can be null.
      */
@@ -135,16 +139,14 @@ public class RequestManager implements Runnable
 
     /**
      * Send request and return an array of response codes corresponding to the requests.
-     * 
      * <br>
      * If the request is blocking the main thread itself will take care of
      * spawning multiple SingleClients and capturing the response.
-     * 
      * <br>
      * If the request has to be non-blocking a separate thread is created by main thread
      * which will take care of spawning multiple SingleClients and capturing the response.
      * The main thread will return.
-     * 
+     *
      * @return An array of response codes corresponding to the requests. If non blocking
      *         APIs were used the array can be null.
      */
@@ -265,74 +267,73 @@ public class RequestManager implements Runnable
         }
 
         /* Add non-ssl parameters */
-        HttpClient.Builder builder = HttpClient.newBuilder()
-            .followRedirects(cmdArg.followRedirect ? Redirect.ALWAYS : Redirect.NEVER)
-            .proxy(proxySelector);
-        
+        HttpClient.Builder builder = HttpClient.newBuilder().version(cmdArg.httpVersion).followRedirects(cmdArg.followRedirect ? Redirect.ALWAYS : Redirect.NEVER).proxy(proxySelector);
+
         /* Add ssl parameters */
         if (cmdArg.isSSL)
         {
             SSLContext context = SSLContext.getInstance("TLS");
             if (cmdArg.fileKeystore == null && cmdArg.passwordKeyStore == null)
             {
-                context.init(null, new TrustManager[] 
-                {
-                    new X509ExtendedTrustManager()
+                context.init(null, new TrustManager[] { new X509ExtendedTrustManager()
                     {
+                        @Override
                         public X509Certificate[] getAcceptedIssuers()
                         {
                             return null;
                         }
-    
+
+                        @Override
                         public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type)
                         {
                         }
-    
+
+                        @Override
                         public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type)
                         {
                         }
-    
+
+                        @Override
                         public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket)
                         {
                         }
-    
+
+                        @Override
                         public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket)
                         {
                         }
-    
+
+                        @Override
                         public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine)
                         {
                         }
-    
+
+                        @Override
                         public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine)
                         {
                         }
-                    }
-                }, null);
+                    } }, null);
             }
             else
             {
                 JGet.setKeyStore(cmdArg.fileKeystore.getAbsolutePath(), cmdArg.passwordKeyStore);
-    
+
                 KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
                 InputStream in = new java.io.FileInputStream(cmdArg.fileKeystore);
                 ks.load(in, cmdArg.passwordKeyStore.toCharArray());
-    
+
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 tmf.init(ks);
                 context.init(null, tmf.getTrustManagers(), null);
             }
-            
+
             SSLParameters params = new SSLParameters();
             if (cmdArg.ciphers != null)
                 params.setCipherSuites(cmdArg.ciphers.split(","));
-            
-            if (cmdArg.tlsVersion != null)
-                params.setProtocols(new String[]{"TLSv" + cmdArg.tlsVersion});
-            
-            builder.sslContext(context)
-                .sslParameters(params);
-            
+            params.setProtocols((cmdArg.tlsVersion == null) ? SSL_PARAMS_DEFAULT_PROTOCOLS : new String[] { "TLSv" + cmdArg.tlsVersion });
+
+            builder.sslContext(context).sslParameters(params);
+
         }
         return builder.build();
     }
@@ -366,7 +367,7 @@ public class RequestManager implements Runnable
     }
 
     /**
-     * Log the obtained response codes. If the response code arry size is greater
+     * Log the obtained response codes. If the response code array size is greater
      * than one then use below given log format.
      * <br>
      * {@code <request range begin>-<request range end>=<response code>}
@@ -380,7 +381,7 @@ public class RequestManager implements Runnable
         String message = null;
 
         if (respCode.length == 1)
-            message = "ResponseCode=" + respCode[0];
+            message = "ResponseCode=" + respCode[0] + Util.LineSep;
         else
         {
             List<String> listRange = new ArrayList<String>();
@@ -406,7 +407,7 @@ public class RequestManager implements Runnable
 
     /**
      * Log response codes from multiple unique client (MUC) requests.
-     * 
+     *
      * @param respCode Array of response codes corresponding to the requests.
      * @param listURI List of URIs to be requested.
      */
@@ -426,7 +427,7 @@ public class RequestManager implements Runnable
     /**
      * If response code file is specified, write {@code message} having
      * response codes to file.
-     * 
+     *
      * @param message
      * @throws IOException
      */
@@ -436,7 +437,7 @@ public class RequestManager implements Runnable
             return;
 
         PrintWriter out = new PrintWriter(new FileWriter(cmdArg.fileRespCode));
-        out.println(message);
+        out.print(message);
         out.close();
     }
 
@@ -446,14 +447,12 @@ public class RequestManager implements Runnable
      * <li>Each SingleClient can have its own post body file and request header file.
      * <li>Each SingleClient will have its own output file and output header file.
      * </ul>
-     * 
      * <br>
      * Handling of output file
      * <ul>
      * <li>If output file is specified, it is appended with {@code <SingleClientIndex>.html}
      * <li>If header output file is specified, it is appended with {@code <SingleClientIndex>.html}
      * </ul>
-     * 
      * <br>
      * Handling of post-body/request-header files
      * <ul>
@@ -462,7 +461,7 @@ public class RequestManager implements Runnable
      * <li>If count > number of post-body/request-header files, first count number of
      * SingleClients will use a unique post-body/request-header file, others use none.
      * </ul>
-     * 
+     *
      * @param cmdArg An instance of command line arguments
      * @param count Number of SingleClients to create
      * @throws MalformedURLException
@@ -510,7 +509,6 @@ public class RequestManager implements Runnable
     /**
      * Synchronizes all the SingleClients - Ensures all the SingleClients are in a wait
      * state and then releases (notifies) them all. This ensures parallelism.
-     * 
      * The sequence of events are as follows:
      * <ul>
      * <li>Create a thread for every {@code client} instance.
@@ -530,7 +528,7 @@ public class RequestManager implements Runnable
      * </ul>
      * <li>Record response code from each thread.
      * </ul>
-     * 
+     *
      * @param cmdArg An instance of command line arguments
      * @param client An array of SingleClient, each having its own request properties.
      * @throws InterruptedException
@@ -550,9 +548,7 @@ public class RequestManager implements Runnable
         /**
          * Once the last thread invokes barrier.await(), all thread come out of wait.
          * When all threads come out of wait, the number of threads waiting on barrier shall be zero.
-         * 
          * Check if Number of threads waiting on the barrier is 0.
-         * 
          * Give necessary time for this to happen by checking the above condition
          * max_attempts_to_sync_threads times and sleeping for sleep_after_attempt
          * milliseconds after each attempt, failing which throw an exception.

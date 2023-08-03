@@ -61,7 +61,7 @@ public class SingleClient implements Runnable
     /* Attributes WITH setter */
 
     /**
-     * A context object obtained from JReq
+     * A context object obtained from JGet
      */
     private JGet.Context context = null;
 
@@ -156,7 +156,7 @@ public class SingleClient implements Runnable
     /**
      * Create a SingleClient object - Takes care of one request.
      * 
-     * @param context JReq context.
+     * @param context JGet context.
      * @param httpClient HttpClient object to be used by all SingleClients
      * @param cmdArg Argument object.
      * @throws MalformedURLException Exception if the URL is malformed
@@ -283,6 +283,7 @@ public class SingleClient implements Runnable
                 /* Send request */
                 propConnInfo.setProperty("client.http.version", httpClient.version().toString());
                 propConnInfo.setProperty("request.http.version", request.version().toString());
+                
                 HttpResponse<InputStream> response = httpClient.send(request, BodyHandlers.ofInputStream());
 
                 /* Process Response */
@@ -408,7 +409,7 @@ public class SingleClient implements Runnable
     }
 
     /**
-     * If session binding is enabled, add cookies present in JReq context to HttpURLConnection.
+     * If session binding is enabled, add cookies present in JGet context to HttpURLConnection.
      * 
      * @param conn HttpURLConnection object
      */
@@ -649,7 +650,7 @@ public class SingleClient implements Runnable
 
     /**
      * If session binding is enabled, process the response headers map to extract all cookies
-     * from Set-Cookie header value and populate the cookie map in JReq context.
+     * from Set-Cookie header value and populate the cookie map in JGet context.
      * 
      * @param mapHeaderValue Map having response headers
      */
