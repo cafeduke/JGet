@@ -107,7 +107,8 @@ public class JGet
      */
     public static void main(String arg[]) throws Exception
     {
-        JGet.getInstance().sendRequest(arg);
+        JGet.getInstance()
+            .sendRequest(arg);
     }
 
     /**
@@ -405,7 +406,8 @@ public class JGet
     {
         private Logger logger = JGet.DEFAULT_LOGGER;
 
-        private String clientId = UUID.randomUUID().toString();
+        private String clientId = UUID.randomUUID()
+            .toString();
 
         private Map<String, String> mapCookie = new Hashtable<String, String>();
 

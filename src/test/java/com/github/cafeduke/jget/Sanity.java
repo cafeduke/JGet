@@ -1,6 +1,7 @@
 package com.github.cafeduke.jget;
 
-import static com.github.cafeduke.jget.common.TestUtil.*;
+import static com.github.cafeduke.jget.common.TestUtil.assertResponseOK;
+import static com.github.cafeduke.jget.common.TestUtil.println;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +15,6 @@ import org.json.JSONObject;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.github.cafeduke.jget.JGet;
 import com.github.cafeduke.jget.ArgProcessor.MultiThreadMode;
 import com.github.cafeduke.jget.common.TestCase;
 
@@ -56,7 +56,7 @@ public class Sanity extends TestCase
     {
         String output = TestPrefix + ".doPost.json";
         JGet.ArgBuilder builder = JGet.newBuilder()
-            .url("https://httpbin.org/post")
+            .url("https://postman-echo.com/post")
             .outputToFile(output)
             .doPost()
             .postBody("item=Apple&count=12");
@@ -64,7 +64,7 @@ public class Sanity extends TestCase
         assertResponseOK(respCode);
 
         JSONObject jsonRoot = new JSONObject(FileUtils.readFileToString(new File(output), Charset.defaultCharset()));
-        JSONObject jsonForm = (JSONObject) jsonRoot.getJSONObject("form");
+        JSONObject jsonForm = jsonRoot.getJSONObject("form");
         Assert.assertEquals(jsonForm.getInt("count"), 12);
         Assert.assertEquals(jsonForm.getString("item"), "Apple");
     }

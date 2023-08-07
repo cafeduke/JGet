@@ -309,7 +309,7 @@ public class ArgProcessor
     /**
      * The JGet version string
      */
-    public static final String JGET_VERSION_STRING = "1.4";
+    public static final String JGET_VERSION_STRING = "1.5";
     private boolean showVersion = false;
 
     /**
@@ -647,7 +647,8 @@ public class ArgProcessor
             else if (currArg.matches(URL))
             {
                 url = validateArgUrl(arg, index++);
-                if (url.getProtocol().equalsIgnoreCase("https"))
+                if (url.getProtocol()
+                    .equalsIgnoreCase("https"))
                     isSSL = true;
             }
             else if (currArg.matches(URI_FILE))
@@ -894,7 +895,8 @@ public class ArgProcessor
 
         if (multiThreadMode == MultiThreadMode.MSC || multiThreadMode == MultiThreadMode.MUC)
         {
-            int numberOfThread = (multiThreadMode == MultiThreadMode.MSC) ? threadCount : FileUtils.readLines(fileURI, Charset.defaultCharset()).size();
+            int numberOfThread = (multiThreadMode == MultiThreadMode.MSC) ? threadCount : FileUtils.readLines(fileURI, Charset.defaultCharset())
+                .size();
             int numberOfPostBodyFile = listPostBodyFile.size();
             int numberOfRequestHeaderFile = listRequestHeaderFile.size();
 
@@ -905,7 +907,8 @@ public class ArgProcessor
                 dieUsage("Number of ReqHeaderFiles :" + numberOfRequestHeaderFile + " exceeds NumberOfThreads :" + numberOfThread);
         }
 
-        if (url != null && url.getProtocol().equalsIgnoreCase("https"))
+        if (url != null && url.getProtocol()
+            .equalsIgnoreCase("https"))
             isSSL = true;
 
         /* Keystore */
@@ -964,7 +967,8 @@ public class ArgProcessor
 
     private static List<String> validateArgStrings(String arg[], int index)
     {
-        return Arrays.asList(Util.getSwitchValue(arg, index).split(","));
+        return Arrays.asList(Util.getSwitchValue(arg, index)
+            .split(","));
     }
 
     private static File validateArgFile(String arg[], int index) throws FileNotFoundException
@@ -977,7 +981,8 @@ public class ArgProcessor
 
     private static List<File> validateArgFiles(String arg[], int index) throws FileNotFoundException
     {
-        String filename[] = Util.getSwitchValue(arg, index).split(",");
+        String filename[] = Util.getSwitchValue(arg, index)
+            .split(",");
         List<File> listFile = new ArrayList<File>();
 
         for (String currFilename : filename)

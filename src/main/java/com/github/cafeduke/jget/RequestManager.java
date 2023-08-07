@@ -267,14 +267,18 @@ public class RequestManager implements Runnable
         }
 
         /* Add non-ssl parameters */
-        HttpClient.Builder builder = HttpClient.newBuilder().version(cmdArg.httpVersion).followRedirects(cmdArg.followRedirect ? Redirect.ALWAYS : Redirect.NEVER).proxy(proxySelector);
+        HttpClient.Builder builder = HttpClient.newBuilder()
+            .version(cmdArg.httpVersion)
+            .followRedirects(cmdArg.followRedirect ? Redirect.ALWAYS : Redirect.NEVER)
+            .proxy(proxySelector);
 
         /* Add ssl parameters */
         if (cmdArg.isSSL)
         {
-            SSLContext context = SSLContext.getInstance("TLS");
+            SSLContext context = null;
             if (cmdArg.fileKeystore == null && cmdArg.passwordKeyStore == null)
             {
+                context = SSLContext.getInstance("TLS");
                 context.init(null, new TrustManager[] { new X509ExtendedTrustManager()
                     {
                         @Override
@@ -324,16 +328,16 @@ public class RequestManager implements Runnable
 
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 tmf.init(ks);
+
+                context = SSLContext.getInstance("TLS");
                 context.init(null, tmf.getTrustManagers(), null);
             }
 
-            SSLParameters params = new SSLParameters();
+            SSLParameters params = context.getDefaultSSLParameters();
             if (cmdArg.ciphers != null)
                 params.setCipherSuites(cmdArg.ciphers.split(","));
             params.setProtocols((cmdArg.tlsVersion == null) ? SSL_PARAMS_DEFAULT_PROTOCOLS : new String[] { "TLSv" + cmdArg.tlsVersion });
-
-            builder.sslContext(context).sslParameters(params);
-
+            builder.sslParameters(params);
         }
         return builder.build();
     }
@@ -399,7 +403,9 @@ public class RequestManager implements Runnable
             }
             listRange.add(rangeBegin + "-" + respCode.length + "=" + rangeRespCode);
             message = "RequestRange-ResponseCode" + Util.LineSep;
-            message = message + listRange.toString().replaceAll("[\\[\\]]", "").replaceAll(", ", Util.LineSep);
+            message = message + listRange.toString()
+                .replaceAll("[\\[\\]]", "")
+                .replaceAll(", ", Util.LineSep);
         }
         logger.info(message);
         writeRespCode(message);
