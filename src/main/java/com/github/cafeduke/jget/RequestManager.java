@@ -333,11 +333,13 @@ public class RequestManager implements Runnable
                 context.init(null, tmf.getTrustManagers(), null);
             }
 
-            SSLParameters params = context.getDefaultSSLParameters();
+            SSLParameters params = new SSLParameters();
             if (cmdArg.ciphers != null)
                 params.setCipherSuites(cmdArg.ciphers.split(","));
             params.setProtocols((cmdArg.tlsVersion == null) ? SSL_PARAMS_DEFAULT_PROTOCOLS : new String[] { "TLSv" + cmdArg.tlsVersion });
-            builder.sslParameters(params);
+
+            builder.sslContext(context)
+                .sslParameters(params);
         }
         return builder.build();
     }
