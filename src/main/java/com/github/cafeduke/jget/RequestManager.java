@@ -278,45 +278,63 @@ public class RequestManager implements Runnable
             SSLContext context = null;
             if (cmdArg.fileKeystore == null && cmdArg.passwordKeyStore == null)
             {
-                context = SSLContext.getInstance("TLS");
-                context.init(null, new TrustManager[] { new X509ExtendedTrustManager()
+                TrustManager tm = new X509ExtendedTrustManager()
                     {
+
                         @Override
                         public X509Certificate[] getAcceptedIssuers()
                         {
+                            // TODO Auto-generated method stub
                             return null;
                         }
 
                         @Override
-                        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type)
+                        public void checkServerTrusted(X509Certificate[] arg0, String arg1) throws CertificateException
                         {
+                            // TODO Auto-generated method stub
+
                         }
 
                         @Override
-                        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type)
+                        public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException
                         {
+                            // TODO Auto-generated method stub
+
                         }
 
                         @Override
-                        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket)
+                        public void checkServerTrusted(X509Certificate[] arg0, String arg1, SSLEngine arg2) throws CertificateException
                         {
+                            // TODO Auto-generated method stub
+
                         }
 
                         @Override
-                        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final Socket a_socket)
+                        public void checkServerTrusted(X509Certificate[] arg0, String arg1, Socket arg2) throws CertificateException
                         {
+                            // TODO Auto-generated method stub
+
                         }
 
                         @Override
-                        public void checkClientTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine)
+                        public void checkClientTrusted(X509Certificate[] arg0, String arg1, SSLEngine arg2) throws CertificateException
                         {
+                            // TODO Auto-generated method stub
+
                         }
 
                         @Override
-                        public void checkServerTrusted(final X509Certificate[] a_certificates, final String a_auth_type, final SSLEngine a_engine)
+                        public void checkClientTrusted(X509Certificate[] arg0, String arg1, Socket arg2) throws CertificateException
                         {
+                            // TODO Auto-generated method stub
+
                         }
-                    } }, null);
+                    };
+                context = SSLContext.getInstance("TLS");
+                context.init(null, new TrustManager[] { tm }, null);
+
+                // Add context to builder only when explicit keystore and storepass are not provided
+                builder.sslContext(context);
             }
             else
             {
@@ -337,11 +355,10 @@ public class RequestManager implements Runnable
             if (cmdArg.ciphers != null)
                 params.setCipherSuites(cmdArg.ciphers.split(","));
             params.setProtocols((cmdArg.tlsVersion == null) ? SSL_PARAMS_DEFAULT_PROTOCOLS : new String[] { "TLSv" + cmdArg.tlsVersion });
-
-            builder.sslContext(context)
-                .sslParameters(params);
+            builder.sslParameters(params);
         }
         return builder.build();
+
     }
 
     /**
