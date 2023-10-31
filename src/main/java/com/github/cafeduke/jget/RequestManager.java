@@ -101,7 +101,7 @@ public class RequestManager implements Runnable
 
     public static final HttpClient.Version DEFAULT_HTTP_VERSION = HttpClient.Version.HTTP_1_1;
 
-    public static final String[] SSL_PARAMS_DEFAULT_PROTOCOLS = new String[] { "TLSv1.2", "TLSv1.1" };
+    public static final String[] SSL_PARAMS_DEFAULT_PROTOCOLS = new String[] { "TLSv1.3", "TLSv1.2", "TLSv1.1" };
 
     /**
      * Create a request manager instance.

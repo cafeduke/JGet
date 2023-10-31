@@ -1,0 +1,19 @@
+##
+# [Date][Verbosity][Class][Method][ThreadId]
+# [Message]
+##
+
+[2023-10-26T13:49:05+0530] [INFO] [com.github.cafeduke.jget.JGet] [sendRequest] [1] 
+Executing JGet: -rco /tmp/jget.resp.txt jget.jar
+
+[2023-10-26T13:49:05+0530] [SEVERE] [com.github.cafeduke.jget.RequestManager] [sendRequest] [1] 
+Exception
+java.lang.IllegalArgumentException: Usage Error: Unknown argument 'jget.jar'
+com.github.cafeduke.jget.ArgProcessor.dieUsage(ArgProcessor.java:1007)
+com.github.cafeduke.jget.ArgProcessor.parseArg(ArgProcessor.java:829)
+com.github.cafeduke.jget.ArgProcessor.processArg(ArgProcessor.java:608)
+com.github.cafeduke.jget.RequestManager.sendRequest(RequestManager.java:157)
+com.github.cafeduke.jget.JGet.sendRequest(JGet.java:151)
+com.github.cafeduke.jget.JGet.sendRequest(JGet.java:135)
+com.github.cafeduke.jget.JGet.main(JGet.java:111)
+
