@@ -1,7 +1,10 @@
 # JGet
-A Java HTTP library/tool to send HTTP/1.1 and HTTP/2 reqeusts sequentially or in parallel. 
+A Java HTTP library/tool to send HTTP/1.1 and HTTP/2 requests sequentially or in parallel. 
 - JGet supports various request methods (GET, HEAD, POST, PUT, DELETE, OPTIONS). 
-- JGet supports forcing custom http protocol, TLS version and cipher list.
+- JGet supports forcing given http protocol, TLS version and cipher list.
+- Parallel request modes
+   - JGet mode MSC (Multiple Similar Clients): Create 'n' threads each requesting the same URL
+   - JGet mode MUC (Multiple Unique  Clients): Create 'n' threads one per URL read from input file
 
 # Pre-requisite
 JDK11+
