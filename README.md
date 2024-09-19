@@ -1,5 +1,7 @@
 # JGet
-A Java HTTP library/tool to send HTTP/1.1 and HTTP/2 reqeusts
+A Java HTTP library/tool to send HTTP/1.1 and HTTP/2 reqeusts sequentially or in parallel. 
+- JGet supports various request methods (GET, HEAD, POST, PUT, DELETE, OPTIONS). 
+- JGet supports forcing custom http protocol, TLS version and cipher list.
 
 # Pre-requisite
 JDK11+
@@ -43,4 +45,75 @@ set-cookie: 1P_JAR=2022-09-22-11; expires=Sat, 22-Oct-2022 11:16:31 GMT; path=/;
 vary: Accept-Encoding
 x-frame-options: SAMEORIGIN
 x-xss-protection: 0
+```
+# Options
+```bash
+Usage:
+java JGet
+     [-v|-version]
+     [-u <URL>]
+     [-f <File having URLs>]
+     [
+        -h|-host <Host name> -p|-port <Port>
+        [-f <File having URIs>]
+        [-uri <URI>]
+     ]
+     [-login <Login> -password <Password>]
+     [-proxyHost|-proxy <ProxyHost:ProxyPort> ]
+     [-proxyAuth <Username:Password> ]
+     [
+        -ssl
+        -keystore <Path to Java Key Store (JKS)>
+        -storepass <Password to access JKS>
+     ]
+     [-http <HTTP protocol version 2|1.1> ]
+     [-ciphers <cipher1>[,<cipher2>,<cipher3>...<cipherN>]]
+     [-tls <tls version Eg: 1.3|1.2|1.1|1>]
+     [-H|-hostHeader <Host header>]
+     [-c|-cookie <Cookie header>]
+     [-e|-encoding <Accept-Encoding header>]
+     [-inm <If-None-Match header>]
+     [-ims <If-Modified-Since header>]
+     [-R|-range <Range header>]
+     [-b|-browser <User-Agent header>]
+     [-cert|-clientCert <SSL-Client-Cert header>]
+     [-k|-keepAlive <Connection header>]
+     [-s|-stdout <Standard ouput>]
+     [-o|-output <Overwrite file>]
+     [-a|-append <Append file>]
+     [-q|-quiet <Quiet mode>]
+     [-get (Use HTTP method GET)]
+     [-P|-post (Use HTTP method POST)]
+     [-head (Use HTTP method HEAD)]
+     [-put (Use HTTP method PUT)]
+     [-delete (Use HTTP method DELETE)]
+     [-trace (Use HTTP method TRACE)]
+     [-options (Use HTTP method OPTIONS)]
+     [-pb|-postBody <Post body>]
+     [-chunklen <Number of bytes each chunked request body should have> ]
+     [-byteSendDelay <Time in milliseonds to sleep after sending each byte of post body> ]
+     [-byteReceiveDelay <Time in milliseonds to sleep after receiving each byte of response body> ]
+     [-pbf|-postBodyFile <post1>[|<post2>|<post3>...<postN>]] (Files having post body)
+     [(-hdr|-header <Header name>:<Header value> )*] (Any number of occurence of header argument)
+     [-rqh|-requestHeaderFile <req1>[,<req1>,<req3>...<reqN>]] (Files having request headers)
+     [
+        -sh|-showHeader
+        [
+         -sah|-showAllHeader <Show All Headers>
+         -sph<h1>[,<h2>,<h3>...<hN> (Show Perticular Headers)
+        ]
+        -ho|-headerOutput<Filename to store response headers>
+     ]
+     [-rco|-respCodeOutput <Filename to store response code per request>]
+     [-n|-threadCount <Number of threads>]
+     [-r|-repeat <Number of sequential repeated requests per thread>]
+     [-mode SC | MSC | MUC ]
+     [-meta|-metaData (Record meta data. Stored in <output file>.jget.properties)]
+     [-socketTimeout <Socket timeout in milliseconds for each thread> ]
+     [-respBodyTimeout <Timeout after which all threads shall abort processing of response body.
+                       Applicable with MSC/MUC only.>
+     [-disableFollowRedirect (Do not follow redirection. Default=false) ]
+     [-nonBlock (Send non-blocking request. Default=false) ]
+     [-disableErrorLog (Disable logging error messages. Default=false) ]
+     [-disableClientId (Do not send the OtdClientId header. Default=false)]
 ```
