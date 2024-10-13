@@ -2,3 +2,4 @@
 .settings/
 *.zip
 JGet.log
+.vscode/

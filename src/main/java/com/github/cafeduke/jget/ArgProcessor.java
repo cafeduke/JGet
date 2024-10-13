@@ -27,13 +27,11 @@ import com.github.cafeduke.jget.common.Util;
  *
  * @author Raghunandan.Seshadri
  */
-public class ArgProcessor
-{
+public class ArgProcessor {
     /**
      * An enumeration of standard HTTP Headers supported using arguments.
      */
-    public enum HttpHeader
-    {
+    public enum HttpHeader {
         /**
          * HTTP header -- Host
          */
@@ -80,10 +78,8 @@ public class ArgProcessor
         KEEP_ALIVE;
 
         @Override
-        public String toString()
-        {
-            switch (this)
-            {
+        public String toString() {
+            switch (this) {
                 case HOST:
                     return "Host";
                 case COOKIE:
@@ -110,10 +106,8 @@ public class ArgProcessor
         /**
          * @return Return the JGet switch/options for the HTTP header
          */
-        public String toArg()
-        {
-            switch (this)
-            {
+        public String toArg() {
+            switch (this) {
                 case HOST:
                     return "-H|-hostHeader";
                 case COOKIE:
@@ -141,8 +135,7 @@ public class ArgProcessor
     /**
      * An enumeration of standard HTTP Methods supported using arguments.
      */
-    public static enum HttpMethod
-    {
+    public static enum HttpMethod {
         /**
          * HTTP method -- Get
          */
@@ -181,10 +174,8 @@ public class ArgProcessor
         /**
          * @return Return the JGet switch/options for the HTTP method
          */
-        public String toArg()
-        {
-            switch (this)
-            {
+        public String toArg() {
+            switch (this) {
                 case GET:
                     return "-get";
                 case POST:
@@ -208,8 +199,7 @@ public class ArgProcessor
     /**
      * An enumeration of output modes.
      */
-    public static enum OutputMode
-    {
+    public static enum OutputMode {
         /**
          * Write output to standard output
          */
@@ -233,10 +223,8 @@ public class ArgProcessor
         /**
          * @return Return the JGet switch/options for the output mode
          */
-        public String toArg()
-        {
-            switch (this)
-            {
+        public String toArg() {
+            switch (this) {
                 case STDOUT:
                     return "-s|-stdout";
                 case FILE_WRITE:
@@ -251,10 +239,8 @@ public class ArgProcessor
         }
 
         @Override
-        public String toString()
-        {
-            switch (this)
-            {
+        public String toString() {
+            switch (this) {
                 case STDOUT:
                     return "Standard ouput";
                 case FILE_WRITE:
@@ -277,8 +263,7 @@ public class ArgProcessor
      * <li>MUC = Multiple Unique Clients
      * </ul>
      */
-    public static enum MultiThreadMode
-    {
+    public static enum MultiThreadMode {
         /**
          * Single thread {@link SingleClient Client}
          */
@@ -309,7 +294,7 @@ public class ArgProcessor
     /**
      * The JGet version string
      */
-    public static final String JGET_VERSION_STRING = "1.6";
+    public static final String JGET_VERSION_STRING = "1.7";
     private boolean showVersion = false;
 
     /**
@@ -500,7 +485,8 @@ public class ArgProcessor
     boolean showAllResponseHeader = false;
 
     /**
-     * Only the response headers mentioned in the list will be included in the output.
+     * Only the response headers mentioned in the list will be included in the
+     * output.
      */
     public static final String SHOW_PARTICULAR_HEADER = "-sph";
     List<String> listParticularHeader = new ArrayList<String>();
@@ -530,12 +516,15 @@ public class ArgProcessor
     boolean recordMetaData = false;
 
     /**
-     * Default socket {@link java.net.http.HttpRequest.Builder#timeout(java.time.Duration) timeout}.
+     * Default socket
+     * {@link java.net.http.HttpRequest.Builder#timeout(java.time.Duration)
+     * timeout}.
      */
     public static final int DEFAULT_SOCKET_TIMEOUT = 2 * 60 * 60 * 1000;
 
     /**
-     * Socket {@link java.net.http.HttpRequest.Builder#timeout(java.time.Duration) timeout}.
+     * Socket {@link java.net.http.HttpRequest.Builder#timeout(java.time.Duration)
+     * timeout}.
      */
     public static final String SOCKET_TIMEOUT = "-socketTimeout";
     int timeoutSocket = DEFAULT_SOCKET_TIMEOUT;
@@ -553,7 +542,8 @@ public class ArgProcessor
     int timeoutRespBody = DEFAULT_RESPONSE_BODY_TIMEOUT;
 
     /**
-     * If true, HTTP redirects (requests with response code 3xx) will be automatically followed.
+     * If true, HTTP redirects (requests with response code 3xx) will be
+     * automatically followed.
      */
     public static final String DISABLE_FOLLOW_REDIRECT = "-disableFollowRedirect";
     boolean followRedirect = true;
@@ -590,31 +580,28 @@ public class ArgProcessor
      *
      * @param arg arguments to process
      */
-    public ArgProcessor(String arg[])
-    {
+    public ArgProcessor(String arg[]) {
         this.arg = arg;
     }
 
     /**
      * @return Returns true if argument processing is successful, false otherwise
-     * @throws KeyManagementException Exceptions parsing arguments
-     * @throws KeyStoreException Exceptions parsing arguments
+     * @throws KeyManagementException   Exceptions parsing arguments
+     * @throws KeyStoreException        Exceptions parsing arguments
      * @throws NoSuchAlgorithmException Exceptions parsing arguments
-     * @throws CertificateException Exceptions parsing arguments
-     * @throws IOException Exceptions parsing arguments
+     * @throws CertificateException     Exceptions parsing arguments
+     * @throws IOException              Exceptions parsing arguments
      */
-    public boolean processArg() throws KeyManagementException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
-    {
+    public boolean processArg() throws KeyManagementException, KeyStoreException, NoSuchAlgorithmException,
+            CertificateException, IOException {
         parseArg();
 
-        if (arg.length == 0 || showHelp == true)
-        {
+        if (arg.length == 0 || showHelp == true) {
             usage();
             return false;
         }
 
-        if (showVersion == true)
-        {
+        if (showVersion == true) {
             System.out.println("JGet HTTP Client v" + JGET_VERSION_STRING);
             return false;
         }
@@ -624,198 +611,113 @@ public class ArgProcessor
         return true;
     }
 
-    private void parseArg() throws MalformedURLException, FileNotFoundException
-    {
+    private void parseArg() throws MalformedURLException, FileNotFoundException {
         HttpHeader currHeader = null;
         HttpMethod currMethod = null;
         OutputMode currOutputMode = null;
 
-        for (int index = 0; index < arg.length; index++)
-        {
+        for (int index = 0; index < arg.length; index++) {
             String currArg = arg[index];
 
-            if (currArg.matches(JGET_VERSION))
-            {
+            if (currArg.matches(JGET_VERSION)) {
                 showVersion = true;
                 index++;
-            }
-            else if (currArg.matches(HELP))
-            {
+            } else if (currArg.matches(HELP)) {
                 showHelp = true;
                 index++;
-            }
-            else if (currArg.matches(URL))
-            {
+            } else if (currArg.matches(URL)) {
                 url = validateArgUrl(arg, index++);
                 if (url.getProtocol()
-                    .equalsIgnoreCase("https"))
+                        .equalsIgnoreCase("https"))
                     isSSL = true;
-            }
-            else if (currArg.matches(URI_FILE))
-            {
+            } else if (currArg.matches(URI_FILE)) {
                 fileURI = validateArgFile(arg, index++);
-            }
-            else if (currArg.matches(HOST))
-            {
+            } else if (currArg.matches(HOST)) {
                 host = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(PORT))
-            {
+            } else if (currArg.matches(PORT)) {
                 port = validateArgLong(arg, index++);
-            }
-            else if (currArg.matches(URI))
-            {
+            } else if (currArg.matches(URI)) {
                 uri = Util.getSwitchValue(arg, index++);
-            }
-            else if ((currHeader = isHttpHeader(currArg)) != null)
-            {
+            } else if ((currHeader = isHttpHeader(currArg)) != null) {
                 if (currHeader == HttpHeader.RANGE)
                     mapHeaderValue.put(currHeader.toString(), "bytes=" + Util.getSwitchValue(arg, index++));
                 else if (currHeader == HttpHeader.KEEP_ALIVE)
                     mapHeaderValue.put(currHeader.toString(), "Keep-Alive");
                 else
                     mapHeaderValue.put(currHeader.toString(), Util.getSwitchValue(arg, index++));
-            }
-            else if (currArg.matches(LOGIN_NAME))
-            {
+            } else if (currArg.matches(LOGIN_NAME)) {
                 login = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(PASSWORD))
-            {
+            } else if (currArg.matches(PASSWORD)) {
                 password = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(PROXY_HOST))
-            {
+            } else if (currArg.matches(PROXY_HOST)) {
                 proxyHost = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(PROXY_AUTH))
-            {
+            } else if (currArg.matches(PROXY_AUTH)) {
                 proxyAuth = Util.getSwitchValue(arg, index++);
-            }
-            else if ((currMethod = isHttpMethod(currArg)) != null)
-            {
+            } else if ((currMethod = isHttpMethod(currArg)) != null) {
                 httpMethod = currMethod;
-            }
-            else if (currArg.matches(POST_BODY))
-            {
+            } else if (currArg.matches(POST_BODY)) {
                 httpMethod = HttpMethod.POST;
                 postBody = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(POST_BODY_FILE))
-            {
+            } else if (currArg.matches(POST_BODY_FILE)) {
                 httpMethod = HttpMethod.POST;
                 listPostBodyFile = validateArgFiles(arg, index++);
-            }
-            else if (currArg.matches(CHUNK_LEN))
-            {
+            } else if (currArg.matches(CHUNK_LEN)) {
                 chunkLen = validateArgInteger(arg, index++);
-            }
-            else if (currArg.matches(POST_BODY_BYTE_SEND_DELAY))
-            {
+            } else if (currArg.matches(POST_BODY_BYTE_SEND_DELAY)) {
                 byteSendDelay = validateArgInteger(arg, index++);
-            }
-            else if (currArg.matches(SSL))
-            {
+            } else if (currArg.matches(SSL)) {
                 isSSL = true;
-            }
-            else if (currArg.matches(KEYSTORE))
-            {
+            } else if (currArg.matches(KEYSTORE)) {
                 fileKeystore = validateArgFile(arg, index++);
-            }
-            else if (currArg.matches(KEYSTORE_PASSWORD))
-            {
+            } else if (currArg.matches(KEYSTORE_PASSWORD)) {
                 passwordKeyStore = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(CIPHERS))
-            {
+            } else if (currArg.matches(CIPHERS)) {
                 ciphers = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(TLS_VERSION))
-            {
+            } else if (currArg.matches(TLS_VERSION)) {
                 tlsVersion = Util.getSwitchValue(arg, index++);
-            }
-            else if ((currOutputMode = isOutputMode(currArg)) != null)
-            {
+            } else if ((currOutputMode = isOutputMode(currArg)) != null) {
                 outputMode = currOutputMode;
                 if (currOutputMode == OutputMode.FILE_WRITE || currOutputMode == OutputMode.FILE_APPEND)
                     outputFile = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(THREAD_REPEAT_COUNT))
-            {
+            } else if (currArg.matches(THREAD_REPEAT_COUNT)) {
                 repeatCountPerThread = validateArgInteger(arg, index++);
-            }
-            else if (currArg.matches(HEADER_OUTPUT_FILE))
-            {
+            } else if (currArg.matches(HEADER_OUTPUT_FILE)) {
                 outputFileHeader = Util.getSwitchValue(arg, index++);
-            }
-            else if (currArg.matches(RESPONSE_CODE_OUTPUT))
-            {
+            } else if (currArg.matches(RESPONSE_CODE_OUTPUT)) {
                 fileRespCode = new File(Util.getSwitchValue(arg, index++));
-            }
-            else if (currArg.matches(SHOW_HEADER))
-            {
+            } else if (currArg.matches(SHOW_HEADER)) {
                 showResponseHeader = true;
-            }
-            else if (currArg.matches(SHOW_ALL_HEADER))
-            {
+            } else if (currArg.matches(SHOW_ALL_HEADER)) {
                 showResponseHeader = true;
                 showAllResponseHeader = true;
-            }
-            else if (currArg.matches(RECORD_META_DATA))
-            {
+            } else if (currArg.matches(RECORD_META_DATA)) {
                 recordMetaData = true;
-            }
-            else if (currArg.matches(MULTI_THREAD_MODE))
-            {
+            } else if (currArg.matches(MULTI_THREAD_MODE)) {
                 multiThreadMode = Enum.valueOf(MultiThreadMode.class, Util.getSwitchValue(arg, index++));
-            }
-            else if (currArg.matches(THREAD_COUNT))
-            {
+            } else if (currArg.matches(THREAD_COUNT)) {
                 threadCount = validateArgInteger(arg, index++);
-            }
-            else if (currArg.matches(REQUEST_HEADER))
-            {
+            } else if (currArg.matches(REQUEST_HEADER)) {
                 listHeader.add(Util.getSwitchValue(arg, index++));
-            }
-            else if (currArg.matches(REQUEST_HEADER_FILE))
-            {
+            } else if (currArg.matches(REQUEST_HEADER_FILE)) {
                 listRequestHeaderFile = validateArgFiles(arg, index++);
-            }
-            else if (currArg.matches(SHOW_PARTICULAR_HEADER))
-            {
+            } else if (currArg.matches(SHOW_PARTICULAR_HEADER)) {
                 showResponseHeader = true;
                 listParticularHeader = validateArgStrings(arg, index++);
-            }
-            else if (currArg.matches(SOCKET_TIMEOUT))
-            {
+            } else if (currArg.matches(SOCKET_TIMEOUT)) {
                 timeoutSocket = validateArgInteger(arg, index++);
-            }
-            else if (currArg.matches(RESPONSE_BODY_TIMEOUT))
-            {
+            } else if (currArg.matches(RESPONSE_BODY_TIMEOUT)) {
                 timeoutRespBody = validateArgInteger(arg, index++);
-            }
-            else if (currArg.matches(DISABLE_FOLLOW_REDIRECT))
-            {
+            } else if (currArg.matches(DISABLE_FOLLOW_REDIRECT)) {
                 followRedirect = false;
-            }
-            else if (currArg.matches(NON_BLOCKING_REQUEST))
-            {
+            } else if (currArg.matches(NON_BLOCKING_REQUEST)) {
                 blockRequest = false;
-            }
-            else if (currArg.matches(DISABLE_CLIENT_ID))
-            {
+            } else if (currArg.matches(DISABLE_CLIENT_ID)) {
                 sendClientId = false;
-            }
-            else if (currArg.matches(DISABLE_ERROR_LOG))
-            {
+            } else if (currArg.matches(DISABLE_ERROR_LOG)) {
                 enableErrorLog = false;
-            }
-            else if (currArg.matches(ENABLE_SESSION_BINDING))
-            {
+            } else if (currArg.matches(ENABLE_SESSION_BINDING)) {
                 enableSessionBinding = true;
-            }
-            else if (currArg.matches(HTTP_PROTOCOL_VERSION))
-            {
+            } else if (currArg.matches(HTTP_PROTOCOL_VERSION)) {
                 String version = Util.getSwitchValue(arg, index++);
                 if (version.equals("1.1"))
                     httpVersion = HttpClient.Version.HTTP_1_1;
@@ -823,16 +725,13 @@ public class ArgProcessor
                     httpVersion = HttpClient.Version.HTTP_2;
                 else
                     dieUsage("Option " + HTTP_PROTOCOL_VERSION + " must be 2 or 1.1 CurrentValue=" + version);
-            }
-            else
-            {
+            } else {
                 dieUsage("Unknown argument '" + currArg + "'");
             }
         }
     }
 
-    private void parseSystemArg()
-    {
+    private void parseSystemArg() {
         String propValue = null;
         if ((propValue = System.getProperty("javax.net.ssl.keyStore")) != null)
             fileKeystore = new File(propValue);
@@ -852,17 +751,13 @@ public class ArgProcessor
      * @throws NoSuchAlgorithmException
      * @throws KeyManagementException
      */
-    private void validateUsage() throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException, KeyManagementException
-    {
-        if (fileURI == null)
-        {
-            if (url == null)
-            {
+    private void validateUsage() throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
+            KeyManagementException {
+        if (fileURI == null) {
+            if (url == null) {
                 if (host == null || port == null || uri == null)
                     dieUsage("MUST specify ONE among (1) URL, (2) Host, Port and URI (3)URI file");
-            }
-            else
-            {
+            } else {
                 if (host != null || port != null || uri != null)
                     dieUsage("Specify only ONE among (1) URL, (2) Host, Port and URI (3)URI file");
             }
@@ -877,43 +772,43 @@ public class ArgProcessor
          * (-pb) is specified log error and exit - If neither of them is specified
          * then default to (-pb) with "" as post body
          */
-        if (httpMethod == HttpMethod.POST)
-        {
+        if (httpMethod == HttpMethod.POST) {
             if (postBody != null && listPostBodyFile.size() > 0)
-                dieUsage("Only ONE among postbody (" + POST_BODY + ") OR post body file (" + POST_BODY_FILE + ") has to be used");
+                dieUsage("Only ONE among postbody (" + POST_BODY + ") OR post body file (" + POST_BODY_FILE
+                        + ") has to be used");
 
             if (postBody == null && (listPostBodyFile == null || listPostBodyFile.size() == 0))
                 postBody = "";
         }
 
         /* Thread modes */
-        if (multiThreadMode == MultiThreadMode.MUC)
-        {
+        if (multiThreadMode == MultiThreadMode.MUC) {
             if (fileURI == null)
                 dieUsage("Input URI file MUST be specified for mode " + MultiThreadMode.MUC);
         }
 
-        if (multiThreadMode == MultiThreadMode.MSC || multiThreadMode == MultiThreadMode.MUC)
-        {
-            int numberOfThread = (multiThreadMode == MultiThreadMode.MSC) ? threadCount : FileUtils.readLines(fileURI, Charset.defaultCharset())
-                .size();
+        if (multiThreadMode == MultiThreadMode.MSC || multiThreadMode == MultiThreadMode.MUC) {
+            int numberOfThread = (multiThreadMode == MultiThreadMode.MSC) ? threadCount
+                    : FileUtils.readLines(fileURI, Charset.defaultCharset())
+                            .size();
             int numberOfPostBodyFile = listPostBodyFile.size();
             int numberOfRequestHeaderFile = listRequestHeaderFile.size();
 
             if (numberOfPostBodyFile > numberOfThread)
-                dieUsage("Number of PostBodyFiles :" + numberOfPostBodyFile + " exceeds NumberOfThreads :" + numberOfThread);
+                dieUsage("Number of PostBodyFiles :" + numberOfPostBodyFile + " exceeds NumberOfThreads :"
+                        + numberOfThread);
 
             if (numberOfRequestHeaderFile > numberOfThread)
-                dieUsage("Number of ReqHeaderFiles :" + numberOfRequestHeaderFile + " exceeds NumberOfThreads :" + numberOfThread);
+                dieUsage("Number of ReqHeaderFiles :" + numberOfRequestHeaderFile + " exceeds NumberOfThreads :"
+                        + numberOfThread);
         }
 
         if (url != null && url.getProtocol()
-            .equalsIgnoreCase("https"))
+                .equalsIgnoreCase("https"))
             isSSL = true;
 
         /* Keystore */
-        if (isSSL)
-        {
+        if (isSSL) {
             /**
              * Note: ^ is an XOR operator
              * If a, b are two expressions then a ^ b is true when
@@ -925,8 +820,7 @@ public class ArgProcessor
         }
     }
 
-    private HttpHeader isHttpHeader(String currArg)
-    {
+    private HttpHeader isHttpHeader(String currArg) {
         for (HttpHeader currHeader : HttpHeader.values())
             if (currArg.matches(currHeader.toArg()))
                 return currHeader;
@@ -934,59 +828,50 @@ public class ArgProcessor
         return null;
     }
 
-    private HttpMethod isHttpMethod(String currArg)
-    {
+    private HttpMethod isHttpMethod(String currArg) {
         for (HttpMethod currMethod : HttpMethod.values())
             if (currArg.matches(currMethod.toArg()))
                 return currMethod;
         return null;
     }
 
-    private OutputMode isOutputMode(String currArg)
-    {
+    private OutputMode isOutputMode(String currArg) {
         for (OutputMode currOutputMode : OutputMode.values())
             if (currArg.matches(currOutputMode.toArg()))
                 return currOutputMode;
         return null;
     }
 
-    private static URL validateArgUrl(String arg[], int index) throws MalformedURLException
-    {
+    private static URL validateArgUrl(String arg[], int index) throws MalformedURLException {
         return new URL(Util.getSwitchValue(arg, index));
     }
 
-    private static int validateArgInteger(String arg[], int index)
-    {
+    private static int validateArgInteger(String arg[], int index) {
         return Integer.parseInt(Util.getSwitchValue(arg, index));
     }
 
-    private static Long validateArgLong(String arg[], int index)
-    {
+    private static Long validateArgLong(String arg[], int index) {
         return Long.parseLong(Util.getSwitchValue(arg, index));
     }
 
-    private static List<String> validateArgStrings(String arg[], int index)
-    {
+    private static List<String> validateArgStrings(String arg[], int index) {
         return Arrays.asList(Util.getSwitchValue(arg, index)
-            .split(","));
+                .split(","));
     }
 
-    private static File validateArgFile(String arg[], int index) throws FileNotFoundException
-    {
+    private static File validateArgFile(String arg[], int index) throws FileNotFoundException {
         File file = new File(Util.getSwitchValue(arg, index));
         if (!file.exists())
             throw new FileNotFoundException("File  " + file.getAbsolutePath() + " not found");
         return file;
     }
 
-    private static List<File> validateArgFiles(String arg[], int index) throws FileNotFoundException
-    {
+    private static List<File> validateArgFiles(String arg[], int index) throws FileNotFoundException {
         String filename[] = Util.getSwitchValue(arg, index)
-            .split(",");
+                .split(",");
         List<File> listFile = new ArrayList<File>();
 
-        for (String currFilename : filename)
-        {
+        for (String currFilename : filename) {
             File file = new File(currFilename);
             if (!file.exists())
                 throw new FileNotFoundException("File  " + file.getAbsolutePath() + " not found");
@@ -1000,8 +885,7 @@ public class ArgProcessor
      *
      * @param mesg
      */
-    private static void dieUsage(String mesg)
-    {
+    private static void dieUsage(String mesg) {
         System.out.println("Usage Error :" + mesg);
         usage();
         throw new IllegalArgumentException("Usage Error: " + mesg);
@@ -1010,8 +894,7 @@ public class ArgProcessor
     /**
      * Print Usage and exit
      */
-    private static void usage()
-    {
+    private static void usage() {
         StringBuilder builder = new StringBuilder();
         builder.append("Usage:" + Util.LineSep);
         builder.append("java JGet" + Util.LineSep);
@@ -1023,7 +906,8 @@ public class ArgProcessor
         builder.append("        [" + ArgProcessor.URI_FILE + " <File having URIs>]" + Util.LineSep);
         builder.append("        [" + ArgProcessor.URI + " <URI>]" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.LOGIN_NAME + " <Login> " + ArgProcessor.PASSWORD + " <Password>]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.LOGIN_NAME + " <Login> " + ArgProcessor.PASSWORD + " <Password>]"
+                + Util.LineSep);
         builder.append("     [" + ArgProcessor.PROXY_HOST + " <ProxyHost:ProxyPort> ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.PROXY_AUTH + " <Username:Password> ]" + Util.LineSep);
 
@@ -1032,8 +916,10 @@ public class ArgProcessor
         builder.append("        " + ArgProcessor.KEYSTORE + " <Path to Java Key Store (JKS)>" + Util.LineSep);
         builder.append("        " + ArgProcessor.KEYSTORE_PASSWORD + " <Password to access JKS>" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.HTTP_PROTOCOL_VERSION + " <HTTP protocol version 2|1.1> ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.CIPHERS + " <cipher1>[,<cipher2>,<cipher3>...<cipherN>]]" + Util.LineSep);
+        builder.append(
+                "     [" + ArgProcessor.HTTP_PROTOCOL_VERSION + " <HTTP protocol version 2|1.1> ]" + Util.LineSep);
+        builder.append(
+                "     [" + ArgProcessor.CIPHERS + " <cipher1>[,<cipher2>,<cipher3>...<cipherN>]]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.TLS_VERSION + " <tls version Eg: 1.3|1.2|1.1|1>]" + Util.LineSep);
 
         for (HttpHeader currHeader : HttpHeader.values())
@@ -1043,41 +929,59 @@ public class ArgProcessor
             builder.append("     [" + currMode.toArg() + " <" + currMode.toString() + ">]" + Util.LineSep);
 
         for (HttpMethod currMethod : HttpMethod.values())
-            builder.append("     [" + currMethod.toArg() + " (Use HTTP method " + currMethod.toString() + ")]" + Util.LineSep);
+            builder.append(
+                    "     [" + currMethod.toArg() + " (Use HTTP method " + currMethod.toString() + ")]" + Util.LineSep);
 
         builder.append("     [" + ArgProcessor.POST_BODY + " <Post body>]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.CHUNK_LEN + " <Number of bytes each chunked request body should have> ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.POST_BODY_BYTE_SEND_DELAY + " <Time in milliseonds to sleep after sending each byte of post body> ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.POST_BODY_BYTE_RECEIVE_DELAY + " <Time in milliseonds to sleep after receiving each byte of response body> ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.POST_BODY_FILE + " <post1>[|<post2>|<post3>...<postN>]] (Files having post body)" + Util.LineSep);
-        builder.append("     [(" + ArgProcessor.REQUEST_HEADER + " <Header name>:<Header value> )*] (Any number of occurence of header argument)" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.REQUEST_HEADER_FILE + " <req1>[,<req1>,<req3>...<reqN>]] (Files having request headers)" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.CHUNK_LEN + " <Number of bytes each chunked request body should have> ]"
+                + Util.LineSep);
+        builder.append("     [" + ArgProcessor.POST_BODY_BYTE_SEND_DELAY
+                + " <Time in milliseonds to sleep after sending each byte of post body> ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.POST_BODY_BYTE_RECEIVE_DELAY
+                + " <Time in milliseonds to sleep after receiving each byte of response body> ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.POST_BODY_FILE
+                + " <post1>[|<post2>|<post3>...<postN>]] (Files having post body)" + Util.LineSep);
+        builder.append("     [(" + ArgProcessor.REQUEST_HEADER
+                + " <Header name>:<Header value> )*] (Any number of occurence of header argument)" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.REQUEST_HEADER_FILE
+                + " <req1>[,<req1>,<req3>...<reqN>]] (Files having request headers)" + Util.LineSep);
         builder.append("     [" + Util.LineSep);
         builder.append("        " + ArgProcessor.SHOW_HEADER + Util.LineSep);
         builder.append("        [" + Util.LineSep);
         builder.append("         " + ArgProcessor.SHOW_ALL_HEADER + " <Show All Headers>" + Util.LineSep);
-        builder.append("         " + ArgProcessor.SHOW_PARTICULAR_HEADER + "<h1>[,<h2>,<h3>...<hN> (Show Perticular Headers)" + Util.LineSep);
+        builder.append("         " + ArgProcessor.SHOW_PARTICULAR_HEADER
+                + "<h1>[,<h2>,<h3>...<hN> (Show Perticular Headers)" + Util.LineSep);
         builder.append("        ]" + Util.LineSep);
-        builder.append("        " + ArgProcessor.HEADER_OUTPUT_FILE + "<Filename to store response headers>" + Util.LineSep);
+        builder.append(
+                "        " + ArgProcessor.HEADER_OUTPUT_FILE + "<Filename to store response headers>" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.RESPONSE_CODE_OUTPUT + " <Filename to store response code per request>]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.RESPONSE_CODE_OUTPUT + " <Filename to store response code per request>]"
+                + Util.LineSep);
 
         builder.append("     [" + ArgProcessor.THREAD_COUNT + " <Number of threads>]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.THREAD_REPEAT_COUNT + " <Number of sequential repeated requests per thread>]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.THREAD_REPEAT_COUNT
+                + " <Number of sequential repeated requests per thread>]" + Util.LineSep);
 
         String modeValue = " ";
         for (MultiThreadMode currMode : MultiThreadMode.values())
             modeValue = modeValue + currMode.name() + " | ";
         modeValue = modeValue.substring(0, modeValue.length() - 2);
         builder.append("     [" + ArgProcessor.MULTI_THREAD_MODE + modeValue + "]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.RECORD_META_DATA + " (Record meta data. Stored in <output file>.jget.properties)]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.SOCKET_TIMEOUT + " <Socket timeout in milliseconds for each thread> ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.RESPONSE_BODY_TIMEOUT + " <Timeout after which all threads shall abort processing of response body." + Util.LineSep);
+        builder.append("     [" + ArgProcessor.RECORD_META_DATA
+                + " (Record meta data. Stored in <output file>.jget.properties)]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.SOCKET_TIMEOUT + " <Socket timeout in milliseconds for each thread> ]"
+                + Util.LineSep);
+        builder.append("     [" + ArgProcessor.RESPONSE_BODY_TIMEOUT
+                + " <Timeout after which all threads shall abort processing of response body." + Util.LineSep);
         builder.append("                       Applicable with MSC/MUC only.>" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.DISABLE_FOLLOW_REDIRECT + " (Do not follow redirection. Default=false) ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.NON_BLOCKING_REQUEST + " (Send non-blocking request. Default=false) ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.DISABLE_ERROR_LOG + " (Disable logging error messages. Default=false) ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.DISABLE_CLIENT_ID + " (Do not send the OtdClientId header. Default=false)]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.DISABLE_FOLLOW_REDIRECT + " (Do not follow redirection. Default=false) ]"
+                + Util.LineSep);
+        builder.append("     [" + ArgProcessor.NON_BLOCKING_REQUEST + " (Send non-blocking request. Default=false) ]"
+                + Util.LineSep);
+        builder.append("     [" + ArgProcessor.DISABLE_ERROR_LOG + " (Disable logging error messages. Default=false) ]"
+                + Util.LineSep);
+        builder.append("     [" + ArgProcessor.DISABLE_CLIENT_ID
+                + " (Do not send the OtdClientId header. Default=false)]" + Util.LineSep);
         System.out.println(builder.toString());
     }
 }
