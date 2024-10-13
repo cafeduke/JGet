@@ -10,16 +10,17 @@ A Java HTTP library/tool to send HTTP/1.1 and HTTP/2 requests sequentially or in
 JDK11+
 
 # Install
-- Download the latest `jget-<version>.zip` from [Releases](https://github.com/cafeduke/JGet/releases)
-- Extract archive to an empty directory (say $HOME/Programs/JGet)
-- Provide execute permission to `$HOME/Programs/JGet/bin/*`
+- Download and install the latest version of JGet to `$HOME/Programs/JGet`
 
 ```bash
-wget -q https://github.com/cafeduke/JGet/releases/download/v1.0/jget-1.0.zip -O /tmp/jget.zip \
+wget -q https://github.com/cafeduke/JGet/releases/latest/download/jget.zip -O /tmp/jget.zip \
+   && mkdir -p $HOME/Programs \
    && unzip -q /tmp/jget.zip -d $HOME/Programs/JGet \
    && chmod 755 $HOME/Programs/JGet/bin/* \
-   && rm /tmp/jget.zip 
+   && rm /tmp/jget.zip
 ```
+- Update $HOME/.profile to add `$HOME/Programs/JGet/bin` to PATH
+
 # Sample request
 
 ```bash
