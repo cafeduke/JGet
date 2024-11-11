@@ -18,7 +18,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CyclicBarrier;
@@ -407,24 +406,23 @@ public class RequestManager implements Runnable
             message = "ResponseCode=" + respCode[0] + Util.LineSep;
         else
         {
-            List<String> listRange = new ArrayList<String>();
+            StringBuilder builder = new StringBuilder();
 
             int rangeBegin = -1, rangeRespCode = -1;
+            message = "RequestRange-ResponseCode" + Util.LineSep;
+
             for (int i = 0; i < respCode.length; ++i)
             {
                 if (respCode[i] != rangeRespCode)
                 {
                     if (rangeRespCode != -1)
-                        listRange.add(rangeBegin + "-" + i + "=" + rangeRespCode);
+                        builder.append(rangeBegin).append("-").append(i).append("=").append(rangeRespCode).append(Util.LineSep);
                     rangeRespCode = respCode[i];
                     rangeBegin = (i + 1);
                 }
             }
-            listRange.add(rangeBegin + "-" + respCode.length + "=" + rangeRespCode);
-            message = "RequestRange-ResponseCode" + Util.LineSep;
-            message = message + listRange.toString()
-                .replaceAll("[\\[\\]]", "")
-                .replaceAll(", ", Util.LineSep);
+            builder.append(rangeBegin).append("-").append(respCode.length).append("=").append(rangeRespCode).append(Util.LineSep);
+            message = builder.toString();
         }
         logger.info(message);
         writeRespCode(message);

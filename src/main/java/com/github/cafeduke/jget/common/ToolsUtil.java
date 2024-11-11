@@ -12,16 +12,18 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.github.cafeduke.jget.JGet;
+
 /**
- * This class has utilities required by the test tools 
- * 
- * @author CafeDuke 
+ * This class has utilities required by the test tools
+ *
+ * @author CafeDuke
  */
 public class ToolsUtil
 {
     /**
      * Validate that the value (at <b>index+1</b>) for switch (at <b>index</b>) is a valid URL.
-     * 
+     *
      * @param arg Array of arguments.
      * @param index Index of the switch.
      * @return An URL object
@@ -34,7 +36,7 @@ public class ToolsUtil
 
     /**
      * Validate that the value (at <b>index+1</b>) for switch (at <b>index</b>) is a valid Integer.
-     * 
+     *
      * @param arg Array of arguments.
      * @param index Index of the switch.
      * @return int obtained by parsing String at <b>index+1</b>
@@ -46,7 +48,7 @@ public class ToolsUtil
 
     /**
      * Validate that the value (at <b>index+1</b>) for switch (at <b>index</b>) is a valid Long.
-     * 
+     *
      * @param arg Array of arguments.
      * @param index Index of the switch.
      * @return long obtained by parsing String at <b>index+1</b>
@@ -58,7 +60,7 @@ public class ToolsUtil
 
     /**
      * Validate that the value (at <b>index+1</b>) for switch (at <b>index</b>) is comma separated list of values.
-     * 
+     *
      * @param arg Array of arguments.
      * @param index Index of the switch.
      * @return List of String.
@@ -70,7 +72,7 @@ public class ToolsUtil
 
     /**
      * Validate that the value (at <b>index+1</b>) for switch (at <b>index</b>) is a valid existing file.
-     * 
+     *
      * @param arg Array of arguments.
      * @param index Index of the switch.
      * @return File object.
@@ -86,7 +88,7 @@ public class ToolsUtil
 
     /**
      * Validate that the value (at <b>index+1</b>) for switch (at <b>index</b>) is comma separated list of valid existing files.
-     * 
+     *
      * @param arg Array of arguments.
      * @param index Index of the switch.
      * @return List of File objects.
@@ -107,9 +109,23 @@ public class ToolsUtil
         return listFile;
     }
 
+    public static Logger getDefaultLogger()
+    {
+        Logger logger = null;
+        try
+        {
+            logger = getLogger(JGet.class.getName(), File.createTempFile("jget-", ".log").getAbsolutePath());
+        }
+        catch (IOException e)
+        {
+            Util.die("Error creating tmp file for logging", e);
+        }
+        return logger;
+    }
+
     /**
      * Create a default logger to be used by tools independent of the test framework.
-     * 
+     *
      * @param loggerName Logger name - Typically path to class file.
      * @param logFilename File name to log entries.
      * @return Logger object.

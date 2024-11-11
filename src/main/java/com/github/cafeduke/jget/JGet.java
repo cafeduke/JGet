@@ -61,7 +61,7 @@ public class JGet
     /**
      * Default JGet Logger
      */
-    private static final Logger DEFAULT_LOGGER = ToolsUtil.getLogger(JGet.class.getName(), "JGet.log");
+    private static final Logger DEFAULT_LOGGER = ToolsUtil.getDefaultLogger();
 
     /**
      * JGet context
