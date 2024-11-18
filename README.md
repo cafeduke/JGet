@@ -49,7 +49,7 @@ int respCode[] = jget.sendRequest(listArg);
 
 # JGet as command line utility
 
-# Sample HTTP/1.1 request
+## HTTP/1.1 request
 
 ```bash
 > jget -q -u "https://www.google.co.in" -sh -ho head.txt
@@ -64,7 +64,7 @@ ResponseCode=200
 > grep "Status" head.txt
 Status: HTTP/1.1 200 OK
 ```
-# Sample HTTP/2 request
+## HTTP/2 request
 
 ```bash
 > jget -q -u "https://www.google.co.in" -sh -ho head.txt -http 2
@@ -79,6 +79,28 @@ ResponseCode=200
 > grep "Status" head.txt                                        
 Status: HTTP/2 200 OK
 ```
+## HTTP/2 requests in parallel
+
+```bash
+# Send 10 requests in parallel and caputure reponse headers
+> jget -q -http 2 -u "https://www.google.co.in" -mode MSC -n 10 -sh -sah -ho head.
+-------------------------------------------------------------------------------------------------
+JGet
+-------------------------------------------------------------------------------------------------
+[Mon, 18-Nov-2024 11:59:23 am] Started executing
+1-10=200
+[Mon, 18-Nov-2024 11:59:25 am] Finished executing
+[Mon, 18-Nov-2024 11:59:25 am] Time taken = 1.1305s
+
+# List header files
+> ls head.*
+head.0001.out  head.0002.out  head.0003.out  head.0004.out  head.0005.out  head.0006.out  head.0007.out  head.0008.out  head.0009.out  head.0010.out
+
+# Look for HTTP/2 in reponse header files
+> grep 'Status: HTTP/2' head.* | wc -l
+10
+```
+
 ## Options
 ```bash
 Usage:
