@@ -148,9 +148,10 @@ java JGet
      [-chunklen <Number of bytes each chunked request body should have> ]
      [-byteSendDelay <Time in milliseonds to sleep after sending each byte of post body> ]
      [-byteReceiveDelay <Time in milliseonds to sleep after receiving each byte of response body> ]
-     [-pbf|-postBodyFile <post1>[|<post2>|<post3>...<postN>]] (Files having post body)
+     [-pbf|-postBodyFile <post1>[,<post2>,<post3>...<postN>]] (Files having post body)
      [(-hdr|-header <Header name>:<Header value> )*] (Any number of occurence of header argument)
      [-rqh|-requestHeaderFile <req1>[,<req1>,<req3>...<reqN>]] (Files having request headers)
+     [-sni <sni1>[,<sni2>,<sni3>...<sniN>]] (Server Name Indicator host names)
      [
         -sh|-showHeader
         [
