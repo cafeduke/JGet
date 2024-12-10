@@ -16,6 +16,9 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.net.ssl.SNIHostName;
+import javax.net.ssl.SNIServerName;
+
 import org.apache.commons.io.FileUtils;
 
 import com.github.cafeduke.jget.common.Util;
@@ -309,7 +312,7 @@ public class ArgProcessor
     /**
      * The JGet version string
      */
-    public static final String JGET_VERSION_STRING = "1.8";
+    public static final String JGET_VERSION_STRING = "1.9";
     private boolean showVersion = false;
 
     /**
@@ -432,7 +435,15 @@ public class ArgProcessor
      * Multiple files can be provided in MultiThreadMode.
      */
     public static final String POST_BODY_FILE = "-pbf|-postBodyFile";
-    List<File> listPostBodyFile = new ArrayList<File>();
+    List<File> listPostBodyFile = new ArrayList<>();
+
+    /**
+     * SNI host names
+     * <br>
+     * Multiple SNI host names can be provided.
+     */
+    public static final String SNI_HOST_NAMES = "-sni";
+    List<SNIServerName> listSNI = new ArrayList<>();
 
     /**
      * If set, the request is sent using SSL.
@@ -710,6 +721,12 @@ public class ArgProcessor
             {
                 httpMethod = HttpMethod.POST;
                 listPostBodyFile = validateArgFiles(arg, index++);
+            }
+            else if (currArg.matches(SNI_HOST_NAMES))
+            {
+                List<String> listName = validateArgStrings(arg, index++);
+                for (String curr : listName)
+                    listSNI.add(new SNIHostName(curr));
             }
             else if (currArg.matches(CHUNK_LEN))
             {
@@ -1026,13 +1043,14 @@ public class ArgProcessor
         builder.append("     [" + ArgProcessor.JGET_VERSION + "]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URL + " <URL>]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URI_FILE + " <File having URLs>]" + Util.LineSep);
+
         builder.append("     [" + Util.LineSep);
         builder.append("        " + ArgProcessor.HOST + " <Host name> " + ArgProcessor.PORT + " <Port>" + Util.LineSep);
         builder.append("        [" + ArgProcessor.URI_FILE + " <File having URIs>]" + Util.LineSep);
         builder.append("        [" + ArgProcessor.URI + " <URI>]" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.LOGIN_NAME + " <Login> " + ArgProcessor.PASSWORD + " <Password>]"
-            + Util.LineSep);
+
+        builder.append("     [" + ArgProcessor.LOGIN_NAME + " <Login> " + ArgProcessor.PASSWORD + " <Password>]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.PROXY_HOST + " <ProxyHost:ProxyPort> ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.PROXY_AUTH + " <Username:Password> ]" + Util.LineSep);
 
@@ -1041,6 +1059,7 @@ public class ArgProcessor
         builder.append("        " + ArgProcessor.KEYSTORE + " <Path to Java Key Store (JKS)>" + Util.LineSep);
         builder.append("        " + ArgProcessor.KEYSTORE_PASSWORD + " <Password to access JKS>" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
+
         builder.append("     [" + ArgProcessor.HTTP_PROTOCOL_VERSION + " <HTTP protocol version 2|1.1> ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.CIPHERS + " <cipher1>[,<cipher2>,<cipher3>...<cipherN>]]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.TLS_VERSION + " <tls version Eg: 1.3|1.2|1.1|1>]" + Util.LineSep);
@@ -1055,52 +1074,40 @@ public class ArgProcessor
             builder.append("     [" + currMethod.toArg() + " (Use HTTP method " + currMethod.toString() + ")]" + Util.LineSep);
 
         builder.append("     [" + ArgProcessor.POST_BODY + " <Post body>]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.CHUNK_LEN + " <Number of bytes each chunked request body should have> ]"
-            + Util.LineSep);
-        builder.append("     [" + ArgProcessor.POST_BODY_BYTE_SEND_DELAY
-            + " <Time in milliseonds to sleep after sending each byte of post body> ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.POST_BODY_BYTE_RECEIVE_DELAY
-            + " <Time in milliseonds to sleep after receiving each byte of response body> ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.POST_BODY_FILE
-            + " <post1>[|<post2>|<post3>...<postN>]] (Files having post body)" + Util.LineSep);
-        builder.append("     [(" + ArgProcessor.REQUEST_HEADER
-            + " <Header name>:<Header value> )*] (Any number of occurence of header argument)" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.REQUEST_HEADER_FILE
-            + " <req1>[,<req1>,<req3>...<reqN>]] (Files having request headers)" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.CHUNK_LEN + " <Number of bytes each chunked request body should have> ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.POST_BODY_BYTE_SEND_DELAY + " <Time in milliseonds to sleep after sending each byte of post body> ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.POST_BODY_BYTE_RECEIVE_DELAY + " <Time in milliseonds to sleep after receiving each byte of response body> ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.POST_BODY_FILE + " <post1>[,<post2>,<post3>...<postN>]] (Files having post body)" + Util.LineSep);
+        builder.append("     [(" + ArgProcessor.REQUEST_HEADER + " <Header name>:<Header value> )*] (Any number of occurence of header argument)" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.REQUEST_HEADER_FILE + " <req1>[,<req1>,<req3>...<reqN>]] (Files having request headers)" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.SNI_HOST_NAMES + " <sni1>[,<sni2>,<sni3>...<sniN>]] (Server Name Indicator host names)" + Util.LineSep);
+
         builder.append("     [" + Util.LineSep);
         builder.append("        " + ArgProcessor.SHOW_HEADER + Util.LineSep);
         builder.append("        [" + Util.LineSep);
         builder.append("         " + ArgProcessor.SHOW_ALL_HEADER + " <Show All Headers>" + Util.LineSep);
-        builder.append("         " + ArgProcessor.SHOW_PARTICULAR_HEADER
-            + "<h1>[,<h2>,<h3>...<hN> (Show Perticular Headers)" + Util.LineSep);
+        builder.append("         " + ArgProcessor.SHOW_PARTICULAR_HEADER + "<h1>[,<h2>,<h3>...<hN> (Show Perticular Headers)" + Util.LineSep);
         builder.append("        ]" + Util.LineSep);
+
         builder.append("        " + ArgProcessor.HEADER_OUTPUT_FILE + "<Filename to store response headers>" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.RESPONSE_CODE_OUTPUT + " <Filename to store response code per request>]"
-            + Util.LineSep);
+        builder.append("     [" + ArgProcessor.RESPONSE_CODE_OUTPUT + " <Filename to store response code per request>]" + Util.LineSep);
 
         builder.append("     [" + ArgProcessor.THREAD_COUNT + " <Number of threads>]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.THREAD_REPEAT_COUNT
-            + " <Number of sequential repeated requests per thread>]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.THREAD_REPEAT_COUNT + " <Number of sequential repeated requests per thread>]" + Util.LineSep);
 
         String modeValue = " ";
         for (MultiThreadMode currMode : MultiThreadMode.values())
             modeValue = modeValue + currMode.name() + " | ";
         modeValue = modeValue.substring(0, modeValue.length() - 2);
         builder.append("     [" + ArgProcessor.MULTI_THREAD_MODE + modeValue + "]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.RECORD_META_DATA
-            + " (Record meta data. Stored in <output file>.jget.properties)]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.SOCKET_TIMEOUT + " <Socket timeout in milliseconds for each thread> ]"
-            + Util.LineSep);
-        builder.append("     [" + ArgProcessor.RESPONSE_BODY_TIMEOUT
-            + " <Timeout after which all threads shall abort processing of response body." + Util.LineSep);
+        builder.append("     [" + ArgProcessor.RECORD_META_DATA + " (Record meta data. Stored in <output file>.jget.properties)]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.SOCKET_TIMEOUT + " <Socket timeout in milliseconds for each thread> ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.RESPONSE_BODY_TIMEOUT + " <Timeout after which all threads shall abort processing of response body." + Util.LineSep);
         builder.append("                       Applicable with MSC/MUC only.>" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.DISABLE_FOLLOW_REDIRECT + " (Do not follow redirection. Default=false) ]"
-            + Util.LineSep);
-        builder.append("     [" + ArgProcessor.NON_BLOCKING_REQUEST + " (Send non-blocking request. Default=false) ]"
-            + Util.LineSep);
-        builder.append("     [" + ArgProcessor.DISABLE_ERROR_LOG + " (Disable logging error messages. Default=false) ]"
-            + Util.LineSep);
+        builder.append("     [" + ArgProcessor.DISABLE_FOLLOW_REDIRECT + " (Do not follow redirection. Default=false) ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.NON_BLOCKING_REQUEST + " (Send non-blocking request. Default=false) ]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.DISABLE_ERROR_LOG + " (Disable logging error messages. Default=false) ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.DISABLE_CLIENT_ID
             + " (Do not send the OtdClientId header. Default=false)]" + Util.LineSep);
         System.out.println(builder.toString());

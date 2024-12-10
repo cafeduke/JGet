@@ -354,6 +354,10 @@ public class RequestManager implements Runnable
             if (cmdArg.ciphers != null)
                 params.setCipherSuites(cmdArg.ciphers.split(","));
             params.setProtocols((cmdArg.tlsVersion == null) ? SSL_PARAMS_DEFAULT_PROTOCOLS : new String[] { "TLSv" + cmdArg.tlsVersion });
+
+            if (!cmdArg.listSNI.isEmpty())
+                params.setServerNames(cmdArg.listSNI);
+
             builder.sslParameters(params);
         }
         return builder.build();
