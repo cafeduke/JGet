@@ -46,8 +46,29 @@ List<String> listArg = JGet.newBuilder()
    .build();
 int respCode[] = jget.sendRequest(listArg);
 ```
+# JGet native binary using GraalVM
+This section details the steps to optionally generate a native binary from jget.jar using [GraalVM](https://www.graalvm.org/). If a native binary exists and is placed in `JGet/native` then the JGet scripts shall use the same for a faster request/response cycle.
 
-# JGet as command line utility
+- Download and install [GraalVM](https://www.graalvm.org/downloads/)
+
+- Generate native binary
+
+```bash
+# Add GraalVM software binaries to PATH
+# Verify version
+native-image --version
+native-image 21.0.6 2025-01-21
+GraalVM Runtime Environment Oracle GraalVM 21.0.6+8.1 (build 21.0.6+8-LTS-jvmci-23.1-b55)
+Substrate VM Oracle GraalVM 21.0.6+8.1 (build 21.0.6+8-LTS, serial gc, compressed references)
+
+# Change to JGet install directory
+cd $HOME/Programs/JGet
+
+# Generate native image
+native-image --enable-http --enable-https --enable-all-security-services -jar jget.jar -o native/jget
+```
+
+#  JGet as command line utility
 
 ## HTTP/1.1 request
 
@@ -79,6 +100,33 @@ ResponseCode=200
 > grep "Status" head.txt                                        
 Status: HTTP/2 200 OK
 ```
+## HTTP/1.1 request using native binary
+
+```bash
+> jget -q -u "https://www.google.co.in" -sh -ho head.txt
+-------------------------------------------------------------------------------------------------
+JGet Native
+-------------------------------------------------------------------------------------------------
+[Wed, 05-Feb-2025 08:03:53 pm] Started executing
+ResponseCode=200
+[Wed, 05-Feb-2025 08:03:53 pm] Finished executing
+[Wed, 05-Feb-2025 08:03:53 pm] Time taken = 0.301s
+
+```
+
+## HTTP/2 request using native binary
+
+```bash
+> jget -q -u "https://www.google.co.in" -sh -ho head.txt -http 2
+-------------------------------------------------------------------------------------------------
+JGet Native
+-------------------------------------------------------------------------------------------------
+[Wed, 05-Feb-2025 08:04:36 pm] Started executing
+ResponseCode=200
+[Wed, 05-Feb-2025 08:04:36 pm] Finished executing
+[Wed, 05-Feb-2025 08:04:36 pm] Time taken = 0.251s
+```
+
 ## HTTP/2 requests in parallel
 
 ```bash
