@@ -312,7 +312,7 @@ public class ArgProcessor
     /**
      * The JGet version string
      */
-    public static final String JGET_VERSION_STRING = "1.9";
+    public static final String JGET_VERSION_STRING = "20250205";
     private boolean showVersion = false;
 
     /**

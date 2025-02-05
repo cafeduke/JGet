@@ -4,10 +4,17 @@ BASEDIR=$(dirname $(readlink -f ${0}))
 BASENAME=$(basename ${0})
 JGET_HOME="$(readlink -f ${BASEDIR}/..)"
 
+if [[ -e ${JGET_HOME}/native/jget ]]
+then
+  JGET_PREFIX="${JGET_HOME}/native/jget ${JAVA_OPTIONS}"
+else
+  JGET_PREFIX="${JAVA_HOME}/bin/java ${JAVA_OPTIONS} -jar ${JGET_HOME}/jget.jar"
+fi
+
 if [[ "${#}" == 0 ]]
 then
-  ${JAVA_HOME}/bin/java -jar ${JGET_HOME}/jget.jar
+  ${JGET_PREFIX}
   exit 0
 fi
 
-${JAVA_HOME}/bin/java ${JAVA_OPTIONS} -jar ${JGET_HOME}/jget.jar "$@"
+${JGET_PREFIX} "$@"

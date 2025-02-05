@@ -5,7 +5,7 @@
 
   <groupId>com.github.cafeduke</groupId>
   <artifactId>jget</artifactId>
-  <version>1.9</version>
+  <version>20250205</version>
   <packaging>jar</packaging>
 
   <name>jget</name>
@@ -213,7 +213,7 @@
                 <delete file="${basedir}/jget.zip" />
                 <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${project.build.archive.directory}/jget.jar" />
                 <copy todir="${project.build.archive.directory}">
-                  <fileset dir="${project.basedir}/src/main/resources" includes="bin/*" />
+                  <fileset dir="${project.basedir}/src/main/resources" includes="bin/*,native/*" />
                 </copy>
                 <chmod dir="${project.build.archive.directory}/bin" perm="755" includes="*" />
                 <zip destfile="${basedir}/jget.zip" basedir="${project.build.archive.directory}" />

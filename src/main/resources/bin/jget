@@ -20,26 +20,35 @@ function timeInMilli ()
 # -------------------------------------------------------------------------------------------------
 # Main
 # -------------------------------------------------------------------------------------------------
+if [[ -e ${JGET_HOME}/native/jget ]]
+then
+  JGET_MESSAGE="JGet Native"
+  JGET_PREFIX="${JGET_HOME}/native/jget ${JAVA_OPTIONS}"
+else
+  JGET_MESSAGE="JGet"
+  JGET_PREFIX="${JAVA_HOME}/bin/java ${JAVA_OPTIONS} -jar ${JGET_HOME}/jget.jar"
+fi
+
 
 if [[ "${#}" == 0 ]]
 then
-  ${JAVA_HOME}/bin/java -jar ${JGET_HOME}/jget.jar
+  ${JGET_PREFIX}
   exit 0
 fi
 
 if [[ "${@}" =~ "-rco" ]]
 then
-  ${JAVA_HOME}/bin/java -jar ${JGET_HOME}/jget.jar "$@"
+  ${JGET_PREFIX} "$@"
   exit 0
 fi
 
 echo "-------------------------------------------------------------------------------------------------"
-echo "JGet"
+echo "${JGET_MESSAGE}"
 echo "-------------------------------------------------------------------------------------------------"
 rm -f /tmp/jget.resp.txt
 echo "[$(timestamp)] Started executing"
 tstart=$(timeInMilli)
-${JAVA_HOME}/bin/java ${JAVA_OPTIONS} -jar ${JGET_HOME}/jget.jar -rco /tmp/jget.resp.txt "$@"
+${JGET_PREFIX} -rco /tmp/jget.resp.txt "$@"
 tend=$(timeInMilli)
 if [[ -e /tmp/jget.resp.txt ]]
 then
