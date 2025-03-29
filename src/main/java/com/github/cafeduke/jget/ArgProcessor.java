@@ -301,7 +301,7 @@ public class ArgProcessor
     /**
      * Show usage and exit
      */
-    public static final String HELP = "-h|-help";
+    public static final String HELP = "-help";
     boolean showHelp = false;
 
     /**
@@ -312,7 +312,7 @@ public class ArgProcessor
     /**
      * The JGet version string
      */
-    public static final String JGET_VERSION_STRING = "20250205";
+    public static final String JGET_VERSION_STRING = "20250329";
     private boolean showVersion = false;
 
     /**
@@ -932,8 +932,7 @@ public class ArgProcessor
                     + numberOfThread);
         }
 
-        if (url != null && url.getProtocol()
-            .equalsIgnoreCase("https"))
+        if (url != null && url.getProtocol().equalsIgnoreCase("https"))
             isSSL = true;
 
         /* Keystore */
@@ -1040,6 +1039,7 @@ public class ArgProcessor
         StringBuilder builder = new StringBuilder();
         builder.append("Usage:" + Util.LineSep);
         builder.append("java JGet" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.HELP + "] (Show this help)" + Util.LineSep);
         builder.append("     [" + ArgProcessor.JGET_VERSION + "]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URL + " <URL>]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URI_FILE + " <File having URLs>]" + Util.LineSep);
