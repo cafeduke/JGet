@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.ProxySelector;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.nio.charset.Charset;
@@ -492,8 +493,9 @@ public class RequestManager implements Runnable
      * @param cmdArg An instance of command line arguments
      * @param count Number of SingleClients to create
      * @throws MalformedURLException
+     * @throws URISyntaxException 
      */
-    private void createSingleClients(int count) throws MalformedURLException
+    private void createSingleClients(int count) throws MalformedURLException, URISyntaxException
     {
         client = new SingleClient[count];
 

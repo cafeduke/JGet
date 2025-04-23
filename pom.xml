@@ -5,7 +5,7 @@
 
   <groupId>com.github.cafeduke</groupId>
   <artifactId>jget</artifactId>
-  <version>20250329</version>
+  <version>20250421</version>
   <packaging>jar</packaging>
 
   <name>jget</name>

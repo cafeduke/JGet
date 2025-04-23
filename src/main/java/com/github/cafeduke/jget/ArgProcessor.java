@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URISyntaxException;
+import java.net.*;
 import java.net.http.HttpClient;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -312,7 +314,7 @@ public class ArgProcessor
     /**
      * The JGet version string
      */
-    public static final String JGET_VERSION_STRING = "20250329";
+    public static final String JGET_VERSION_STRING = "20250421";
     private boolean showVersion = false;
 
     /**
@@ -521,7 +523,7 @@ public class ArgProcessor
      * Specifies the current mode of multi-threading.
      */
     public static final String MULTI_THREAD_MODE = "-mode";
-    MultiThreadMode multiThreadMode = MultiThreadMode.SC;
+    MultiThreadMode multiThreadMode = null;
 
     /**
      * Number of threads to be spawned.
@@ -618,8 +620,9 @@ public class ArgProcessor
      * @throws NoSuchAlgorithmException Exceptions parsing arguments
      * @throws CertificateException Exceptions parsing arguments
      * @throws IOException Exceptions parsing arguments
+     * @throws URISyntaxException Exceptions parsing arguments
      */
-    public boolean processArg() throws KeyManagementException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException
+    public boolean processArg() throws KeyManagementException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException, URISyntaxException
     {
         parseArg();
 
@@ -640,7 +643,7 @@ public class ArgProcessor
         return true;
     }
 
-    private void parseArg() throws MalformedURLException, FileNotFoundException
+    private void parseArg() throws MalformedURLException, FileNotFoundException, URISyntaxException
     {
         HttpHeader currHeader = null;
         HttpMethod currMethod = null;
@@ -909,13 +912,22 @@ public class ArgProcessor
                 postBody = "";
         }
 
-        /* Thread modes */
-        if (multiThreadMode == MultiThreadMode.MUC)
-        {
-            if (fileURI == null)
-                dieUsage("Input URI file MUST be specified for mode " + MultiThreadMode.MUC);
-        }
-
+        /* Either -n or -f can be used, NOT both */
+        if (threadCount > 1 && fileURI != null)
+            dieUsage("Either " + THREAD_COUNT + " or " + URI_FILE + " can be specified as argument");
+        
+        /*
+         * Multi thread mode defaults
+         *  - If -n is used then set MSC as mode
+         *  - If -f is used and if user has NOT explicitly specified SC mode, set MUC as mode
+         */
+        if (threadCount > 1)
+            multiThreadMode = MultiThreadMode.MSC;
+        else if (fileURI != null && multiThreadMode != MultiThreadMode.SC)
+            multiThreadMode = MultiThreadMode.MUC;
+        else 
+            multiThreadMode = MultiThreadMode.SC;
+        
         if (multiThreadMode == MultiThreadMode.MSC || multiThreadMode == MultiThreadMode.MUC)
         {
             int numberOfThread = (multiThreadMode == MultiThreadMode.MSC) ? threadCount : FileUtils.readLines(fileURI, Charset.defaultCharset())
@@ -934,6 +946,18 @@ public class ArgProcessor
 
         if (url != null && url.getProtocol().equalsIgnoreCase("https"))
             isSSL = true;
+        
+        // If fileURI is given and if first URI starts with https then it is SSL. 
+        // The file could have relative URIs and user could have used -ssl. In this case, isSSL value is not overridden.
+        if (fileURI != null)
+        {
+            List<String> listURI = Files.readAllLines(fileURI.toPath());
+            if (listURI.isEmpty())
+               dieUsage ("File " + fileURI.getAbsolutePath() + " is empty");
+            
+            if (listURI.getFirst().startsWith("https://"))
+                isSSL = true;            
+        }
 
         /* Keystore */
         if (isSSL)
@@ -974,9 +998,9 @@ public class ArgProcessor
         return null;
     }
 
-    private static URL validateArgUrl(String arg[], int index) throws MalformedURLException
+    private static URL validateArgUrl(String arg[], int index) throws MalformedURLException, URISyntaxException
     {
-        return new URL(Util.getSwitchValue(arg, index));
+        return new URI(Util.getSwitchValue(arg, index)).toURL();
     }
 
     private static int validateArgInteger(String arg[], int index)
@@ -1042,10 +1066,14 @@ public class ArgProcessor
         builder.append("     [" + ArgProcessor.HELP + "] (Show this help)" + Util.LineSep);
         builder.append("     [" + ArgProcessor.JGET_VERSION + "]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.URL + " <URL>]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.URI_FILE + " <File having URLs>]" + Util.LineSep);
+        
+        builder.append("     [" + Util.LineSep);
+        builder.append("        "  + ArgProcessor.URI_FILE + " <File having URLs>" + Util.LineSep);
+        builder.append("        [" + ArgProcessor.MULTI_THREAD_MODE + " " + MultiThreadMode.SC + " (single client mode)]" + Util.LineSep);        
+        builder.append("     ]" + Util.LineSep);
 
         builder.append("     [" + Util.LineSep);
-        builder.append("        " + ArgProcessor.HOST + " <Host name> " + ArgProcessor.PORT + " <Port>" + Util.LineSep);
+        builder.append("        "  + ArgProcessor.HOST + " <Host name> " + ArgProcessor.PORT + " <Port>" + Util.LineSep);
         builder.append("        [" + ArgProcessor.URI_FILE + " <File having URIs>]" + Util.LineSep);
         builder.append("        [" + ArgProcessor.URI + " <URI>]" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
@@ -1091,16 +1119,20 @@ public class ArgProcessor
 
         builder.append("        " + ArgProcessor.HEADER_OUTPUT_FILE + "<Filename to store response headers>" + Util.LineSep);
         builder.append("     ]" + Util.LineSep);
+        
         builder.append("     [" + ArgProcessor.RESPONSE_CODE_OUTPUT + " <Filename to store response code per request>]" + Util.LineSep);
 
-        builder.append("     [" + ArgProcessor.THREAD_COUNT + " <Number of threads>]" + Util.LineSep);
-        builder.append("     [" + ArgProcessor.THREAD_REPEAT_COUNT + " <Number of sequential repeated requests per thread>]" + Util.LineSep);
+        builder.append("     [" + Util.LineSep);        
+        builder.append("        "  + ArgProcessor.THREAD_COUNT + " <Number of threads>" + Util.LineSep);
+        builder.append("        [" + ArgProcessor.THREAD_REPEAT_COUNT + " <Number of sequential repeated requests per thread>]" + Util.LineSep);
+        builder.append("     ]" + Util.LineSep);        
 
         String modeValue = " ";
         for (MultiThreadMode currMode : MultiThreadMode.values())
             modeValue = modeValue + currMode.name() + " | ";
         modeValue = modeValue.substring(0, modeValue.length() - 2);
-        builder.append("     [" + ArgProcessor.MULTI_THREAD_MODE + modeValue + "]" + Util.LineSep);
+        builder.append("     [" + ArgProcessor.MULTI_THREAD_MODE + modeValue + " (Optional. Mode is selected based on other parameters)]" + Util.LineSep);
+        
         builder.append("     [" + ArgProcessor.RECORD_META_DATA + " (Record meta data. Stored in <output file>.jget.properties)]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.SOCKET_TIMEOUT + " <Socket timeout in milliseconds for each thread> ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.RESPONSE_BODY_TIMEOUT + " <Timeout after which all threads shall abort processing of response body." + Util.LineSep);
@@ -1110,6 +1142,7 @@ public class ArgProcessor
         builder.append("     [" + ArgProcessor.DISABLE_ERROR_LOG + " (Disable logging error messages. Default=false) ]" + Util.LineSep);
         builder.append("     [" + ArgProcessor.DISABLE_CLIENT_ID
             + " (Do not send the OtdClientId header. Default=false)]" + Util.LineSep);
+        
         System.out.println(builder.toString());
     }
 }

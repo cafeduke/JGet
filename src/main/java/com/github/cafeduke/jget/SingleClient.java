@@ -16,6 +16,7 @@ import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -160,8 +161,9 @@ public class SingleClient implements Runnable
      * @param httpClient HttpClient object to be used by all SingleClients
      * @param cmdArg Argument object.
      * @throws MalformedURLException Exception if the URL is malformed
+     * @throws URISyntaxException Exception if the URL is malformed
      */
-    public SingleClient(Context context, HttpClient httpClient, ArgProcessor cmdArg) throws MalformedURLException
+    public SingleClient(Context context, HttpClient httpClient, ArgProcessor cmdArg) throws MalformedURLException, URISyntaxException
     {
         this.context = context;
         this.httpClient = httpClient;
@@ -855,8 +857,9 @@ public class SingleClient implements Runnable
      * 
      * @param uri URI to be set. Format {@code /<path prefix>}
      * @throws MalformedURLException If URI is malformed
+     * @throws URISyntaxException If URI is malformed
      */
-    public void setURI(String uri) throws MalformedURLException
+    public void setURI(String uri) throws MalformedURLException, URISyntaxException
     {
         this.url = constructURL(uri);
     }
@@ -875,14 +878,15 @@ public class SingleClient implements Runnable
      * @param URI URI having path prefix
      * @return Constructed URL  
      * @throws MalformedURLException If URI is malformed
+     * @throws URISyntaxException If URI is malformed
      */
-    private URL constructURL(String URI) throws MalformedURLException
+    private URL constructURL(String URI) throws MalformedURLException, URISyntaxException
     {
         if (URI == null)
             throw new IllegalArgumentException("URI cannot be null");
 
         if (URI.startsWith("http://") || URI.startsWith("https://"))
-            return new URL(URI);
+            return new URI(URI).toURL();
 
         URL currURL = null;
         String strSSL = cmdArg.isSSL ? "s" : "";
@@ -893,10 +897,10 @@ public class SingleClient implements Runnable
                 throw new IllegalArgumentException("URI '" + URI + "' is identified as prefix, for which " +
                         "<host> and <port> arguments are needed but NOT found." + Util.LineSep +
                         "Host :" + cmdArg.host + " Port :" + cmdArg.port);
-            currURL = new URL("http" + strSSL + "://" + cmdArg.host + ":" + cmdArg.port + URI);
+            currURL = new URI("http" + strSSL + "://" + cmdArg.host + ":" + cmdArg.port + URI).toURL();
         }
         else
-            currURL = new URL(URI);
+            currURL = new URI(URI).toURL();
         return currURL;
     }
 
